@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Note Recognition Piano Trainer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <button id="settings-toggle" class="settings-toggle" type="button" aria-expanded="false"
+    aria-controls="settings-panel">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.02 7.02 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.23-1.12.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.86a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.4 1.05.72 1.63.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54c.58-.23 1.12-.54 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z" />
+    </svg>
+  </button>
+
+  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M12 3.25a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V4a.75.75 0 0 1 .75-.75Zm6.2 2.05a.75.75 0 0 1 1.06 0l1.06 1.06a.75.75 0 1 1-1.06 1.06L18.2 6.36a.75.75 0 0 1 0-1.06ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm8.75 4.25a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V12a.75.75 0 0 1 .75-.75ZM4 11.25a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V12a.75.75 0 0 1 .75-.75Zm15.26 5.38a.75.75 0 0 1 1.06 1.06l-1.06 1.06a.75.75 0 1 1-1.06-1.06l1.06-1.06ZM6.36 18.2a.75.75 0 0 1 0 1.06L5.3 20.32a.75.75 0 1 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0ZM12 18.75a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75ZM4.74 5.3a.75.75 0 0 1 1.06 0l1.06 1.06a.75.75 0 1 1-1.06 1.06L4.74 6.36a.75.75 0 0 1 0-1.06Z" />
+    </svg>
+  </button>
+
+  <button id="home-button" class="home-button" type="button" aria-label="Return to free roam" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M12 3.5 3.5 10a1 1 0 0 0 1.2 1.6l.8-.6V20a1 1 0 0 0 1 1h4.5a1 1 0 0 0 1-1v-4h2v4a1 1 0 0 0 1 1H18a1 1 0 0 0 1-1v-9l.8.6A1 1 0 1 0 21.5 10L12 3.5Z" />
+    </svg>
+  </button>
+
+  <aside id="settings-panel" class="settings-panel" aria-hidden="true">
+    <h2>Settings</h2>
+    <div class="settings-body">
+      <div class="settings-grid">
+        <div class="control">
+          <label for="note-count">Notes per round</label>
+          <div class="control-row">
+            <input id="note-count" type="range" min="1" max="6" step="1" value="2" />
+            <span class="volume-value" id="note-count-value">2 notes</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <label>Play style</label>
+          <div class="segmented" role="group" aria-label="Play style">
+            <button class="segmented-btn active" type="button" data-mode="simultaneous">Same time</button>
+            <button class="segmented-btn" type="button" data-mode="ascending">Low to high</button>
+          </div>
+        </div>
+
+        <div class="control compact">
+          <label for="blind-mode">Blind mode</label>
+          <div class="control-row">
+            <label class="switch" for="blind-mode">
+              <input id="blind-mode" type="checkbox" />
+              <span class="switch-track">
+                <span class="switch-thumb"></span>
+              </span>
+            </label>
+            <span class="unit">No checks, no replay</span>
+          </div>
+        </div>
+
+        <div class="control compact">
+          <label for="nice-notes">Nice notes</label>
+          <div class="control-row">
+            <label class="switch" for="nice-notes">
+              <input id="nice-notes" type="checkbox" />
+              <span class="switch-track">
+                <span class="switch-thumb"></span>
+              </span>
+            </label>
+            <span class="unit">Only harmonic combos</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <label for="piano-volume">Piano volume</label>
+          <div class="control-row">
+            <input id="piano-volume" type="range" min="0" max="1" step="0.01" value="0.45" />
+            <span class="volume-value" id="volume-value">45%</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <label for="piano-trigger">Piano sound</label>
+          <div class="control-row">
+            <button id="piano-trigger" class="dropdown-trigger" type="button" aria-expanded="false"
+              aria-controls="piano-panel">
+              <span id="piano-label">Classical</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                <path d="M5 7.5 10 12.5 15 7.5" />
+              </svg>
+            </button>
+            <button id="piano-preview-main" class="piano-preview main" type="button" aria-label="Play preview"></button>
+          </div>
+        </div>
+
+        <div class="control">
+          <label for="note-length">Note length</label>
+          <div class="control-row">
+            <input id="note-length" type="range" min="0.4" max="3.0" step="0.1" value="1.0" />
+            <span class="volume-value" id="length-value">1.0s</span>
+          </div>
+          <div class="control-row align-end">
+            <button id="advanced-trigger" class="advanced-trigger" type="button">Advanced</button>
+          </div>
+        </div>
+
+        <div class="control">
+          <label for="key-count">Key count</label>
+          <div class="control-row">
+            <input id="key-count" type="range" min="12" max="36" step="1" value="24" />
+            <span class="volume-value" id="key-count-value">24 keys</span>
+          </div>
+        </div>
+
+        <div class="control">
+          <label>Start note</label>
+          <div class="control-row start-note-row">
+            <div class="start-note-stepper">
+              <button id="start-note-down-oct" class="step-btn oct" type="button"
+                aria-label="Lower start note by octave">&lt;&lt;</button>
+              <button id="start-note-down" class="step-btn" type="button" aria-label="Lower start note">&lt;</button>
+              <span id="start-note-value" class="start-note-value">C3</span>
+              <button id="start-note-up" class="step-btn" type="button" aria-label="Raise start note">&gt;</button>
+              <button id="start-note-up-oct" class="step-btn oct" type="button"
+                aria-label="Raise start note by octave">&gt;&gt;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button id="reset-settings" class="btn ghost" type="button">Reset</button>
+  </aside>
+
+  <section id="advanced-panel" class="advanced-panel" aria-hidden="true">
+    <h3>Advanced</h3>
+    <div class="advanced-grid">
+      <div class="control">
+        <label for="attack-time">Attack (A)</label>
+        <div class="control-row">
+          <input id="attack-time" type="range" min="0.005" max="0.08" step="0.001" value="0.02" />
+          <span class="volume-value" id="attack-value">0.02s</span>
+        </div>
+      </div>
+      <div class="control">
+        <label for="decay-rate">Decay rate (Ks)</label>
+        <div class="control-row">
+          <input id="decay-rate" type="range" min="0.1" max="2" step="0.1" value="0.5" />
+          <span class="volume-value" id="decay-value">0.5</span>
+        </div>
+      </div>
+      <div class="control">
+        <label for="release-rate">Release rate (Kr)</label>
+        <div class="control-row">
+          <input id="release-rate" type="range" min="5" max="30" step="1" value="15" />
+          <span class="volume-value" id="release-value">15</span>
+        </div>
+      </div>
+      <div class="control">
+        <label for="sustain-length">Note length (L)</label>
+        <div class="control-row">
+          <input id="sustain-length" type="range" min="0.4" max="3.0" step="0.1" value="1.0" />
+          <span class="volume-value" id="sustain-value">1.0s</span>
+        </div>
+      </div>
+    </div>
+    <div class="advanced-footer">
+      <button id="test-envelope" class="piano-preview wide" type="button" aria-label="Play test melody">
+        <span class="play-icon" aria-hidden="true"></span>
+        <span class="play-label">Play test melody</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="piano-panel" class="piano-panel" aria-hidden="true">
+    <h3>Piano</h3>
+    <div class="piano-options" id="piano-options"></div>
+  </section>
+
+  <main class="app">
+    <header class="hero">
+      <div class="badge">Piano Ear Lab</div>
+      <h1>Note Recognition Trainer</h1>
+      <p>Listen to the notes, then pick them on the keyboard. Selected keys are blue until you submit.</p>
+    </header>
+
+    <section class="actions">
+      <button id="primary-action" class="btn primary" type="button">New Round (Enter)</button>
+      <button id="play-selected" class="btn ghost" type="button">Play Selected (Space)</button>
+    </section>
+
+    <section class="keyboard-zone">
+      <div class="keyboard-stack">
+        <div class="keyboard-wrapper">
+          <div class="keyboard disabled" id="keyboard">
+            <div class="white-keys" id="white-keys"></div>
+            <div class="black-keys" id="black-keys"></div>
+          </div>
+        </div>
+        <div class="pedal-box">
+          <div class="pedal-label">Pedal</div>
+          <div class="pedal-icon" id="pedal-icon"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="status">
+      <div class="status-row">
+        <div><strong>Round</strong> <span id="round-count">1</span></div>
+        <div><strong>Selected</strong> <span id="selected-list">None</span></div>
+        <div><strong>Goal</strong> <span id="goal-count">2</span> notes</div>
+        <div><strong>Mode</strong> <span id="mode-label">Normal</span></div>
+      </div>
+      <div class="status-actions">
+        <button id="hint-button" class="btn secondary hint-button" type="button">Hint</button>
+      </div>
+      <div class="result" id="result" aria-live="polite"></div>
+      <div class="reveal" id="reveal"></div>
+      <div id="hint-flag" class="hint-flag" hidden>Hint used</div>
+    </section>
+
+    <footer class="tips">
+      Enter starts a round. Space plays your selection during a round.
+      <span id="pedal-tip">Pedal: hold Shift or Ctrl.</span>
+    </footer>
+  </main>
+
+  <script src="js/core.js" defer></script>
+  <script src="js/audio.js" defer></script>
+  <script src="js/game.js" defer></script>
+  <script src="js/settings.js" defer></script>
+  <script src="js/events.js" defer></script>
+</body>
+
+</html>
+
+
+
