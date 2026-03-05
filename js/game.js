@@ -755,6 +755,10 @@ const updateStatus = () => {
                 ? "Press New Round to hear a chord, then play it, type it, or both."
             : "Press New Round to begin.";
         revealEl.textContent = "";
+        if (helperSlotEl) {
+            helperSlotEl.innerHTML = "";
+            helperSlotEl.hidden = true;
+        }
         hintFlag.hidden = true;
         hintButton.hidden = true;
         updateReplayAvailability();
@@ -798,9 +802,15 @@ const updateStatus = () => {
     hintFlag.hidden = !(state.submitted && state.hintUsed);
     updateReplayAvailability();
 
+    const shouldShowHelpers = !state.submitted
+        && getIsChordRound()
+        && Boolean(state.chordExtraHelpers)
+        && Boolean(state.targetChord);
+    if (helperSlotEl) {
+        helperSlotEl.hidden = !shouldShowHelpers;
+        helperSlotEl.innerHTML = shouldShowHelpers ? renderChordHelperBox() : "";
+    }
     if (!state.submitted) {
-        const shouldShowHelpers = getIsChordRound() && Boolean(state.chordExtraHelpers) && Boolean(state.targetChord);
-        resultEl.innerHTML = shouldShowHelpers ? renderChordHelperBox() : "";
         revealEl.textContent = "";
     }
     updateChordReadout();
