@@ -446,7 +446,7 @@ const CHORD_TUTORIAL_STEPS = [
         bodyHtml: `
             <p>Write chords as <strong>Root + Quality</strong>.</p>
             <p>Examples: C, Cm, C7, Cmaj7, Csus4, Cdim, Caug, F#m7, Bbmaj7.</p>
-            <p>Optional: add an octave after root (example: <strong>A#3m</strong>, <strong>C4maj7</strong>). If you include octave, it will be checked.</p>
+            <p>Optional: add octave as a prefix (example: <strong>3A#m</strong>, <strong>4Cmaj7</strong>). If included, octave is checked.</p>
             <p>Buttons are grouped by chord family for clarity; full theory includes extra variants like <strong>m6</strong> and <strong>m9</strong>.</p>
             <p>Typing mode accepts compact forms and spaced forms. Enter submits. Space previews typed input when blind mode is off.</p>
         `,

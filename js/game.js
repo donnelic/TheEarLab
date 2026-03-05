@@ -249,13 +249,13 @@ const parseChordInput = (raw, options = {}) => {
     const input = String(raw ?? "").trim();
     if (!input) return null;
     const normalizedInput = input.replace(/♯/g, "#").replace(/♭/g, "b");
-    const match = normalizedInput.match(/^([A-Ga-g])\s*([#b]?)(-?\d+)?\s*(.*)$/);
+    const match = normalizedInput.match(/^(-?\d+)?\s*([A-Ga-g])\s*([#b]?)\s*(.*)$/);
     if (!match) return null;
 
-    const rootToken = `${match[1].toUpperCase()}${(match[2] || "").toUpperCase()}`;
+    const rootToken = `${match[2].toUpperCase()}${(match[3] || "").toUpperCase()}`;
     const rootPc = CHORD_ROOT_ALIASES[rootToken];
     if (!Number.isFinite(rootPc)) return null;
-    const rootOctave = match[3] !== undefined ? Number.parseInt(match[3], 10) : null;
+    const rootOctave = match[1] !== undefined ? Number.parseInt(match[1], 10) : null;
     const rootMidi = Number.isFinite(rootOctave) ? ((rootOctave + 1) * 12) + rootPc : null;
 
     const qualityToken = normalizeQualityToken(match[4] || "");

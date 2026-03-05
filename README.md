@@ -86,7 +86,7 @@ Browser-based piano ear-training app for note and chord recognition.
   - supports optional visual piano and optional typed-chord key preview.
   - pressing `Space` inside the typing field previews the typed chord when parsing succeeds and blind mode is off; it will not auto-replay target notes when nothing is selected/typed.
   - includes a built-in chord tutorial opened directly from the `?` button in typing mode and from `Game Settings -> Chord tutorial`.
-  - typed chords can optionally include root octave (for example `C4m`, `A#3maj7`); when octave is included, grading checks it.
+- typed chords can optionally include root octave as a prefix (for example `4Cm`, `3A#maj7`); when octave is included, grading checks it.
   - when a typed answer is correct, result key-highlighting uses the target-note mapping so octave placement chosen by typed preview does not produce false "missed notes".
   - tutorial now uses a progressive root/quality matrix: all roots/qualities stay visible, locked items are greyed out until introduced, newly introduced items are highlighted, and each theory step explains specific chord families in plain language.
   - typed chord parsing treats a bare root (for example `F`) as major (`F`), not minor.
