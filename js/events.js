@@ -472,7 +472,7 @@ const tutorialState = {
 let tutorialReturnFocusEl = null;
 
 const isChordTutorialOpen = () => Boolean(chordTutorialModal && !chordTutorialModal.hidden);
-const TUTORIAL_FIT_CLASSES = ["tutorial-fit-1", "tutorial-fit-2", "tutorial-fit-3"];
+const TUTORIAL_FIXED_FIT_CLASS = "tutorial-fit-3";
 
 const fitTutorialLayout = ({ recompute = false } = {}) => {
     if (!isChordTutorialOpen()) return;
@@ -481,7 +481,7 @@ const fitTutorialLayout = ({ recompute = false } = {}) => {
     const tutorialLab = tutorialCard.querySelector(".tutorial-lab");
 
     const clearFitClasses = () => {
-        TUTORIAL_FIT_CLASSES.forEach((className) => tutorialCard.classList.remove(className));
+        ["tutorial-fit-1", "tutorial-fit-2", "tutorial-fit-3"].forEach((className) => tutorialCard.classList.remove(className));
         tutorialCard.classList.remove("tutorial-overflow-scroll");
     };
 
@@ -493,22 +493,9 @@ const fitTutorialLayout = ({ recompute = false } = {}) => {
     };
 
     if (recompute || !tutorialState.fitClass) {
-        let chosenFitClass = "";
-        applyFitClass("");
-        const maxLevel = TUTORIAL_FIT_CLASSES.length;
-        for (let level = 0; level <= maxLevel; level += 1) {
-            if (tutorialCard.scrollHeight <= tutorialCard.clientHeight + 1) {
-                break;
-            }
-            if (level < maxLevel) {
-                chosenFitClass = TUTORIAL_FIT_CLASSES[level];
-                applyFitClass(chosenFitClass);
-            }
-        }
-        tutorialState.fitClass = chosenFitClass;
-    } else {
-        applyFitClass(tutorialState.fitClass);
+        tutorialState.fitClass = TUTORIAL_FIXED_FIT_CLASS;
     }
+    applyFitClass(tutorialState.fitClass);
 
     const cardOverflow = tutorialCard.scrollHeight > tutorialCard.clientHeight + 1;
     const labOverflow = Boolean(tutorialLab && (tutorialLab.scrollHeight > tutorialLab.clientHeight + 1));

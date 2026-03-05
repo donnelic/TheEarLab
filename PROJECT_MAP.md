@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-05 23:24:19 +01:00
+Generated: 2026-03-05 23:27:04 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -36,7 +36,7 @@ Generated: 2026-03-05 23:24:19 +01:00
 | styles.css | CSS | Loaded directly | Yes | 2699 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1517 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 822 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 1541 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 1528 |
 | js/game.js | JavaScript | Browser runtime module | Yes | 1545 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1111 |
 | README.md | Markdown | Human + AI onboarding | Yes | 102 |
@@ -663,48 +663,48 @@ File lines: 1-822
 | rebuildKeyboard | 814-821 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-1541
+File lines: 1-1528
 
 | Symbol | Lines |
 |---|---|
 | isChordTutorialOpen | 474-474 |
-| fitTutorialLayout | 477-518 |
+| fitTutorialLayout | 477-505 |
 | clearFitClasses | 483-486 |
 | applyFitClass | 488-493 |
-| getTutorialStep | 520-525 |
-| getStepUnlockedRootSet | 527-535 |
-| getStepUnlockedQualitySet | 537-543 |
-| isTutorialRootEnabled | 545-545 |
-| isTutorialQualityEnabled | 546-546 |
-| getTutorialRootLabel | 548-551 |
-| midiToTutorialLabel | 553-557 |
-| getClosestNoteIdFromMidi | 559-566 |
-| getTutorialRenderedChord | 568-590 |
-| ensureTutorialKeyboard | 592-630 |
-| getStepAllowedQualityIds | 632-634 |
-| getTutorialActiveSpec | 636-638 |
-| renderTutorialCurrentText | 640-651 |
-| renderTutorialPianoHighlight | 653-687 |
-| renderTutorialRootOptions | 689-707 |
-| renderTutorialQualityOptions | 709-754 |
-| syncTutorialRootChipStates | 756-775 |
-| syncTutorialQualityChipStates | 777-796 |
-| setTutorialHoverSpec | 798-805 |
-| clearTutorialHoverSpec | 807-810 |
-| refreshTutorialVisuals | 812-816 |
-| renderChordTutorialStep | 844-899 |
-| closeChordTutorial | 901-911 |
-| openChordTutorial | 913-930 |
-| registerTutorialOpenTrigger | 932-939 |
-| isChordTypingCaptureActive | 1051-1056 |
-| insertTypedCharacter | 1058-1065 |
-| tryPlayTypedChordPreview | 1067-1070 |
-| triggerPrimaryAction | 1072-1078 |
-| triggerReplayAction | 1080-1086 |
-| bindPianoOptionEvents | 1261-1286 |
-| setRandomBackgroundAngle | 1494-1497 |
-| init | 1499-1535 |
-| runDeferredCatalogLoad | 1519-1528 |
+| getTutorialStep | 507-512 |
+| getStepUnlockedRootSet | 514-522 |
+| getStepUnlockedQualitySet | 524-530 |
+| isTutorialRootEnabled | 532-532 |
+| isTutorialQualityEnabled | 533-533 |
+| getTutorialRootLabel | 535-538 |
+| midiToTutorialLabel | 540-544 |
+| getClosestNoteIdFromMidi | 546-553 |
+| getTutorialRenderedChord | 555-577 |
+| ensureTutorialKeyboard | 579-617 |
+| getStepAllowedQualityIds | 619-621 |
+| getTutorialActiveSpec | 623-625 |
+| renderTutorialCurrentText | 627-638 |
+| renderTutorialPianoHighlight | 640-674 |
+| renderTutorialRootOptions | 676-694 |
+| renderTutorialQualityOptions | 696-741 |
+| syncTutorialRootChipStates | 743-762 |
+| syncTutorialQualityChipStates | 764-783 |
+| setTutorialHoverSpec | 785-792 |
+| clearTutorialHoverSpec | 794-797 |
+| refreshTutorialVisuals | 799-803 |
+| renderChordTutorialStep | 831-886 |
+| closeChordTutorial | 888-898 |
+| openChordTutorial | 900-917 |
+| registerTutorialOpenTrigger | 919-926 |
+| isChordTypingCaptureActive | 1038-1043 |
+| insertTypedCharacter | 1045-1052 |
+| tryPlayTypedChordPreview | 1054-1057 |
+| triggerPrimaryAction | 1059-1065 |
+| triggerReplayAction | 1067-1073 |
+| bindPianoOptionEvents | 1248-1273 |
+| setRandomBackgroundAngle | 1481-1484 |
+| init | 1486-1522 |
+| runDeferredCatalogLoad | 1506-1515 |
 
 Event bindings:
 | Target | Event | Line |
@@ -748,64 +748,64 @@ Event bindings:
 | hintButton | click | 307 |
 | chordAnswerInput | input | 312 |
 | chordAnswerInput | keydown | 319 |
-| triggerEl | click | 934 |
-| chordTutorialClose | click | 946 |
-| chordTutorialBackdrop | click | 953 |
-| chordTutorialPrev | click | 959 |
-| chordTutorialNext | click | 967 |
-| chordTutorialRootList | mouseover | 979 |
-| chordTutorialRootList | mouseleave | 987 |
-| chordTutorialRootList | focusin | 990 |
-| chordTutorialRootList | focusout | 998 |
-| chordTutorialRootList | click | 1001 |
-| chordTutorialQualityList | mouseover | 1017 |
-| chordTutorialQualityList | mouseleave | 1024 |
-| chordTutorialQualityList | focusin | 1027 |
-| chordTutorialQualityList | focusout | 1034 |
-| chordTutorialQualityList | click | 1037 |
-| volumeSlider | dblclick | 1088 |
-| lengthSlider | dblclick | 1092 |
-| keyCountSlider | dblclick | 1096 |
-| startNoteDownButton | click | 1102 |
-| startNoteUpButton | click | 1105 |
-| startNoteDownOctButton | click | 1111 |
-| startNoteUpOctButton | click | 1114 |
-| noteCountInput | dblclick | 1119 |
-| attackSlider | dblclick | 1127 |
-| decaySlider | dblclick | 1131 |
-| releaseSlider | dblclick | 1135 |
-| sustainSlider | dblclick | 1139 |
-| profileSearch | input | 1144 |
-| profileList | click | 1150 |
-| profileList | dblclick | 1155 |
-| profileList | keydown | 1158 |
-| profileApply | click | 1169 |
-| profileSave | click | 1175 |
-| instrumentPresetSearch | input | 1181 |
-| instrumentPresetList | click | 1187 |
-| instrumentPresetList | dblclick | 1192 |
-| instrumentPresetList | keydown | 1195 |
-| instrumentPresetApply | click | 1206 |
-| advancedTrigger | click | 1211 |
-| advancedPanel | click | 1220 |
-| pianoTrigger | click | 1225 |
-| pianoPanel | click | 1237 |
-| instrumentBrowserTrigger | click | 1243 |
-| instrumentBrowserPanel | click | 1256 |
-| pianoOptionsContainer | click | 1264 |
-| pianoOptionsContainer | keydown | 1278 |
-| pianoPreviewMain | click | 1289 |
-| testEnvelopeButton | click | 1296 |
-| keyboardEl | pointerdown | 1301 |
-| document | pointerup | 1337 |
-| document | pointercancel | 1344 |
-| keyboardEl | click | 1351 |
-| document | keydown | 1355 |
-| document | keyup | 1442 |
-| pedalBox | pointerdown | 1461 |
-| pedalBox | pointerup | 1470 |
-| pedalBox | pointercancel | 1479 |
-| pedalBox | pointerleave | 1487 |
+| triggerEl | click | 921 |
+| chordTutorialClose | click | 933 |
+| chordTutorialBackdrop | click | 940 |
+| chordTutorialPrev | click | 946 |
+| chordTutorialNext | click | 954 |
+| chordTutorialRootList | mouseover | 966 |
+| chordTutorialRootList | mouseleave | 974 |
+| chordTutorialRootList | focusin | 977 |
+| chordTutorialRootList | focusout | 985 |
+| chordTutorialRootList | click | 988 |
+| chordTutorialQualityList | mouseover | 1004 |
+| chordTutorialQualityList | mouseleave | 1011 |
+| chordTutorialQualityList | focusin | 1014 |
+| chordTutorialQualityList | focusout | 1021 |
+| chordTutorialQualityList | click | 1024 |
+| volumeSlider | dblclick | 1075 |
+| lengthSlider | dblclick | 1079 |
+| keyCountSlider | dblclick | 1083 |
+| startNoteDownButton | click | 1089 |
+| startNoteUpButton | click | 1092 |
+| startNoteDownOctButton | click | 1098 |
+| startNoteUpOctButton | click | 1101 |
+| noteCountInput | dblclick | 1106 |
+| attackSlider | dblclick | 1114 |
+| decaySlider | dblclick | 1118 |
+| releaseSlider | dblclick | 1122 |
+| sustainSlider | dblclick | 1126 |
+| profileSearch | input | 1131 |
+| profileList | click | 1137 |
+| profileList | dblclick | 1142 |
+| profileList | keydown | 1145 |
+| profileApply | click | 1156 |
+| profileSave | click | 1162 |
+| instrumentPresetSearch | input | 1168 |
+| instrumentPresetList | click | 1174 |
+| instrumentPresetList | dblclick | 1179 |
+| instrumentPresetList | keydown | 1182 |
+| instrumentPresetApply | click | 1193 |
+| advancedTrigger | click | 1198 |
+| advancedPanel | click | 1207 |
+| pianoTrigger | click | 1212 |
+| pianoPanel | click | 1224 |
+| instrumentBrowserTrigger | click | 1230 |
+| instrumentBrowserPanel | click | 1243 |
+| pianoOptionsContainer | click | 1251 |
+| pianoOptionsContainer | keydown | 1265 |
+| pianoPreviewMain | click | 1276 |
+| testEnvelopeButton | click | 1283 |
+| keyboardEl | pointerdown | 1288 |
+| document | pointerup | 1324 |
+| document | pointercancel | 1331 |
+| keyboardEl | click | 1338 |
+| document | keydown | 1342 |
+| document | keyup | 1429 |
+| pedalBox | pointerdown | 1448 |
+| pedalBox | pointerup | 1457 |
+| pedalBox | pointercancel | 1466 |
+| pedalBox | pointerleave | 1474 |
 
 ### js/game.js (Active Runtime)
 File lines: 1-1545
