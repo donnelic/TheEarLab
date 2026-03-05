@@ -25,6 +25,15 @@ segmentedButtons.forEach((button) => {
     });
 });
 
+quickModeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        const mode = String(button.dataset.quickMode ?? "").trim();
+        if (!["random", "nice", "chord"].includes(mode)) return;
+        setPracticeMode(mode);
+        void startRound(true);
+    });
+});
+
 blindToggle.addEventListener("change", (event) => {
     state.blindMode = event.target.checked;
     handleCriticalSettingChange(200);

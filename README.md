@@ -63,6 +63,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - First playback now gates on selected instrument readiness to avoid "short/cut first notes" while SF2 assets are still warming up.
 
 ## Chord Training Modes
+- Landing page now includes quick-start cards for `Random Notes`, `Harmonic Notes`, and `Chord Practice`; pressing `Enter` still starts a round with your last-used mode profile.
 - Default behavior remains classic note training (`Training mode = Keyboard Select`, `Chord rounds = off`).
 - Settings now use one `Practice mode` selector:
   - `Random Notes`: classic random note rounds,
