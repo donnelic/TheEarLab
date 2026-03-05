@@ -753,6 +753,48 @@ const renderTutorialQualityOptions = () => {
     `;
 };
 
+const syncTutorialRootChipStates = () => {
+    if (!chordTutorialRootList) return;
+    const unlockedRoots = getStepUnlockedRootSet();
+    chordTutorialRootList.querySelectorAll("[data-root-pc]").forEach((chip) => {
+        const rootPc = Number.parseInt(chip.dataset.rootPc ?? "", 10);
+        const unlocked = Number.isFinite(rootPc) && unlockedRoots.has(rootPc);
+        const active = unlocked && rootPc === tutorialState.rootPc;
+        chip.classList.toggle("unlocked", unlocked);
+        chip.classList.toggle("locked", !unlocked);
+        chip.classList.toggle("muted", !unlocked);
+        chip.classList.toggle("active", active);
+        chip.classList.toggle("newly-unlocked", unlocked && tutorialState.pendingNewRoots.has(rootPc));
+        chip.disabled = !unlocked;
+        if (!unlocked) {
+            chip.setAttribute("aria-disabled", "true");
+        } else {
+            chip.removeAttribute("aria-disabled");
+        }
+    });
+};
+
+const syncTutorialQualityChipStates = () => {
+    if (!chordTutorialQualityList) return;
+    const unlockedQualities = getStepUnlockedQualitySet();
+    chordTutorialQualityList.querySelectorAll("[data-quality-id]").forEach((chip) => {
+        const qualityId = String(chip.dataset.qualityId ?? "");
+        const unlocked = unlockedQualities.has(qualityId);
+        const active = unlocked && qualityId === tutorialState.qualityId;
+        chip.classList.toggle("unlocked", unlocked);
+        chip.classList.toggle("locked", !unlocked);
+        chip.classList.toggle("muted", !unlocked);
+        chip.classList.toggle("active", active);
+        chip.classList.toggle("newly-unlocked", unlocked && tutorialState.pendingNewQualities.has(qualityId));
+        chip.disabled = !unlocked;
+        if (!unlocked) {
+            chip.setAttribute("aria-disabled", "true");
+        } else {
+            chip.removeAttribute("aria-disabled");
+        }
+    });
+};
+
 const setTutorialHoverSpec = (rootPc, qualityId) => {
     if (!Number.isFinite(rootPc) || !TUTORIAL_QUALITY_BY_ID.has(qualityId)) return;
     tutorialState.hoverSpec = {
@@ -965,7 +1007,7 @@ if (chordTutorialRootList) {
         tutorialState.pendingNewRoots.delete(((rootPc % 12) + 12) % 12);
         tutorialState.rootPc = ((rootPc % 12) + 12) % 12;
         tutorialState.hoverSpec = null;
-        renderTutorialRootOptions();
+        syncTutorialRootChipStates();
         refreshTutorialVisuals();
         playTutorialChordSpec({ rootPc: tutorialState.rootPc, qualityId: tutorialState.qualityId });
     });
@@ -1000,7 +1042,7 @@ if (chordTutorialQualityList) {
         tutorialState.pendingNewQualities.delete(qualityId);
         tutorialState.qualityId = qualityId;
         tutorialState.hoverSpec = null;
-        renderTutorialQualityOptions();
+        syncTutorialQualityChipStates();
         refreshTutorialVisuals();
         playTutorialChordSpec({ rootPc: tutorialState.rootPc, qualityId: tutorialState.qualityId });
     });
