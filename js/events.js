@@ -32,6 +32,14 @@ blindToggle.addEventListener("change", (event) => {
     saveSettings();
 });
 
+if (hideLivePreviewToggle) {
+    hideLivePreviewToggle.addEventListener("change", (event) => {
+        state.hideLivePreview = Boolean(event.target.checked);
+        updateStatus();
+        saveSettings();
+    });
+}
+
 niceNotesToggle.addEventListener("change", (event) => {
     if (event.target.checked) {
         setPracticeMode("nice");
@@ -215,6 +223,9 @@ window.addEventListener("resize", () => {
     if (instrumentBrowserPanel?.classList.contains("open")) {
         positionInstrumentBrowserPanel();
     }
+    if (isChordTutorialOpen()) {
+        fitTutorialLayout();
+    }
 });
 
 playSelectedButton.addEventListener("click", () => {
@@ -312,16 +323,6 @@ if (chordAnswerInput) {
     });
 }
 
-if (typingHelpToggle && typingHelpText) {
-    typingHelpToggle.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const show = typingHelpText.hidden;
-        typingHelpText.hidden = !show;
-        typingHelpToggle.setAttribute("aria-expanded", show ? "true" : "false");
-    });
-}
-
 const TUTORIAL_ROOTS = [
     { pc: 0, label: "C" },
     { pc: 1, label: "C#" },
@@ -340,100 +341,160 @@ const TUTORIAL_ROOTS = [
 const TUTORIAL_QUALITIES = [
     { id: "maj", label: "Major", suffix: "", intervals: [0, 4, 7], roles: ["R", "3", "5"] },
     { id: "min", label: "Minor", suffix: "m", intervals: [0, 3, 7], roles: ["R", "b3", "5"] },
+    { id: "power5", label: "Power chord", suffix: "5", intervals: [0, 7], roles: ["R", "5"] },
     { id: "maj7", label: "Major 7", suffix: "maj7", intervals: [0, 4, 7, 11], roles: ["R", "3", "5", "7"] },
     { id: "m7", label: "Minor 7", suffix: "m7", intervals: [0, 3, 7, 10], roles: ["R", "b3", "5", "b7"] },
     { id: "dom7", label: "Dominant 7", suffix: "7", intervals: [0, 4, 7, 10], roles: ["R", "3", "5", "b7"] },
     { id: "nine", label: "Dominant 9", suffix: "9", intervals: [0, 4, 7, 10, 14], roles: ["R", "3", "5", "b7", "9"] },
+    { id: "maj9", label: "Major 9", suffix: "maj9", intervals: [0, 4, 7, 11, 14], roles: ["R", "3", "5", "7", "9"] },
+    { id: "m9", label: "Minor 9", suffix: "m9", intervals: [0, 3, 7, 10, 14], roles: ["R", "b3", "5", "b7", "9"] },
     { id: "six", label: "Major 6", suffix: "6", intervals: [0, 4, 7, 9], roles: ["R", "3", "5", "6"] },
+    { id: "m6", label: "Minor 6", suffix: "m6", intervals: [0, 3, 7, 9], roles: ["R", "b3", "5", "6"] },
+    { id: "add9", label: "Add9", suffix: "add9", intervals: [0, 2, 4, 7], roles: ["R", "2", "3", "5"] },
     { id: "sus2", label: "Sus2", suffix: "sus2", intervals: [0, 2, 7], roles: ["R", "2", "5"] },
     { id: "sus4", label: "Sus4", suffix: "sus4", intervals: [0, 5, 7], roles: ["R", "4", "5"] },
     { id: "dim", label: "Diminished", suffix: "dim", intervals: [0, 3, 6], roles: ["R", "b3", "b5"] },
-    { id: "aug", label: "Augmented", suffix: "aug", intervals: [0, 4, 8], roles: ["R", "3", "#5"] },
-    { id: "power5", label: "Power chord", suffix: "5", intervals: [0, 7], roles: ["R", "5"] }
+    { id: "aug", label: "Augmented", suffix: "aug", intervals: [0, 4, 8], roles: ["R", "3", "#5"] }
 ];
 
 const TUTORIAL_QUALITY_BY_ID = new Map(TUTORIAL_QUALITIES.map((entry) => [entry.id, entry]));
-const TUTORIAL_DEFAULT_QUALITY_IDS = ["maj", "min", "maj7", "m7", "dom7", "sus2", "sus4", "dim", "aug", "power5"];
+const TUTORIAL_ALL_ROOT_PCS = TUTORIAL_ROOTS.map((entry) => entry.pc);
+const TUTORIAL_ALL_QUALITY_IDS = TUTORIAL_QUALITIES.map((entry) => entry.id);
+const TUTORIAL_QUALITY_GROUPS = [
+    { label: "Core Triads", ids: ["maj", "min", "power5"] },
+    { label: "Suspended", ids: ["sus2", "sus4"] },
+    { label: "6th / 7th", ids: ["six", "m6", "maj7", "m7", "dom7"] },
+    { label: "9th / Add", ids: ["nine", "maj9", "m9", "add9"] },
+    { label: "Altered", ids: ["dim", "aug"] }
+];
 const TUTORIAL_MIDI_START = 48; // C3
-const TUTORIAL_MIDI_END = 72; // C5
+const TUTORIAL_MIDI_END = 86; // D6 (keeps C4-B4 roots stable while still fitting 9th extensions)
+const TUTORIAL_FIXED_ROOT_PC = 0; // C
+const TUTORIAL_FIXED_ROOT_MIDI = 60; // C4
 
 const CHORD_TUTORIAL_STEPS = [
     {
-        title: "1. Root Note",
-        body: "The first part of a chord name is the root note (A-G). Pick roots below and compare how the same quality moves on the piano.",
-        qualityIds: ["maj"],
-        examples: [
-            { rootPc: 0, qualityId: "maj" },
-            { rootPc: 9, qualityId: "maj" },
-            { rootPc: 5, qualityId: "maj" }
-        ]
+        title: "1. Notes and Semitones",
+        bodyHtml: `
+            <p>A semitone is one adjacent key on the piano. Chords are built by stacking semitone distances above a root.</p>
+            <p>Start on root <strong>C</strong> and try a few basic chord qualities to hear how one changed note changes the sound.</p>
+        `,
+        unlockedRootPcs: [0],
+        unlockedQualityIds: ["maj", "min", "power5", "sus2", "sus4"]
     },
     {
-        title: "2. Accidentals",
-        body: "After the root, you can add accidentals: # (sharp) or b (flat). They shift the root by one semitone.",
-        qualityIds: ["maj", "min"],
-        examples: [
-            { rootPc: 6, qualityId: "maj" },
-            { rootPc: 10, qualityId: "maj" },
-            { rootPc: 1, qualityId: "min" },
-            { rootPc: 3, qualityId: "min" }
-        ]
+        title: "2. Scales and Comparison",
+        bodyHtml: `
+            <p><strong>W</strong> means a whole step (2 keys/semitones). <strong>H</strong> means a half step (1 key/semitone).</p>
+            <p>A major scale follows the pattern <strong>W-W-H-W-W-W-H</strong>, which means: move 2, 2, 1, 2, 2, 2, 1 keys.</p>
+            <p>In C major, this lines up with the white keys: C, D, E, F, G, A, B.</p>
+            <p>Now compare roots <strong>C</strong>, <strong>C#</strong>, and <strong>D</strong> with the same quality to hear transposition clearly.</p>
+        `,
+        unlockedRootPcs: [0, 1, 2],
+        unlockedQualityIds: ["maj", "min", "power5", "sus2", "sus4"]
     },
     {
-        title: "3. Major vs Minor",
-        body: "No suffix means major. Use m for minor. The big difference is the 3rd (major 3 vs minor 3).",
-        qualityIds: ["maj", "min"],
-        examples: [
-            { rootPc: 0, qualityId: "maj" },
-            { rootPc: 0, qualityId: "min" },
-            { rootPc: 6, qualityId: "min" }
-        ]
+        title: "3. Major and Minor Triads",
+        bodyHtml: `
+            <p>A triad is root + 3rd + 5th.</p>
+            <p><strong>Major</strong>: 0, 4, 7 semitones. <strong>Minor</strong>: 0, 3, 7 semitones.</p>
+            <p>Use the newly enabled roots to compare how the same formula sounds in different keys.</p>
+        `,
+        unlockedRootPcs: [0, 1, 2, 4, 7],
+        unlockedQualityIds: ["maj", "min"]
     },
     {
-        title: "4. Common Extensions",
-        body: "Then you can extend the chord: 7, maj7, m7, 9, 6 and more. Hover examples to preview the chord tones.",
-        qualityIds: ["maj7", "m7", "dom7", "nine", "six"],
-        examples: [
-            { rootPc: 7, qualityId: "dom7" },
-            { rootPc: 0, qualityId: "maj7" },
-            { rootPc: 2, qualityId: "m7" },
-            { rootPc: 9, qualityId: "nine" }
-        ]
+        title: "4. Suspended and Power Chords",
+        bodyHtml: `
+            <p><strong>Sus2</strong> replaces the 3rd with a 2nd: 0, 2, 7.</p>
+            <p><strong>Sus4</strong> replaces the 3rd with a 4th: 0, 5, 7.</p>
+            <p><strong>Power chord</strong> keeps only root and 5th: 0, 7.</p>
+        `,
+        unlockedRootPcs: [0, 1, 2, 4, 5, 7, 9],
+        unlockedQualityIds: ["maj", "min", "sus2", "sus4", "power5"]
     },
     {
-        title: "5. Color Chords",
-        body: "Other common colors are sus2/sus4, diminished, augmented, and power chords.",
-        qualityIds: ["sus2", "sus4", "dim", "aug", "power5"],
-        examples: [
-            { rootPc: 2, qualityId: "sus4" },
-            { rootPc: 11, qualityId: "dim" },
-            { rootPc: 4, qualityId: "aug" },
-            { rootPc: 9, qualityId: "power5" }
-        ]
+        title: "5. Diminished and Augmented",
+        bodyHtml: `
+            <p><strong>Diminished (dim)</strong>: 0, b3, b5. Example: Cdim = C-Eb-Gb.</p>
+            <p><strong>Augmented (aug)</strong>: 0, 3, #5. Example: Caug = C-E-G#.</p>
+            <p>These are tense colors used for motion and resolution.</p>
+        `,
+        unlockedRootPcs: [0, 1, 2, 4, 5, 7, 9, 11],
+        unlockedQualityIds: ["maj", "min", "sus2", "sus4", "power5", "dim", "aug"]
     },
     {
-        title: "6. Input Tips",
-        body: "Accepted input is flexible: Cmaj7, C major 7, Bb min7, and F sharp minor are all valid. Enter submits; Space previews typed chord (when blind mode is off).",
-        qualityIds: TUTORIAL_DEFAULT_QUALITY_IDS,
-        examples: [
-            { rootPc: 0, qualityId: "maj7" },
-            { rootPc: 10, qualityId: "m7" },
-            { rootPc: 6, qualityId: "min" },
-            { rootPc: 5, qualityId: "sus2" }
-        ]
+        title: "6. 6th and 7th Chords",
+        bodyHtml: `
+            <p><strong>6</strong> adds scale degree 6. <strong>maj7</strong>, <strong>m7</strong>, and <strong>7</strong> add different 7ths.</p>
+            <p>All root notes are now available so you can transpose every formula across the keyboard.</p>
+        `,
+        unlockedRootPcs: [...TUTORIAL_ALL_ROOT_PCS],
+        unlockedQualityIds: ["maj", "min", "sus2", "sus4", "power5", "dim", "aug", "six", "m6", "maj7", "m7", "dom7"]
+    },
+    {
+        title: "7. Extensions (9th)",
+        bodyHtml: `
+            <p><strong>9</strong> keeps the dominant 7 shell and adds the 9th on top.</p>
+            <p>Example: C9 = C-E-G-Bb-D. Try different roots and compare the added color.</p>
+        `,
+        unlockedRootPcs: [...TUTORIAL_ALL_ROOT_PCS],
+        unlockedQualityIds: [...TUTORIAL_ALL_QUALITY_IDS]
+    },
+    {
+        title: "8. Chord Name Format",
+        bodyHtml: `
+            <p>Write chords as <strong>Root + Quality</strong>.</p>
+            <p>Examples: C, Cm, C7, Cmaj7, Csus4, Cdim, Caug, F#m7, Bbmaj7.</p>
+            <p>Buttons are grouped by chord family for clarity; full theory includes extra variants like <strong>m6</strong> and <strong>m9</strong>.</p>
+            <p>Typing mode accepts compact forms and spaced forms. Enter submits. Space previews typed input when blind mode is off.</p>
+        `,
+        unlockedRootPcs: [...TUTORIAL_ALL_ROOT_PCS],
+        unlockedQualityIds: [...TUTORIAL_ALL_QUALITY_IDS]
     }
 ];
 
 const tutorialState = {
     stepIndex: 0,
+    previousStepIndex: 0,
     rootPc: 0,
     qualityId: "maj",
     hoverSpec: null,
+    previousUnlockedRootPcs: new Set(),
+    previousUnlockedQualityIds: new Set(),
+    pendingNewRoots: new Set(),
+    pendingNewQualities: new Set(),
     keySpecs: [],
-    keyElsByMidi: new Map()
+    keyElsByMidi: new Map(),
+    previewToken: 0
 };
+let tutorialReturnFocusEl = null;
 
 const isChordTutorialOpen = () => Boolean(chordTutorialModal && !chordTutorialModal.hidden);
+const TUTORIAL_FIT_CLASSES = ["tutorial-fit-1", "tutorial-fit-2", "tutorial-fit-3"];
+
+const fitTutorialLayout = () => {
+    if (!isChordTutorialOpen()) return;
+    const tutorialCard = chordTutorialModal?.querySelector(".tutorial-card");
+    if (!tutorialCard) return;
+    const tutorialLab = tutorialCard.querySelector(".tutorial-lab");
+    TUTORIAL_FIT_CLASSES.forEach((className) => tutorialCard.classList.remove(className));
+    tutorialCard.classList.remove("tutorial-overflow-scroll");
+    const maxLevel = TUTORIAL_FIT_CLASSES.length;
+    for (let level = 0; level <= maxLevel; level += 1) {
+        if (tutorialCard.scrollHeight <= tutorialCard.clientHeight + 1) {
+            break;
+        }
+        if (level < maxLevel) {
+            tutorialCard.classList.add(TUTORIAL_FIT_CLASSES[level]);
+        }
+    }
+    const cardOverflow = tutorialCard.scrollHeight > tutorialCard.clientHeight + 1;
+    const labOverflow = Boolean(tutorialLab && (tutorialLab.scrollHeight > tutorialLab.clientHeight + 1));
+    if (cardOverflow || labOverflow) {
+        tutorialCard.classList.add("tutorial-overflow-scroll");
+    }
+};
 
 const getTutorialStep = () => {
     const total = CHORD_TUTORIAL_STEPS.length;
@@ -442,16 +503,30 @@ const getTutorialStep = () => {
     return CHORD_TUTORIAL_STEPS[safeIndex];
 };
 
+const getStepUnlockedRootSet = () => {
+    const step = getTutorialStep();
+    const rootPcs = Array.isArray(step?.unlockedRootPcs) ? step.unlockedRootPcs : [TUTORIAL_FIXED_ROOT_PC];
+    const normalized = rootPcs
+        .map((value) => ((Math.round(Number(value)) % 12) + 12) % 12)
+        .filter((value) => Number.isFinite(value));
+    if (!normalized.length) return new Set([TUTORIAL_FIXED_ROOT_PC]);
+    return new Set(normalized);
+};
+
+const getStepUnlockedQualitySet = () => {
+    const step = getTutorialStep();
+    const qualityIds = Array.isArray(step?.unlockedQualityIds) ? step.unlockedQualityIds : ["maj"];
+    const filtered = qualityIds.filter((qualityId) => TUTORIAL_QUALITY_BY_ID.has(qualityId));
+    if (!filtered.length) return new Set(["maj"]);
+    return new Set(filtered);
+};
+
+const isTutorialRootEnabled = (rootPc) => getStepUnlockedRootSet().has(((Math.round(Number(rootPc)) % 12) + 12) % 12);
+const isTutorialQualityEnabled = (qualityId) => getStepUnlockedQualitySet().has(String(qualityId ?? ""));
+
 const getTutorialRootLabel = (pitchClass) => {
     const normalized = ((Math.round(pitchClass) % 12) + 12) % 12;
     return TUTORIAL_ROOTS.find((entry) => entry.pc === normalized)?.label ?? "C";
-};
-
-const getTutorialChordLabel = (spec) => {
-    if (!spec) return "C";
-    const quality = TUTORIAL_QUALITY_BY_ID.get(spec.qualityId);
-    const rootLabel = getTutorialRootLabel(spec.rootPc);
-    return `${rootLabel}${quality?.suffix ?? ""}`;
 };
 
 const midiToTutorialLabel = (midi) => {
@@ -473,20 +548,19 @@ const getTutorialRenderedChord = (spec) => {
     if (!spec) return null;
     const quality = TUTORIAL_QUALITY_BY_ID.get(spec.qualityId);
     if (!quality) return null;
-    const rootPc = ((Math.round(spec.rootPc) % 12) + 12) % 12;
-    let rootMidi = 60 + rootPc;
-    while (rootMidi > 66) rootMidi -= 12;
-    while (rootMidi < 52) rootMidi += 12;
-    const midis = quality.intervals.map((interval) => rootMidi + interval);
-    while (Math.max(...midis) > TUTORIAL_MIDI_END) {
-        for (let i = 0; i < midis.length; i += 1) midis[i] -= 12;
-    }
-    while (Math.min(...midis) < TUTORIAL_MIDI_START) {
-        for (let i = 0; i < midis.length; i += 1) midis[i] += 12;
-    }
+    const requestedRootPc = ((Math.round(Number(spec.rootPc ?? TUTORIAL_FIXED_ROOT_PC)) % 12) + 12) % 12;
+    const rootPc = isTutorialRootEnabled(requestedRootPc) ? requestedRootPc : TUTORIAL_FIXED_ROOT_PC;
+
+    // Keep root start position stable: C4..B4 for all qualities.
+    const rootMidi = TUTORIAL_FIXED_ROOT_MIDI + rootPc;
+
+    const midis = quality.intervals
+        .map((interval) => rootMidi + interval)
+        .filter((midi) => midi >= TUTORIAL_MIDI_START && midi <= TUTORIAL_MIDI_END);
     const noteIds = Array.from(new Set(midis.map((midi) => getClosestNoteIdFromMidi(midi)).filter(Boolean)));
     return {
         rootPc,
+        rootMidi,
         quality,
         label: `${getTutorialRootLabel(rootPc)}${quality.suffix}`,
         midis,
@@ -535,11 +609,7 @@ const ensureTutorialKeyboard = () => {
 };
 
 const getStepAllowedQualityIds = () => {
-    const step = getTutorialStep();
-    const qualityIds = Array.isArray(step?.qualityIds) && step.qualityIds.length
-        ? step.qualityIds.filter((id) => TUTORIAL_QUALITY_BY_ID.has(id))
-        : TUTORIAL_DEFAULT_QUALITY_IDS;
-    return qualityIds.length ? qualityIds : ["maj"];
+    return TUTORIAL_ALL_QUALITY_IDS.filter((qualityId) => TUTORIAL_QUALITY_BY_ID.has(qualityId));
 };
 
 const getTutorialActiveSpec = () => {
@@ -555,9 +625,8 @@ const renderTutorialCurrentText = () => {
         return;
     }
     const qualityLabel = rendered.quality.label;
-    const tones = rendered.midis.map((midi) => midiToTutorialLabel(midi)).join(" - ");
-    const hoverSuffix = tutorialState.hoverSpec ? " (hover preview)" : "";
-    chordTutorialCurrent.textContent = `Current chord: ${rendered.label} (${qualityLabel}) | Tones: ${tones}${hoverSuffix}`;
+    const notesText = rendered.midis.map((midi) => midiToTutorialLabel(midi)).join(" - ");
+    chordTutorialCurrent.textContent = `Current chord: ${rendered.label} (${qualityLabel}) | Notes: ${notesText}`;
 };
 
 const renderTutorialPianoHighlight = () => {
@@ -582,39 +651,83 @@ const renderTutorialPianoHighlight = () => {
 
 const renderTutorialRootOptions = () => {
     if (!chordTutorialRootList) return;
+    const unlockedRoots = getStepUnlockedRootSet();
+    if (!unlockedRoots.has(tutorialState.rootPc)) {
+        tutorialState.rootPc = unlockedRoots.values().next().value ?? TUTORIAL_FIXED_ROOT_PC;
+    }
     chordTutorialRootList.innerHTML = TUTORIAL_ROOTS.map((entry) => {
-        const active = entry.pc === tutorialState.rootPc;
-        return `<button class="tutorial-chip ${active ? "active" : ""}" type="button" data-root-pc="${entry.pc}">${entry.label}</button>`;
+        const unlocked = unlockedRoots.has(entry.pc);
+        const active = unlocked && entry.pc === tutorialState.rootPc;
+        const classes = [
+            "tutorial-chip",
+            unlocked ? "unlocked" : "locked",
+            active ? "active" : "",
+            unlocked ? "" : "muted",
+            tutorialState.pendingNewRoots.has(entry.pc) ? "newly-unlocked" : ""
+        ].filter(Boolean).join(" ");
+        return `<button class="${classes}" type="button" data-root-pc="${entry.pc}" ${unlocked ? "" : 'aria-disabled="true" disabled'}>${entry.label}</button>`;
     }).join("");
 };
 
 const renderTutorialQualityOptions = () => {
     if (!chordTutorialQualityList) return;
-    const allowed = getStepAllowedQualityIds();
-    if (!allowed.includes(tutorialState.qualityId)) {
-        tutorialState.qualityId = allowed[0];
+    const unlockedQualities = getStepUnlockedQualitySet();
+    if (!unlockedQualities.has(tutorialState.qualityId)) {
+        tutorialState.qualityId = unlockedQualities.values().next().value ?? "maj";
     }
-    chordTutorialQualityList.innerHTML = allowed.map((qualityId) => {
-        const quality = TUTORIAL_QUALITY_BY_ID.get(qualityId);
-        if (!quality) return "";
-        const active = qualityId === tutorialState.qualityId;
-        return `<button class="tutorial-chip ${active ? "active" : ""}" type="button" data-quality-id="${qualityId}">${quality.label}</button>`;
+    const allowed = new Set(getStepAllowedQualityIds());
+    const grouped = TUTORIAL_QUALITY_GROUPS.map((group) => ({
+        label: group.label,
+        ids: group.ids.filter((qualityId) => allowed.has(qualityId) && TUTORIAL_QUALITY_BY_ID.has(qualityId))
+    })).filter((group) => group.ids.length);
+    const covered = new Set(grouped.flatMap((group) => group.ids));
+    const remaining = Array.from(allowed).filter((qualityId) => !covered.has(qualityId));
+    if (remaining.length) {
+        grouped.push({ label: "Other", ids: remaining });
+    }
+
+    const rows = grouped.map((group) => {
+        const chips = group.ids.map((qualityId) => {
+            const quality = TUTORIAL_QUALITY_BY_ID.get(qualityId);
+            if (!quality) return "";
+            const unlocked = unlockedQualities.has(qualityId);
+            const active = unlocked && qualityId === tutorialState.qualityId;
+            const classes = [
+                "tutorial-chip",
+                unlocked ? "unlocked" : "locked",
+                active ? "active" : "",
+                unlocked ? "" : "muted",
+                tutorialState.pendingNewQualities.has(qualityId) ? "newly-unlocked" : ""
+            ].filter(Boolean).join(" ");
+            return `<button class="${classes}" type="button" data-quality-id="${qualityId}" ${unlocked ? "" : 'aria-disabled="true" disabled'}>${quality.label}</button>`;
+        }).join("");
+        return `
+            <tr>
+                <th scope="row">${group.label}</th>
+                <td><div class="tutorial-chip-group-list">${chips}</div></td>
+            </tr>
+        `;
     }).join("");
+
+    chordTutorialQualityList.innerHTML = `
+        <table class="tutorial-quality-table">
+            <tbody>${rows}</tbody>
+        </table>
+    `;
 };
 
-const renderTutorialExampleOptions = () => {
-    if (!chordTutorialExamples) return;
-    const step = getTutorialStep();
-    const examples = Array.isArray(step?.examples) ? step.examples : [];
-    if (!examples.length) {
-        chordTutorialExamples.innerHTML = '<span class="tutorial-chip muted">No examples for this step.</span>';
-        return;
-    }
-    chordTutorialExamples.innerHTML = examples.map((entry) => {
-        const safeQualityId = TUTORIAL_QUALITY_BY_ID.has(entry.qualityId) ? entry.qualityId : "maj";
-        const label = getTutorialChordLabel({ rootPc: entry.rootPc, qualityId: safeQualityId });
-        return `<button class="tutorial-chip example" type="button" data-root-pc="${entry.rootPc}" data-quality-id="${safeQualityId}">${label}</button>`;
-    }).join("");
+const setTutorialHoverSpec = (rootPc, qualityId) => {
+    if (!Number.isFinite(rootPc) || !TUTORIAL_QUALITY_BY_ID.has(qualityId)) return;
+    tutorialState.hoverSpec = {
+        rootPc: ((Math.round(rootPc) % 12) + 12) % 12,
+        qualityId
+    };
+    refreshTutorialVisuals();
+};
+
+const clearTutorialHoverSpec = () => {
+    tutorialState.hoverSpec = null;
+    refreshTutorialVisuals();
 };
 
 const refreshTutorialVisuals = () => {
@@ -625,11 +738,23 @@ const refreshTutorialVisuals = () => {
 
 const playTutorialChordSpec = (spec = getTutorialActiveSpec()) => {
     const rendered = getTutorialRenderedChord(spec);
-    if (!rendered || !rendered.noteIds.length) return;
+    if (!rendered || !rendered.midis.length) return;
+    tutorialState.previewToken += 1;
+    const previewToken = tutorialState.previewToken;
     if (typeof App.audio?.stopAllNotes === "function") {
         App.audio.stopAllNotes();
     }
-    if (typeof App.audio?.playNotes === "function") {
+    if (typeof App.audio?.playPianoNote === "function" && typeof App.audio?.ensureAudio === "function") {
+        const ctx = App.audio.ensureAudio();
+        const start = ctx.currentTime + (SCHEDULE_LEAD || 0.02);
+        const duration = Math.max(0.8, state.noteDuration);
+        rendered.midis.forEach((midi, index) => {
+            const frequency = 440 * Math.pow(2, (midi - 69) / 12);
+            App.audio.playPianoNote(frequency, start, duration, 1, `tutorial-preview-${previewToken}-${index}`);
+        });
+        return;
+    }
+    if (typeof App.audio?.playNotes === "function" && rendered.noteIds.length) {
         App.audio.playNotes(rendered.noteIds, "simultaneous", undefined, {
             animate: false,
             durationOverride: Math.max(0.8, state.noteDuration)
@@ -644,16 +769,54 @@ const renderChordTutorialStep = () => {
     if (!step) return;
 
     chordTutorialStep.innerHTML = `
+        <div class="tutorial-step-kicker">Read this first</div>
         <div class="tutorial-step-title">${step.title}</div>
-        <div class="tutorial-step-body">${step.body}</div>
+        <div class="tutorial-step-body">${step.bodyHtml ?? step.body ?? ""}</div>
     `;
+    chordTutorialStep.classList.remove("focus-flash");
+    void chordTutorialStep.offsetWidth;
+    chordTutorialStep.classList.add("focus-flash");
     chordTutorialProgress.textContent = `Step ${tutorialState.stepIndex + 1}/${total}`;
     if (chordTutorialPrev) chordTutorialPrev.disabled = tutorialState.stepIndex <= 0;
     if (chordTutorialNext) chordTutorialNext.textContent = tutorialState.stepIndex >= total - 1 ? "Done" : "Next";
+    const unlockedRoots = getStepUnlockedRootSet();
+    const unlockedQualities = getStepUnlockedQualitySet();
+    const stepChanged = tutorialState.stepIndex !== tutorialState.previousStepIndex;
+    if (stepChanged) {
+        const newRoots = new Set(
+            Array.from(unlockedRoots).filter((rootPc) =>
+                tutorialState.stepIndex > 0 && !tutorialState.previousUnlockedRootPcs.has(rootPc)
+            )
+        );
+        const newQualities = new Set(
+            Array.from(unlockedQualities).filter((qualityId) =>
+                tutorialState.stepIndex > 0 && !tutorialState.previousUnlockedQualityIds.has(qualityId)
+            )
+        );
+        tutorialState.pendingNewRoots = newRoots;
+        tutorialState.pendingNewQualities = newQualities;
+    }
     renderTutorialRootOptions();
     renderTutorialQualityOptions();
-    renderTutorialExampleOptions();
+    if (tutorialRowRoot) {
+        const allRootsUnlocked = unlockedRoots.size >= TUTORIAL_ALL_ROOT_PCS.length;
+        tutorialRowRoot.classList.toggle("locked", !allRootsUnlocked);
+        const newlyUnlocked = Array.from(unlockedRoots).some((rootPc) => !tutorialState.previousUnlockedRootPcs.has(rootPc))
+            && tutorialState.stepIndex > 0;
+        tutorialRowRoot.classList.toggle("newly-unlocked", newlyUnlocked);
+    }
+    if (tutorialRowQuality) {
+        const allQualitiesUnlocked = unlockedQualities.size >= TUTORIAL_ALL_QUALITY_IDS.length;
+        tutorialRowQuality.classList.toggle("locked", !allQualitiesUnlocked);
+        const newlyUnlocked = Array.from(unlockedQualities).some((qualityId) => !tutorialState.previousUnlockedQualityIds.has(qualityId))
+            && tutorialState.stepIndex > 0;
+        tutorialRowQuality.classList.toggle("newly-unlocked", newlyUnlocked);
+    }
+    tutorialState.previousUnlockedRootPcs = new Set(unlockedRoots);
+    tutorialState.previousUnlockedQualityIds = new Set(unlockedQualities);
+    tutorialState.previousStepIndex = tutorialState.stepIndex;
     refreshTutorialVisuals();
+    fitTutorialLayout();
 };
 
 const closeChordTutorial = () => {
@@ -661,27 +824,43 @@ const closeChordTutorial = () => {
     chordTutorialModal.hidden = true;
     chordTutorialModal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("tutorial-open");
-    if (chordTutorialOpen && typeof chordTutorialOpen.focus === "function") {
-        chordTutorialOpen.focus();
+    const fallback = tutorialReturnFocusEl ?? chordTutorialOpen ?? typingHelpToggle ?? chordTutorialOpenOptions;
+    if (fallback && typeof fallback.focus === "function") {
+        fallback.focus();
     }
+    tutorialReturnFocusEl = null;
 };
 
-const openChordTutorial = (stepIndex = 0) => {
+const openChordTutorial = (stepIndex = 0, sourceEl = null) => {
     if (!chordTutorialModal) return;
+    tutorialReturnFocusEl = sourceEl && typeof sourceEl.focus === "function" ? sourceEl : null;
     tutorialState.stepIndex = Number.isFinite(stepIndex) ? stepIndex : 0;
+    tutorialState.previousStepIndex = tutorialState.stepIndex;
     tutorialState.hoverSpec = null;
-    renderChordTutorialStep();
+    tutorialState.rootPc = TUTORIAL_FIXED_ROOT_PC;
+    tutorialState.previousUnlockedRootPcs = new Set();
+    tutorialState.previousUnlockedQualityIds = new Set();
+    tutorialState.pendingNewRoots = new Set();
+    tutorialState.pendingNewQualities = new Set();
     chordTutorialModal.hidden = false;
     chordTutorialModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("tutorial-open");
+    renderChordTutorialStep();
+    requestAnimationFrame(() => fitTutorialLayout());
 };
 
-if (chordTutorialOpen) {
-    chordTutorialOpen.addEventListener("click", (event) => {
+const registerTutorialOpenTrigger = (triggerEl, stepIndex = 0) => {
+    if (!triggerEl) return;
+    triggerEl.addEventListener("click", (event) => {
         event.preventDefault();
-        openChordTutorial(0);
+        event.stopPropagation();
+        openChordTutorial(stepIndex, triggerEl);
     });
-}
+};
+
+registerTutorialOpenTrigger(chordTutorialOpen, 0);
+registerTutorialOpenTrigger(chordTutorialOpenOptions, 0);
+registerTutorialOpenTrigger(typingHelpToggle, 0);
 
 if (chordTutorialClose) {
     chordTutorialClose.addEventListener("click", (event) => {
@@ -717,77 +896,75 @@ if (chordTutorialNext) {
 }
 
 if (chordTutorialRootList) {
+    chordTutorialRootList.addEventListener("mouseover", (event) => {
+        const chip = event.target.closest("[data-root-pc]");
+        if (!chip) return;
+        const rootPc = Number.parseInt(chip.dataset.rootPc, 10);
+        if (!isTutorialRootEnabled(rootPc)) return;
+        const qualityId = TUTORIAL_QUALITY_BY_ID.has(tutorialState.qualityId) ? tutorialState.qualityId : "maj";
+        setTutorialHoverSpec(rootPc, qualityId);
+    });
+    chordTutorialRootList.addEventListener("mouseleave", () => {
+        clearTutorialHoverSpec();
+    });
+    chordTutorialRootList.addEventListener("focusin", (event) => {
+        const chip = event.target.closest("[data-root-pc]");
+        if (!chip) return;
+        const rootPc = Number.parseInt(chip.dataset.rootPc, 10);
+        if (!isTutorialRootEnabled(rootPc)) return;
+        const qualityId = TUTORIAL_QUALITY_BY_ID.has(tutorialState.qualityId) ? tutorialState.qualityId : "maj";
+        setTutorialHoverSpec(rootPc, qualityId);
+    });
+    chordTutorialRootList.addEventListener("focusout", () => {
+        clearTutorialHoverSpec();
+    });
     chordTutorialRootList.addEventListener("click", (event) => {
         const chip = event.target.closest("[data-root-pc]");
         if (!chip) return;
         const rootPc = Number.parseInt(chip.dataset.rootPc, 10);
         if (!Number.isFinite(rootPc)) return;
+        if (!isTutorialRootEnabled(rootPc)) return;
+        tutorialState.pendingNewRoots.delete(((rootPc % 12) + 12) % 12);
         tutorialState.rootPc = ((rootPc % 12) + 12) % 12;
         tutorialState.hoverSpec = null;
         renderTutorialRootOptions();
-        refreshTutorialVisuals();
-    });
-}
-
-if (chordTutorialQualityList) {
-    chordTutorialQualityList.addEventListener("click", (event) => {
-        const chip = event.target.closest("[data-quality-id]");
-        if (!chip) return;
-        const qualityId = String(chip.dataset.qualityId ?? "");
-        if (!TUTORIAL_QUALITY_BY_ID.has(qualityId)) return;
-        tutorialState.qualityId = qualityId;
-        tutorialState.hoverSpec = null;
-        renderTutorialQualityOptions();
-        refreshTutorialVisuals();
-    });
-}
-
-if (chordTutorialExamples) {
-    chordTutorialExamples.addEventListener("mouseover", (event) => {
-        const chip = event.target.closest("[data-root-pc][data-quality-id]");
-        if (!chip) return;
-        const rootPc = Number.parseInt(chip.dataset.rootPc, 10);
-        const qualityId = String(chip.dataset.qualityId ?? "");
-        if (!Number.isFinite(rootPc) || !TUTORIAL_QUALITY_BY_ID.has(qualityId)) return;
-        tutorialState.hoverSpec = { rootPc, qualityId };
-        refreshTutorialVisuals();
-    });
-    chordTutorialExamples.addEventListener("mouseleave", () => {
-        tutorialState.hoverSpec = null;
-        refreshTutorialVisuals();
-    });
-    chordTutorialExamples.addEventListener("focusin", (event) => {
-        const chip = event.target.closest("[data-root-pc][data-quality-id]");
-        if (!chip) return;
-        const rootPc = Number.parseInt(chip.dataset.rootPc, 10);
-        const qualityId = String(chip.dataset.qualityId ?? "");
-        if (!Number.isFinite(rootPc) || !TUTORIAL_QUALITY_BY_ID.has(qualityId)) return;
-        tutorialState.hoverSpec = { rootPc, qualityId };
-        refreshTutorialVisuals();
-    });
-    chordTutorialExamples.addEventListener("focusout", () => {
-        tutorialState.hoverSpec = null;
-        refreshTutorialVisuals();
-    });
-    chordTutorialExamples.addEventListener("click", (event) => {
-        const chip = event.target.closest("[data-root-pc][data-quality-id]");
-        if (!chip) return;
-        const rootPc = Number.parseInt(chip.dataset.rootPc, 10);
-        const qualityId = String(chip.dataset.qualityId ?? "");
-        if (!Number.isFinite(rootPc) || !TUTORIAL_QUALITY_BY_ID.has(qualityId)) return;
-        tutorialState.rootPc = ((rootPc % 12) + 12) % 12;
-        tutorialState.qualityId = qualityId;
-        tutorialState.hoverSpec = null;
-        renderTutorialRootOptions();
-        renderTutorialQualityOptions();
         refreshTutorialVisuals();
         playTutorialChordSpec({ rootPc: tutorialState.rootPc, qualityId: tutorialState.qualityId });
     });
 }
 
-if (chordTutorialPlay) {
-    chordTutorialPlay.addEventListener("click", () => {
-        playTutorialChordSpec();
+if (chordTutorialQualityList) {
+    chordTutorialQualityList.addEventListener("mouseover", (event) => {
+        const chip = event.target.closest("[data-quality-id]");
+        if (!chip) return;
+        const qualityId = String(chip.dataset.qualityId ?? "");
+        if (!isTutorialQualityEnabled(qualityId)) return;
+        setTutorialHoverSpec(tutorialState.rootPc, qualityId);
+    });
+    chordTutorialQualityList.addEventListener("mouseleave", () => {
+        clearTutorialHoverSpec();
+    });
+    chordTutorialQualityList.addEventListener("focusin", (event) => {
+        const chip = event.target.closest("[data-quality-id]");
+        if (!chip) return;
+        const qualityId = String(chip.dataset.qualityId ?? "");
+        if (!isTutorialQualityEnabled(qualityId)) return;
+        setTutorialHoverSpec(tutorialState.rootPc, qualityId);
+    });
+    chordTutorialQualityList.addEventListener("focusout", () => {
+        clearTutorialHoverSpec();
+    });
+    chordTutorialQualityList.addEventListener("click", (event) => {
+        const chip = event.target.closest("[data-quality-id]");
+        if (!chip) return;
+        const qualityId = String(chip.dataset.qualityId ?? "");
+        if (!TUTORIAL_QUALITY_BY_ID.has(qualityId) || !isTutorialQualityEnabled(qualityId)) return;
+        tutorialState.pendingNewQualities.delete(qualityId);
+        tutorialState.qualityId = qualityId;
+        tutorialState.hoverSpec = null;
+        renderTutorialQualityOptions();
+        refreshTutorialVisuals();
+        playTutorialChordSpec({ rootPc: tutorialState.rootPc, qualityId: tutorialState.qualityId });
     });
 }
 
@@ -1251,9 +1428,6 @@ const init = async () => {
     if (typeof App.game?.updateTypedPreviewFromInput === "function") {
         App.game.updateTypedPreviewFromInput();
     }
-    setPianoTone(state.pianoTone, { save: false, skipProfilePrompts: true });
-    await refreshSoundfontCatalog();
-    await refreshInstrumentPresetBrowser();
     refreshResponseProfileBrowser();
     setVolume(state.volume);
     setNoteLength(state.noteDuration);
@@ -1261,7 +1435,23 @@ const init = async () => {
     updateStatus();
     updateKeyStates();
     updateKeyboardScale();
-    void ensureSoundfontReady(state.pianoTone);
+
+    const runDeferredCatalogLoad = () => {
+        void (async () => {
+            try {
+                await refreshSoundfontCatalog({ loadAllPacks: false });
+                void ensureSoundfontReady(state.pianoTone);
+            } catch (error) {
+                console.warn("Deferred soundfont load failed:", error);
+            }
+        })();
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(() => runDeferredCatalogLoad(), { timeout: 1200 });
+    } else {
+        setTimeout(runDeferredCatalogLoad, 60);
+    }
 };
 
 init().catch((error) => {
