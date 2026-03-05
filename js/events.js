@@ -472,7 +472,7 @@ const tutorialState = {
 let tutorialReturnFocusEl = null;
 
 const isChordTutorialOpen = () => Boolean(chordTutorialModal && !chordTutorialModal.hidden);
-const TUTORIAL_FIXED_FIT_CLASS = "tutorial-fit-3";
+const TUTORIAL_FIXED_FIT_CLASS = "tutorial-fit-2";
 
 const fitTutorialLayout = ({ recompute = false } = {}) => {
     if (!isChordTutorialOpen()) return;
