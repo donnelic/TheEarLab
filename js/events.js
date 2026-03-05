@@ -631,21 +631,37 @@ const renderTutorialCurrentText = () => {
 
 const renderTutorialPianoHighlight = () => {
     if (!chordTutorialPiano) return;
-    tutorialState.keyElsByMidi.forEach((keyEl) => {
-        keyEl.classList.remove("tone", "root");
-        keyEl.removeAttribute("data-role");
-    });
     const activeSpec = getTutorialActiveSpec();
     const rendered = getTutorialRenderedChord(activeSpec);
-    if (!rendered) return;
-    rendered.midis.forEach((midi, index) => {
-        const keyEl = tutorialState.keyElsByMidi.get(midi);
-        if (!keyEl) return;
-        keyEl.classList.add("tone");
-        if (index === 0) {
-            keyEl.classList.add("root");
+    const nextRolesByMidi = new Map();
+    let rootMidi = null;
+
+    if (rendered) {
+        rendered.midis.forEach((midi, index) => {
+            if (!nextRolesByMidi.has(midi)) {
+                nextRolesByMidi.set(midi, rendered.quality.roles[index] ?? "");
+                if (rootMidi === null) rootMidi = midi;
+            }
+        });
+    }
+
+    tutorialState.keyElsByMidi.forEach((keyEl, midi) => {
+        const shouldTone = nextRolesByMidi.has(midi);
+        const shouldRoot = shouldTone && midi === rootMidi;
+        keyEl.classList.toggle("tone", shouldTone);
+        keyEl.classList.toggle("root", shouldRoot);
+
+        if (!shouldTone) {
+            if (keyEl.hasAttribute("data-role")) {
+                keyEl.removeAttribute("data-role");
+            }
+            return;
         }
-        keyEl.setAttribute("data-role", rendered.quality.roles[index] ?? "");
+
+        const nextRole = nextRolesByMidi.get(midi) ?? "";
+        if (keyEl.getAttribute("data-role") !== nextRole) {
+            keyEl.setAttribute("data-role", nextRole);
+        }
     });
 };
 
