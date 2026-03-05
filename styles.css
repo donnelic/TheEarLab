@@ -268,9 +268,29 @@ h1 {
             line-height: 1.4;
         }
 
-        body:not(.landing) .hero,
+        body:not(.landing) .hero h1,
+        body:not(.landing) .hero p {
+            display: none;
+        }
+
         body:not(.landing) .tips {
             display: none;
+        }
+
+        .hero,
+        .actions,
+        .chord-readout,
+        .typing-zone,
+        .status,
+        .tips {
+            width: min(100%, 820px);
+            margin-inline: auto;
+        }
+
+        body:not(.landing) .hero {
+            display: flex;
+            justify-content: center;
+            padding-bottom: 2px;
         }
 
         .control {
@@ -473,35 +493,47 @@ h1 {
 }
 
 .typing-zone {
-    background: linear-gradient(180deg, var(--panel), var(--status-bg));
-    border: 1px solid var(--control-border);
-    border-radius: 12px;
-    padding: 10px;
+    background:
+        linear-gradient(160deg, color-mix(in oklab, var(--panel) 86%, transparent), color-mix(in oklab, var(--status-bg) 92%, transparent));
+    border: 1px solid color-mix(in oklab, var(--control-border) 85%, var(--accent));
+    border-radius: 14px;
+    padding: 10px 12px 11px;
     display: grid;
-    gap: 8px;
+    gap: 7px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
 .typing-zone label {
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     font-weight: 700;
     color: var(--muted);
+    margin-left: 2px;
 }
 
 .typing-zone input[type="text"] {
     width: 100%;
-    border: 1px solid var(--input-border);
-    background: var(--input-bg);
+    border: 1px solid color-mix(in oklab, var(--input-border) 82%, var(--accent));
+    background: color-mix(in oklab, var(--input-bg) 86%, white);
     color: var(--ink);
-    border-radius: 10px;
-    padding: 10px 38px 10px 12px;
+    border-radius: 12px;
+    padding: 11px 40px 11px 13px;
     font: inherit;
+    font-weight: 700;
+    font-size: 0.94rem;
+    line-height: 1.1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.46);
+}
+
+.typing-zone input[type="text"]::placeholder {
+    color: color-mix(in oklab, var(--muted) 82%, transparent);
     font-weight: 600;
 }
 
 .typing-row {
-    display: block;
+    display: grid;
+    gap: 6px;
 }
 
 .typing-input-wrap {
@@ -513,17 +545,18 @@ h1 {
     right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    border: 1px solid var(--input-border);
-    background: var(--panel);
+    border: 1px solid color-mix(in oklab, var(--input-border) 82%, var(--accent));
+    background: color-mix(in oklab, var(--panel) 88%, transparent);
     color: var(--muted);
     font-weight: 800;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     line-height: 1;
     cursor: pointer;
     padding: 0;
+    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.1);
 }
 
 .typing-help-toggle:hover {
@@ -537,11 +570,11 @@ h1 {
 }
 
 .typing-help-text {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     color: var(--muted);
     line-height: 1.4;
-    border-top: 1px dashed var(--control-border);
-    padding-top: 6px;
+    border-top: 1px dashed color-mix(in oklab, var(--control-border) 75%, var(--accent));
+    padding-top: 7px;
 }
 
 .typing-help-text strong {
