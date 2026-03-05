@@ -610,12 +610,13 @@ const updateReplayAvailability = () => {
 
 const getChordHelperHints = () => {
     if (!state.targetChord) return [];
-    const hints = [];
-    hints.push(`${state.targetChord.noteCount} notes`);
-    hints.push(`Type: ${state.targetChord.qualityHint}`);
-    hints.push(`Voicing: ${getVoicingHintLabel(state.targetChord.voicing)}`);
+    const hints = [
+        { label: "Chord size", value: `${state.targetChord.noteCount} notes` },
+        { label: "Chord type", value: state.targetChord.qualityHint },
+        { label: "Voicing", value: getVoicingHintLabel(state.targetChord.voicing) }
+    ];
     if (Number.isFinite(state.targetChord.intervalSpan)) {
-        hints.push(`Span: ${state.targetChord.intervalSpan} semitones`);
+        hints.push({ label: "Pitch span", value: `${state.targetChord.intervalSpan} semitones` });
     }
     return hints;
 };
@@ -623,9 +624,18 @@ const getChordHelperHints = () => {
 const renderChordHelperBox = () => {
     const hints = getChordHelperHints();
     if (!hints.length) return "";
-    const indexSeed = Math.max(0, Number(state.round || 0)) + (state.targetNotes?.length || 0);
-    const hint = hints[indexSeed % hints.length];
-    return `<div class="helper-card"><div class="helper-title">Chord helper</div><div class="helper-value">${hint}</div></div>`;
+    const rows = hints.map((hint) => `
+        <div class="helper-item" tabindex="0">
+            <div class="helper-label">${hint.label}</div>
+            <div class="helper-value">${hint.value}</div>
+        </div>
+    `).join("");
+    return `
+        <div class="helper-card">
+            <div class="helper-title">Chord helper</div>
+            <div class="helper-list">${rows}</div>
+        </div>
+    `;
 };
 
 const updateStatus = () => {

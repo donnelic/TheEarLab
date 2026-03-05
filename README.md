@@ -68,7 +68,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - `Practice mode = Chord Training` switches round targets from loose notes to chord targets.
 - Live selected chord detection is shown below the keyboard while in chord rounds.
 - Reveal/check output shows chord names (target vs your chord) in chord rounds.
-- In chord rounds, helper hints are shown as delayed hover-reveal cards (single hint at a time) when `Extra helpers` is enabled.
+- In chord rounds, helper hints are shown as delayed hover-reveal rows (all labels visible, each value revealed independently) when `Extra helpers` is enabled.
 - `Answer input` options in chord practice:
   - `Play on keyboard` (keyboard only),
   - `Type chord name` (typing only),
