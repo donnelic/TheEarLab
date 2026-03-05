@@ -210,6 +210,15 @@
             --layout-extra: var(--pedal-width);
         }
 
+        body.landing .app {
+            grid-template-rows: auto auto auto minmax(160px, 1fr) auto;
+        }
+
+        body.landing .keyboard-zone {
+            align-items: center;
+            padding-block: 0;
+        }
+
         .app {
             width: min(100%, calc(var(--keyboard-width) + 140px + var(--layout-extra)));
             background: var(--card);
