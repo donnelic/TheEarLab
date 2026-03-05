@@ -1304,10 +1304,34 @@ const startHeldPlayback = () => {
         return;
     }
     if (state.submitted) {
+        const replayNotes = (lastReveal?.selected?.length
+            ? [...lastReveal.selected]
+            : (state.selectedNotes.length ? [...state.selectedNotes] : [...state.targetNotes]));
+        if (!replayNotes.length) {
+            resultEl.textContent = "No notes available to replay.";
+            return;
+        }
         if (revealPlaying) {
             abortPlayback();
         }
-        playRevealSequence({ delay: 0, snapshot: lastReveal });
+        const ctx = ensureAudio();
+        const durationOverride = state.noteDuration + HOLD_MAX_EXTRA;
+        playNotes(replayNotes, state.mode, ctx.currentTime + KEY_PRESS_DELAY, {
+            animate: false,
+            durationOverride
+        });
+        replayNotes.forEach((noteId) => {
+            activateKey(noteId);
+        });
+        holdState.active = true;
+        holdState.holding = false;
+        holdState.pressAt = performance.now();
+        holdState.noteIds = replayNotes;
+        holdState.stopAt = holdState.pressAt + state.noteDuration * 1000;
+        if (holdState.holdTimer) clearTimeout(holdState.holdTimer);
+        holdState.holdTimer = setTimeout(() => {
+            holdState.holding = true;
+        }, HOLD_THRESHOLD * 1000);
         return;
     }
     if (!state.selectedNotes.length) {
@@ -1340,12 +1364,6 @@ const startHeldPlayback = () => {
 
 const releaseHeldPlayback = () => {
     if (isTypingOnlyMode()) {
-        return;
-    }
-    if (state.submitted) {
-        if (revealPlaying) {
-            abortPlayback();
-        }
         return;
     }
     if (!holdState.active) return;

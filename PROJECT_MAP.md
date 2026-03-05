@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-05 23:41:11 +01:00
+Generated: 2026-03-05 23:43:58 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -37,7 +37,7 @@ Generated: 2026-03-05 23:41:11 +01:00
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1517 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 822 |
 | js/events.js | JavaScript | Browser runtime module | Yes | 1544 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 1565 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 1583 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1111 |
 | README.md | Markdown | Human + AI onboarding | Yes | 103 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
@@ -808,7 +808,7 @@ Event bindings:
 | pedalBox | pointerleave | 1490 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-1565
+File lines: 1-1583
 
 | Symbol | Lines |
 |---|---|
@@ -881,11 +881,11 @@ File lines: 1-1565
 | playRevealSequence | 1200-1252 |
 | playSelectedChord | 1254-1279 |
 | playTypedInputChord | 1281-1295 |
-| startHeldPlayback | 1297-1339 |
-| releaseHeldPlayback | 1341-1374 |
-| buildTypingRevealDetail | 1376-1394 |
-| submitTypedAnswer | 1396-1473 |
-| submitAnswer | 1475-1544 |
+| startHeldPlayback | 1297-1363 |
+| releaseHeldPlayback | 1365-1392 |
+| buildTypingRevealDetail | 1394-1412 |
+| submitTypedAnswer | 1414-1491 |
+| submitAnswer | 1493-1562 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1111
