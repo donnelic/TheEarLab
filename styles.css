@@ -288,8 +288,8 @@ h1 {
         }
 
         body:not(.landing) .hero {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            justify-content: start;
             padding-bottom: 2px;
         }
 
@@ -629,16 +629,196 @@ h1 {
 
 .tutorial-card {
     position: relative;
-    width: min(92vw, 560px);
-    max-height: min(82vh, 620px);
-    overflow: auto;
+    width: min(95vw, 700px);
+    max-height: min(93vh, 760px);
+    overflow: hidden;
     background: var(--card);
     border: 1px solid var(--control-border);
     border-radius: 16px;
     box-shadow: 0 24px 48px var(--shadow-strong);
-    padding: 14px;
+    padding: 12px;
     display: grid;
-    gap: 12px;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 10px;
+}
+
+.tutorial-card.tutorial-overflow-scroll {
+    overflow: hidden;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.tutorial-card.tutorial-overflow-scroll .tutorial-step {
+    max-height: min(34vh, 260px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tutorial-card.tutorial-overflow-scroll .tutorial-lab {
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tutorial-card.tutorial-fit-1 {
+    padding: 10px;
+    gap: 8px;
+}
+
+.tutorial-card.tutorial-fit-1 .tutorial-step {
+    padding: 10px;
+    gap: 6px;
+}
+
+.tutorial-card.tutorial-fit-1 .tutorial-lab {
+    padding: 8px;
+    gap: 8px;
+}
+
+.tutorial-card.tutorial-fit-1 .tutorial-chip {
+    padding: 2px 7px;
+    font-size: 0.7rem;
+}
+
+.tutorial-card.tutorial-fit-1 .tutorial-quality-table th {
+    width: 100px;
+}
+
+.tutorial-card.tutorial-fit-1 .tutorial-piano {
+    --tutorial-white-w: 16px;
+    --tutorial-black-w: 10px;
+    --tutorial-white-h: 70px;
+    --tutorial-black-h: 43px;
+}
+
+.tutorial-card.tutorial-fit-2 {
+    padding: 8px;
+    gap: 7px;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-head h4 {
+    font-size: 0.92rem;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-step {
+    padding: 8px;
+    gap: 5px;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-step-title {
+    font-size: 0.84rem;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-step-body {
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-lab {
+    padding: 7px;
+    gap: 6px;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-current {
+    font-size: 0.75rem;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-selector-title {
+    font-size: 0.66rem;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-chip {
+    padding: 2px 6px;
+    font-size: 0.68rem;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-quality-table th {
+    width: 86px;
+    font-size: 0.62rem;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-piano {
+    --tutorial-white-w: 14px;
+    --tutorial-black-w: 9px;
+    --tutorial-white-h: 62px;
+    --tutorial-black-h: 38px;
+}
+
+.tutorial-card.tutorial-fit-2 .tutorial-actions .advanced-trigger {
+    padding: 5px 9px;
+    font-size: 0.76rem;
+}
+
+.tutorial-card.tutorial-fit-3 {
+    padding: 7px;
+    gap: 6px;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-step-kicker {
+    font-size: 0.62rem;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-step {
+    padding: 7px;
+    gap: 4px;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-step-title {
+    font-size: 0.8rem;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-step-body {
+    font-size: 0.76rem;
+    line-height: 1.28;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-lab {
+    padding: 6px;
+    gap: 5px;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-current {
+    display: none;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-piano-title {
+    margin-bottom: 5px;
+    font-size: 0.64rem;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-quality-table th {
+    width: 74px;
+    font-size: 0.58rem;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-quality-table th,
+.tutorial-card.tutorial-fit-3 .tutorial-quality-table td {
+    padding: 4px 0;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-chip {
+    padding: 1px 6px;
+    font-size: 0.64rem;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-piano {
+    --tutorial-white-w: 12px;
+    --tutorial-black-w: 8px;
+    --tutorial-white-h: 54px;
+    --tutorial-black-h: 33px;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-actions .advanced-trigger {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+}
+
+.tutorial-card.tutorial-fit-3 .tutorial-progress {
+    font-size: 0.72rem;
 }
 
 .tutorial-head {
@@ -659,12 +839,34 @@ h1 {
 }
 
 .tutorial-step {
-    background: var(--control-bg);
+    background: var(--status-bg);
     border: 1px solid var(--control-border);
+    border-left: 4px solid color-mix(in oklab, var(--accent) 60%, var(--control-border));
     border-radius: 12px;
     padding: 12px;
     display: grid;
     gap: 8px;
+}
+
+.tutorial-step-kicker {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: color-mix(in oklab, var(--accent) 70%, var(--ink));
+    font-weight: 800;
+}
+
+.tutorial-step.focus-flash {
+    animation: tutorial-focus-flash 0.9s ease;
+}
+
+@keyframes tutorial-focus-flash {
+    0% {
+        box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 45%, transparent);
+    }
+    100% {
+        box-shadow: 0 0 0 14px transparent;
+    }
 }
 
 .tutorial-step-title {
@@ -676,6 +878,14 @@ h1 {
     color: var(--muted);
     line-height: 1.45;
     font-size: 0.86rem;
+}
+
+.tutorial-step-body p {
+    margin: 0;
+}
+
+.tutorial-step-body p + p {
+    margin-top: 6px;
 }
 
 .tutorial-example-list {
@@ -698,6 +908,8 @@ h1 {
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    flex-wrap: nowrap;
+    margin-top: 2px;
 }
 
 .tutorial-progress {
@@ -710,9 +922,11 @@ h1 {
     border: 1px solid var(--control-border);
     border-radius: 12px;
     padding: 10px;
-    background: var(--status-bg);
+    background: var(--panel);
     display: grid;
     gap: 10px;
+    min-height: 0;
+    overflow: visible;
 }
 
 .tutorial-current {
@@ -721,14 +935,54 @@ h1 {
     color: var(--ink);
 }
 
-.tutorial-selectors {
-    display: grid;
-    gap: 8px;
-}
-
 .tutorial-selector-block {
     display: grid;
     gap: 6px;
+}
+
+.tutorial-control-matrix {
+    display: grid;
+    gap: 8px;
+    border: 1px solid var(--control-border);
+    border-radius: 10px;
+    padding: 8px;
+    background: color-mix(in oklab, var(--panel) 88%, transparent);
+}
+
+.tutorial-control-row {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    border: 1px solid color-mix(in oklab, var(--control-border) 85%, transparent);
+    border-radius: 10px;
+    padding: 6px 8px;
+    background: color-mix(in oklab, var(--panel) 75%, transparent);
+}
+
+.tutorial-control-row.locked {
+    opacity: 0.78;
+}
+
+.tutorial-control-row.locked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--control-border) 78%, transparent);
+    pointer-events: none;
+}
+
+.tutorial-control-row.newly-unlocked {
+    animation: tutorial-unlock 1.1s ease;
+}
+
+@keyframes tutorial-unlock {
+    0% {
+        box-shadow: 0 0 0 0 color-mix(in oklab, var(--green) 45%, transparent);
+    }
+    100% {
+        box-shadow: 0 0 0 12px transparent;
+    }
 }
 
 .tutorial-selector-title {
@@ -745,16 +999,87 @@ h1 {
     gap: 6px;
 }
 
+#chord-tutorial-quality-list {
+    display: block;
+    width: 100%;
+}
+
+.tutorial-quality-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 0.76rem;
+}
+
+.tutorial-quality-table th,
+.tutorial-quality-table td {
+    border-top: 1px solid color-mix(in oklab, var(--control-border) 82%, transparent);
+    padding: 6px 0;
+    vertical-align: top;
+}
+
+.tutorial-quality-table tr:first-child th,
+.tutorial-quality-table tr:first-child td {
+    border-top: none;
+}
+
+.tutorial-quality-table th {
+    width: 112px;
+    padding-right: 10px;
+    text-align: left;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.tutorial-chip-group-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
 .tutorial-chip {
+    position: relative;
     border: 1px solid var(--input-border);
     border-radius: 999px;
-    padding: 4px 10px;
+    padding: 3px 8px;
     font: inherit;
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--ink);
     background: var(--panel);
     cursor: pointer;
+    transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
+}
+
+.tutorial-chip.unlocked {
+    border-color: color-mix(in oklab, var(--accent) 26%, var(--input-border));
+    background: color-mix(in oklab, var(--panel) 92%, transparent);
+}
+
+.tutorial-chip.unlocked:hover,
+.tutorial-chip.unlocked:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+.tutorial-chip[disabled] {
+    opacity: 1;
+    pointer-events: none;
+    filter: saturate(0.45) contrast(0.95);
+}
+
+.tutorial-chip.locked {
+    border-style: dashed;
+    border-color: color-mix(in oklab, var(--muted) 35%, var(--input-border));
+    background-image: repeating-linear-gradient(
+        -45deg,
+        color-mix(in oklab, var(--panel) 90%, transparent) 0 6px,
+        color-mix(in oklab, var(--status-bg) 82%, transparent) 6px 12px
+    );
+    color: color-mix(in oklab, var(--muted) 88%, var(--ink));
 }
 
 .tutorial-chip:hover,
@@ -768,10 +1093,6 @@ h1 {
     background: color-mix(in oklab, var(--accent) 14%, var(--panel));
 }
 
-.tutorial-chip.example {
-    background: color-mix(in oklab, var(--yellow) 10%, var(--panel));
-}
-
 .tutorial-chip.muted {
     cursor: default;
     color: var(--muted);
@@ -780,6 +1101,16 @@ h1 {
 .tutorial-chip.muted:hover,
 .tutorial-chip.muted:focus-visible {
     border-color: var(--input-border);
+}
+
+.tutorial-chip.newly-unlocked {
+    animation: tutorial-unlock 1.1s ease;
+    border-color: color-mix(in oklab, var(--green) 58%, var(--input-border));
+}
+
+.tutorial-chip.locked.newly-unlocked {
+    border-style: solid;
+    background-image: none;
 }
 
 .tutorial-piano-wrap {
@@ -861,11 +1192,6 @@ h1 {
     color: #0f172a;
 }
 
-.tutorial-lab-actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
 .helper-card {
     display: grid;
     gap: 8px;
@@ -883,26 +1209,41 @@ h1 {
 }
 
 .helper-list {
-    display: grid;
-    gap: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
 }
 
 .helper-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 5px 8px;
-    border-radius: 8px;
-    border: 1px solid color-mix(in oklab, var(--control-border) 85%, transparent);
-    background: color-mix(in oklab, var(--status-bg) 85%, transparent);
-    transition: border-color 0.18s ease, background 0.18s ease;
+    position: relative;
+    flex: 1 1 150px;
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+    align-content: start;
+    padding: 3px 14px 3px 0;
+    background: transparent;
+    border: none;
+    transition: background 0.18s ease;
+}
+
+.helper-item::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    right: 0;
+    width: 1px;
+    background: color-mix(in oklab, var(--control-border) 80%, transparent);
+}
+
+.helper-item:last-child::after {
+    display: none;
 }
 
 .helper-item:hover,
 .helper-item:focus-within {
-    border-color: color-mix(in oklab, var(--accent) 55%, var(--control-border));
-    background: color-mix(in oklab, var(--panel) 88%, transparent);
+    background: color-mix(in oklab, var(--panel) 78%, transparent);
 }
 
 .helper-label {
@@ -914,17 +1255,46 @@ h1 {
 }
 
 .helper-item .helper-value {
-    color: var(--ink);
+    position: relative;
+    display: inline-block;
+    min-height: 1.2em;
+    max-width: 100%;
     font-size: 0.8rem;
     font-weight: 700;
-    filter: blur(5px);
-    opacity: 0.72;
-    transition: filter 0.18s ease 0.34s, opacity 0.18s ease 0.34s;
     text-align: right;
 }
 
-.helper-item:hover .helper-value,
-.helper-item:focus-within .helper-value {
+.helper-item .helper-mask {
+    display: inline-block;
+    color: var(--ink);
+    filter: blur(5px);
+    opacity: 0.72;
+    letter-spacing: 0.02em;
+    transition: filter 0.18s ease 0.34s, opacity 0.18s ease 0.34s;
+}
+
+.helper-item .helper-real {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: var(--ink);
+    opacity: 0;
+    filter: blur(3px);
+    transition: filter 0.18s ease 0.34s, opacity 0.18s ease 0.34s;
+    white-space: nowrap;
+    max-width: min(24ch, 100%);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.helper-item:hover .helper-mask,
+.helper-item:focus-within .helper-mask {
+    filter: blur(8px);
+    opacity: 0;
+}
+
+.helper-item:hover .helper-real,
+.helper-item:focus-within .helper-real {
     filter: blur(0);
     opacity: 1;
 }
@@ -940,8 +1310,8 @@ h1 {
             display: grid;
             gap: 6px;
             min-height: 0;
-            max-height: min(38vh, 260px);
-            overflow: auto;
+            max-height: none;
+            overflow: visible;
         }
 
         .status[hidden] {
@@ -2294,7 +2664,7 @@ h1 {
             }
 
             .tutorial-actions {
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
             }
         }
 
@@ -2302,6 +2672,22 @@ h1 {
             :root {
                 --keyboard-height: 200px;
                 --black-height: 120px;
+            }
+
+            .tutorial-card {
+                max-height: min(92vh, 700px);
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .tutorial-step {
+                padding: 10px;
+                gap: 6px;
+            }
+
+            .tutorial-lab {
+                padding: 8px;
+                gap: 8px;
             }
         }
 
