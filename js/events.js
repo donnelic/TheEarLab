@@ -828,33 +828,6 @@ const triggerReplayAction = (event) => {
     }
 };
 
-if (homeButton) {
-    homeButton.addEventListener("click", () => {
-        if (typeof App.settings?.goHome === "function") {
-            App.settings.goHome();
-        }
-    });
-}
-
-const heroTitle = document.querySelector(".hero h1");
-if (heroTitle) {
-    heroTitle.setAttribute("role", "button");
-    heroTitle.setAttribute("tabindex", "0");
-    heroTitle.classList.add("hero-link");
-    const goHomeAction = () => {
-        if (typeof App.settings?.goHome === "function") {
-            App.settings.goHome();
-        }
-    };
-    heroTitle.addEventListener("click", goHomeAction);
-    heroTitle.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            goHomeAction();
-        }
-    });
-}
-
 volumeSlider.addEventListener("dblclick", () => {
     setVolume(DEFAULTS.volume);
 });
@@ -1163,7 +1136,12 @@ document.addEventListener("keydown", (event) => {
     if (chordInputFocused && event.code === "Space") {
         event.preventDefault();
         if (!tryPlayTypedChordPreview()) {
-            triggerReplayAction(event);
+            const canReplaySelection = state.trainingMode === "both" && state.selectedNotes.length > 0;
+            if (canReplaySelection) {
+                triggerReplayAction(event);
+            } else {
+                resultEl.textContent = "Type a valid chord or select notes first.";
+            }
         }
         return;
     }

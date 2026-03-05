@@ -49,6 +49,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - Full SF2 instrument browsing is in a separate `Instrument Browser` panel (grouped by inferred GM families for bank 0).
 - Advanced panel is now dedicated to `Articulation Profile` controls and profile management.
 - Game settings (`Play style`, `Blind mode`, mode-specific chord controls, typing controls) live in the `Game Settings` popup opened from settings.
+- `Notes per round` now lives inside `Game Settings` and is only shown in `Random Notes` / `Harmonic Notes` modes.
 - Advanced sliders show absolute values (seconds + hold multiplier), not percentages.
 - Slider ghost markers show the selected profile target while editing.
 - Profiles support built-in + custom saved presets (persisted in local storage).
@@ -67,6 +68,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - `Practice mode = Chord Training` switches round targets from loose notes to chord targets.
 - Live selected chord detection is shown below the keyboard while in chord rounds.
 - Reveal/check output shows chord names (target vs your chord) in chord rounds.
+- In chord rounds, helper hints are shown as delayed hover-reveal cards (single hint at a time) when `Extra helpers` is enabled.
 - `Answer input` options in chord practice:
   - `Play on keyboard` (keyboard only),
   - `Type chord name` (typing only),
@@ -78,7 +80,7 @@ Browser-based piano ear-training app for note and chord recognition.
   - gives detailed mismatch feedback on wrong answers,
   - keeps hint/replay available,
   - supports optional visual piano and optional typed-chord key preview.
-  - pressing `Space` inside the typing field previews the typed chord when parsing succeeds and blind mode is off (otherwise it falls back to replay).
+  - pressing `Space` inside the typing field previews the typed chord when parsing succeeds and blind mode is off; it will not auto-replay target notes when nothing is selected/typed.
   - includes a built-in "Learn more about chord format" guided tutorial from the typing help popover.
   - tutorial now has an interactive chord lab: root/quality selectors, hover-highlighted examples, click-to-play examples, and a visual piano that shows chord tones without allowing manual key play/selection.
 

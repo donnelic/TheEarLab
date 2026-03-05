@@ -1,6 +1,177 @@
 var App = window.App || (window.App = {});
 App.game = App.game || {};
 
+const CHORD_ROOT_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const CHORD_ROOT_ALIASES = {
+    C: 0,
+    "B#": 0,
+    "C#": 1,
+    DB: 1,
+    D: 2,
+    "D#": 3,
+    EB: 3,
+    E: 4,
+    FB: 4,
+    F: 5,
+    "E#": 5,
+    "F#": 6,
+    GB: 6,
+    G: 7,
+    "G#": 8,
+    AB: 8,
+    A: 9,
+    "A#": 10,
+    BB: 10,
+    B: 11,
+    CB: 11
+};
+
+const CHORD_QUALITIES = [
+    { id: "maj", suffix: "", intervals: [0, 4, 7], aliases: ["", "maj", "major", "mjr"] },
+    { id: "min", suffix: "m", intervals: [0, 3, 7], aliases: ["m", "min", "minor", "-"] },
+    { id: "sus2", suffix: "sus2", intervals: [0, 2, 7], aliases: ["sus2", "2sus"] },
+    { id: "sus4", suffix: "sus4", intervals: [0, 5, 7], aliases: ["sus", "sus4", "4sus"] },
+    { id: "power5", suffix: "5", intervals: [0, 7], aliases: ["5", "power", "powerchord"] },
+    { id: "maj7", suffix: "maj7", intervals: [0, 4, 7, 11], aliases: ["maj7", "major7", "ma7", "M7"] },
+    { id: "min7", suffix: "m7", intervals: [0, 3, 7, 10], aliases: ["m7", "min7", "minor7", "-7"] },
+    { id: "dom7", suffix: "7", intervals: [0, 4, 7, 10], aliases: ["7", "dom7", "dominant7"] },
+    { id: "dim", suffix: "dim", intervals: [0, 3, 6], aliases: ["dim", "diminished", "o"] },
+    { id: "aug", suffix: "aug", intervals: [0, 4, 8], aliases: ["aug", "augmented", "+"] },
+    { id: "m7b5", suffix: "m7b5", intervals: [0, 3, 6, 10], aliases: ["m7b5", "min7b5", "halfdim", "half-diminished"] },
+    { id: "dim7", suffix: "dim7", intervals: [0, 3, 6, 9], aliases: ["dim7", "diminished7", "o7"] },
+    { id: "six", suffix: "6", intervals: [0, 4, 7, 9], aliases: ["6", "maj6", "major6"] },
+    { id: "sixNine", suffix: "6/9", intervals: [0, 4, 7, 9, 14], aliases: ["6/9", "69", "sixnine"] },
+    { id: "nine", suffix: "9", intervals: [0, 4, 7, 10, 14], aliases: ["9", "dom9", "dominant9"] },
+    { id: "add9", suffix: "add9", intervals: [0, 2, 4, 7], aliases: ["add9"] },
+    { id: "mMaj7", suffix: "mMaj7", intervals: [0, 3, 7, 11], aliases: ["mmaj7", "minmaj7", "minormajor7"] },
+    { id: "maj7#11", suffix: "maj7#11", intervals: [0, 4, 6, 11], aliases: ["maj7#11", "major7#11", "lydian"] },
+    { id: "7b9", suffix: "7b9", intervals: [0, 1, 4, 7, 10], aliases: ["7b9", "dom7b9", "dominant7b9"] }
+];
+
+const CHORD_QUALITY_BY_ID = new Map(CHORD_QUALITIES.map((entry) => [entry.id, entry]));
+const CHORD_QUALITY_ALIASES = new Map();
+const CHORD_DIFFICULTY_CONFIG = {
+    easy: {
+        qualityIds: ["maj", "min", "power5", "sus2", "sus4"],
+        voicing: "root",
+        spacingChance: 0
+    },
+    medium: {
+        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "maj7", "min7", "dom7", "add9", "six", "dim", "aug"],
+        voicing: "root",
+        spacingChance: 0
+    },
+    voiced: {
+        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "maj7", "min7", "dom7", "add9", "six"],
+        voicing: "spread",
+        spacingChance: 0.55,
+        maxInversion: 1
+    },
+    hard: {
+        qualityIds: ["maj7", "min7", "dom7", "dim", "aug", "m7b5", "dim7", "six", "sixNine", "nine", "add9", "mMaj7", "maj7#11", "7b9"],
+        voicing: "advanced",
+        spacingChance: 0.8,
+        maxInversion: 2
+    }
+};
+const CHORD_DIFFICULTY_ORDER = ["easy", "medium", "voiced", "hard"];
+const CHORD_QUALITY_HINTS = {
+    maj: "major",
+    min: "minor",
+    power5: "power chord",
+    sus2: "suspended 2",
+    sus4: "suspended 4",
+    maj7: "major 7",
+    min7: "minor 7",
+    dom7: "dominant 7",
+    dim: "diminished",
+    aug: "augmented",
+    m7b5: "half-diminished",
+    dim7: "diminished 7",
+    six: "major 6",
+    sixNine: "6/9",
+    nine: "dominant 9",
+    add9: "add 9",
+    mMaj7: "minor major 7",
+    "maj7#11": "major 7 sharp 11",
+    "7b9": "dominant 7 flat 9"
+};
+const TYPE_SUCCESS_FLASH_MS = 700;
+const CHORD_HISTORY_LIMIT = 8;
+const recentChordTargets = [];
+let typingAutoNextTimer = null;
+
+const normalizeQualityToken = (value) => {
+    return String(value ?? "")
+        .replace(/[♯]/g, "#")
+        .replace(/[♭]/g, "b")
+        .replace(/major/gi, "maj")
+        .replace(/minor/gi, "min")
+        .replace(/dominant/gi, "dom")
+        .replace(/\s+/g, "")
+        .replace(/_/g, "")
+        .replace(/-/g, "")
+        .replace(/[^a-zA-Z0-9#b+/]/g, "")
+        .toLowerCase();
+};
+
+CHORD_QUALITIES.forEach((quality) => {
+    quality.aliases.forEach((alias) => {
+        CHORD_QUALITY_ALIASES.set(normalizeQualityToken(alias), quality.id);
+    });
+    CHORD_QUALITY_ALIASES.set(normalizeQualityToken(quality.suffix), quality.id);
+});
+
+const isTypingEnabled = () => state.trainingMode === "type" || state.trainingMode === "both";
+const isTypingOnlyMode = () => state.trainingMode === "type";
+const getIsChordRound = () => isTypingEnabled() || state.chordMode;
+const getEffectiveBlindMode = () => state.blindMode;
+const getKeyboardZoneEl = () => document.querySelector(".keyboard-zone");
+const normalizePitchClass = (value) => ((Math.round(value) % 12) + 12) % 12;
+const getRootName = (pitchClass) => CHORD_ROOT_NAMES[normalizePitchClass(pitchClass)];
+const getMidiFromNoteId = (noteId) => noteMap.get(noteId)?.midi;
+const buildChordLabel = (rootPc, quality) => `${getRootName(rootPc)}${quality?.suffix ?? ""}`;
+
+const getPitchClassSetFromNoteIds = (noteIds) => {
+    const set = new Set();
+    noteIds.forEach((noteId) => {
+        const midi = getMidiFromNoteId(noteId);
+        if (!Number.isFinite(midi)) return;
+        set.add(normalizePitchClass(midi));
+    });
+    return set;
+};
+
+const getChordDifficultyId = (value = state.chordDifficulty) => {
+    const normalized = String(value ?? "").trim().toLowerCase();
+    if (normalized === "playful") return "voiced";
+    if (CHORD_DIFFICULTY_ORDER.includes(normalized)) return normalized;
+    return "easy";
+};
+
+const getChordDifficultyConfig = (difficulty = state.chordDifficulty) => {
+    const id = getChordDifficultyId(difficulty);
+    return CHORD_DIFFICULTY_CONFIG[id] ?? CHORD_DIFFICULTY_CONFIG.easy;
+};
+
+const getAllowedChordQualities = (difficulty = state.chordDifficulty) => {
+    const config = getChordDifficultyConfig(difficulty);
+    return (config.qualityIds ?? [])
+        .map((id) => CHORD_QUALITY_BY_ID.get(id))
+        .filter(Boolean);
+};
+
+const getChordQualityHint = (qualityId) => {
+    if (!qualityId) return "unknown quality";
+    return CHORD_QUALITY_HINTS[qualityId] ?? qualityId;
+};
+
+const getVoicingHintLabel = (voicing) => {
+    if (voicing === "advanced") return "spread + inversion";
+    if (voicing === "spread") return "spread voicing";
+    return "root position";
+};
+
 const randomSample = (array, count) => {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i -= 1) {
@@ -49,7 +220,225 @@ const getNiceTarget = (count) => {
     return randomSample(pool, count).map((note) => note.id);
 };
 
-const createTarget = () => {
+const getQualityPitchClassSet = (rootPc, quality) => {
+    const set = new Set();
+    quality.intervals.forEach((interval) => {
+        set.add(normalizePitchClass(rootPc + interval));
+    });
+    return set;
+};
+
+const parseChordInput = (raw, options = {}) => {
+    const input = String(raw ?? "").trim();
+    if (!input) return null;
+    const match = input.match(/^([A-Ga-g])\s*([#b♯♭]?)(.*)$/);
+    if (!match) return null;
+
+    const rootToken = `${match[1].toUpperCase()}${(match[2] || "").replace("♯", "#").replace("♭", "b").toUpperCase()}`;
+    const rootPc = CHORD_ROOT_ALIASES[rootToken];
+    if (!Number.isFinite(rootPc)) return null;
+
+    const qualityToken = normalizeQualityToken(match[3] || "");
+    const fallbackQuality = qualityToken ? null : "maj";
+    const qualityId = CHORD_QUALITY_ALIASES.get(qualityToken) ?? fallbackQuality;
+    if (!qualityId) return null;
+
+    const quality = CHORD_QUALITY_BY_ID.get(qualityId);
+    if (!quality) return null;
+
+    if (Array.isArray(options.allowedQualityIds) && options.allowedQualityIds.length) {
+        if (!options.allowedQualityIds.includes(quality.id)) return null;
+    }
+
+    return {
+        rootPc,
+        rootName: getRootName(rootPc),
+        quality,
+        label: buildChordLabel(rootPc, quality)
+    };
+};
+
+const detectChordFromNoteIds = (noteIds, qualities = CHORD_QUALITIES) => {
+    if (!noteIds.length) return null;
+    const pitchClassSet = getPitchClassSetFromNoteIds(noteIds);
+    if (pitchClassSet.size < 2) return null;
+
+    const lowestMidi = noteIds
+        .map((noteId) => getMidiFromNoteId(noteId))
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b)[0];
+    const bassPc = Number.isFinite(lowestMidi) ? normalizePitchClass(lowestMidi) : null;
+
+    let best = null;
+    qualities.forEach((quality) => {
+        for (let rootPc = 0; rootPc < 12; rootPc += 1) {
+            const expected = getQualityPitchClassSet(rootPc, quality);
+            if (expected.size !== pitchClassSet.size) continue;
+            const matches = Array.from(expected).every((pc) => pitchClassSet.has(pc));
+            if (!matches) continue;
+
+            const rootInBass = bassPc === rootPc ? 2 : 0;
+            const rootPresent = pitchClassSet.has(rootPc) ? 1 : 0;
+            const compactness = 1 / Math.max(2, quality.intervals.length);
+            const score = rootInBass + rootPresent + compactness;
+            if (!best || score > best.score) {
+                best = {
+                    rootPc,
+                    quality,
+                    label: buildChordLabel(rootPc, quality),
+                    pitchClasses: expected,
+                    score
+                };
+            }
+        }
+    });
+
+    return best ? { ...best } : null;
+};
+
+const normalizeIntervals = (intervals) => {
+    return Array.from(new Set(intervals.map((value) => Math.max(0, Math.round(value))))).sort((a, b) => a - b);
+};
+
+const fitIntervalsToAvailableRange = (intervals) => {
+    if (!notes.length) return intervals;
+    const keySpan = Math.max(12, notes[notes.length - 1].midi - notes[0].midi - 1);
+    const next = [...intervals];
+    let guard = 0;
+    while (Math.max(...next) > keySpan && guard < 30) {
+        guard += 1;
+        let changed = false;
+        for (let index = next.length - 1; index > 0; index -= 1) {
+            const lowered = next[index] - 12;
+            if (lowered > next[index - 1]) {
+                next[index] = lowered;
+                changed = true;
+                break;
+            }
+        }
+        next.sort((a, b) => a - b);
+        if (!changed) break;
+    }
+    return next;
+};
+
+const buildVoicedIntervals = (quality, difficultyId = state.chordDifficulty) => {
+    const config = getChordDifficultyConfig(difficultyId);
+    const voicingMode = config.voicing ?? "root";
+    const base = normalizeIntervals(quality.intervals);
+    if (!base.length) return base;
+    if (voicingMode === "root") return base;
+
+    const intervals = [...base];
+    const maxInversion = Math.min(intervals.length - 1, Math.max(0, Number(config.maxInversion ?? 0)));
+    const inversionCount = maxInversion > 0 ? Math.floor(Math.random() * (maxInversion + 1)) : 0;
+    for (let i = 0; i < inversionCount; i += 1) {
+        intervals[0] += 12;
+        intervals.sort((a, b) => a - b);
+    }
+
+    const keySpan = notes.length ? (notes[notes.length - 1].midi - notes[0].midi) : 24;
+    const spacingChance = Number.isFinite(config.spacingChance) ? config.spacingChance : 0;
+    const allowDoubleOct = voicingMode === "advanced" && keySpan >= 28;
+    for (let index = 1; index < intervals.length; index += 1) {
+        if (Math.random() >= spacingChance) continue;
+        let extra = 12;
+        if (allowDoubleOct && Math.random() < 0.35) {
+            extra = 24;
+        }
+        intervals[index] += extra;
+    }
+
+    return fitIntervalsToAvailableRange(normalizeIntervals(intervals));
+};
+
+const chooseRootCandidatesForIntervals = (intervals) => {
+    if (!notes.length || !intervals.length) return [];
+    const maxMidi = notes[notes.length - 1].midi;
+    const maxInterval = Math.max(...intervals);
+    const base = notes.filter((note) => note.midi + maxInterval <= maxMidi);
+    if (!base.length) return [];
+    if (!state.niceMode) return base;
+    const whiteOnly = base.filter((note) => !note.name.includes("#"));
+    return whiteOnly.length ? whiteOnly : base;
+};
+
+const buildChordFromRoot = (rootNote, quality, intervals, difficultyId) => {
+    const normalizedIntervals = normalizeIntervals(intervals);
+    if (!normalizedIntervals.length) return null;
+    const targetMidis = normalizedIntervals.map((interval) => rootNote.midi + interval);
+    const noteIds = targetMidis.map((midi) => getNoteIdByMidi(midi)).filter(Boolean);
+    const uniqueIds = Array.from(new Set(noteIds));
+    if (uniqueIds.length !== noteIds.length) return null;
+    if (!uniqueIds.length) return null;
+
+    const rootPc = normalizePitchClass(rootNote.midi);
+    const pitchClasses = getQualityPitchClassSet(rootPc, quality);
+    const difficultyKey = getChordDifficultyId(difficultyId);
+    const voicing = getChordDifficultyConfig(difficultyKey).voicing ?? "root";
+    const intervalSpan = normalizedIntervals[normalizedIntervals.length - 1] - normalizedIntervals[0];
+    return {
+        rootPc,
+        rootName: getRootName(rootPc),
+        quality,
+        noteIds: uniqueIds,
+        pitchClasses: Array.from(pitchClasses).sort((a, b) => a - b),
+        label: buildChordLabel(rootPc, quality),
+        signature: `${difficultyKey}-${rootPc}-${quality.id}-${normalizedIntervals.join(".")}`,
+        noteCount: uniqueIds.length,
+        intervalSpan,
+        voicing,
+        qualityHint: getChordQualityHint(quality.id)
+    };
+};
+
+const createChordTarget = () => {
+    const difficultyId = getChordDifficultyId(state.chordDifficulty);
+    const qualities = getAllowedChordQualities(difficultyId);
+    if (!qualities.length || !notes.length) {
+        state.targetChord = null;
+        state.targetNotes = [];
+        return;
+    }
+
+    let picked = null;
+    for (let attempt = 0; attempt < 220; attempt += 1) {
+        const quality = qualities[Math.floor(Math.random() * qualities.length)];
+        const intervals = buildVoicedIntervals(quality, difficultyId);
+        const roots = chooseRootCandidatesForIntervals(intervals);
+        if (!roots.length) continue;
+        const root = roots[Math.floor(Math.random() * roots.length)];
+        const candidate = buildChordFromRoot(root, quality, intervals, difficultyId);
+        if (!candidate) continue;
+        if (recentChordTargets.includes(candidate.signature)) continue;
+        picked = candidate;
+        break;
+    }
+
+    if (!picked) {
+        const fallbackQuality = qualities[0];
+        const fallbackIntervals = buildVoicedIntervals(fallbackQuality, difficultyId);
+        const roots = chooseRootCandidatesForIntervals(fallbackIntervals);
+        const fallbackRoot = roots[0];
+        picked = fallbackRoot ? buildChordFromRoot(fallbackRoot, fallbackQuality, fallbackIntervals, difficultyId) : null;
+    }
+
+    if (!picked) {
+        state.targetChord = null;
+        state.targetNotes = [];
+        return;
+    }
+
+    recentChordTargets.unshift(picked.signature);
+    if (recentChordTargets.length > CHORD_HISTORY_LIMIT) {
+        recentChordTargets.pop();
+    }
+
+    state.targetChord = picked;
+    state.targetNotes = [...picked.noteIds];
+};
+
+const createNoteTarget = () => {
     let next;
     if (state.niceMode && state.noteCount > 1) {
         next = getNiceTarget(state.noteCount);
@@ -81,22 +470,184 @@ const createTarget = () => {
     }
 
     state.targetNotes = next;
+    state.targetChord = null;
+};
+
+const createTarget = () => {
+    if (getIsChordRound()) {
+        createChordTarget();
+        return;
+    }
+    createNoteTarget();
+};
+
+const clearTypingAutoNext = () => {
+    if (!typingAutoNextTimer) return;
+    clearTimeout(typingAutoNextTimer);
+    typingAutoNextTimer = null;
+};
+
+const getTypedPreviewNoteIds = (parsed) => {
+    if (!parsed || !notes.length) return [];
+    const maxMidi = notes[notes.length - 1].midi;
+    const minMidi = notes[0].midi;
+    const maxInterval = Math.max(...parsed.quality.intervals);
+    const centerMidi = Math.round((minMidi + maxMidi) / 2);
+
+    const roots = notes.filter((note) =>
+        normalizePitchClass(note.midi) === parsed.rootPc &&
+        note.midi + maxInterval <= maxMidi
+    );
+    if (!roots.length) return [];
+
+    roots.sort((a, b) => Math.abs(a.midi - centerMidi) - Math.abs(b.midi - centerMidi));
+    const root = roots[0];
+    return parsed.quality.intervals
+        .map((interval) => getNoteIdByMidi(root.midi + interval))
+        .filter(Boolean);
+};
+
+const updateTypedPreviewFromInput = () => {
+    if (!isTypingEnabled()) {
+        state.typedPreviewNotes = [];
+        return null;
+    }
+    const raw = chordAnswerInput?.value ?? "";
+    state.typedAnswer = raw;
+    const parsed = parseChordInput(raw);
+    state.typedPreviewNotes = (state.typingShowTyped && parsed) ? getTypedPreviewNoteIds(parsed) : [];
+    return parsed;
+};
+
+const updateChordReadout = () => {
+    if (!chordReadout) return;
+    const hasKeyboardSelection = state.selectedNotes.length >= 2;
+    const hasTypedInput = Boolean(state.typedAnswer?.trim());
+    const shouldShow = state.active && getIsChordRound() && (hasKeyboardSelection || (isTypingEnabled() && hasTypedInput));
+    chordReadout.hidden = !shouldShow;
+    chordReadout.style.display = shouldShow ? "" : "none";
+    if (!shouldShow) return;
+
+    if (isTypingOnlyMode()) {
+        if (!state.typedAnswer?.trim()) {
+            chordReadout.textContent = "Typed chord: none";
+            return;
+        }
+        const parsed = parseChordInput(state.typedAnswer);
+        chordReadout.textContent = parsed
+            ? `Typed chord: ${parsed.label} (preview)`
+            : "Typed chord: unrecognized";
+        return;
+    }
+
+    const selectedDetected = state.selectedNotes.length ? detectChordFromNoteIds(state.selectedNotes) : null;
+    state.selectedChordLabel = selectedDetected?.label ?? "";
+
+    if (state.trainingMode === "both") {
+        const parsed = hasTypedInput ? parseChordInput(state.typedAnswer) : null;
+        const typedLabel = hasTypedInput ? (parsed?.label ?? "unrecognized") : "";
+        if (state.selectedChordLabel && typedLabel) {
+            chordReadout.textContent = `Selected chord: ${state.selectedChordLabel} | Typed chord: ${typedLabel}`;
+            return;
+        }
+        if (typedLabel) {
+            chordReadout.textContent = `Typed chord: ${typedLabel}`;
+            return;
+        }
+        if (state.selectedChordLabel) {
+            chordReadout.textContent = `Selected chord: ${state.selectedChordLabel}`;
+            return;
+        }
+        chordReadout.textContent = state.selectedNotes.length ? "Selected chord: unknown" : "Selected chord: none";
+        return;
+    }
+
+    if (!state.selectedNotes.length) {
+        chordReadout.textContent = "Selected chord: none";
+        return;
+    }
+    chordReadout.textContent = state.selectedChordLabel
+        ? `Selected chord: ${state.selectedChordLabel}`
+        : "Selected chord: unknown";
+};
+
+const updateModeVisibility = () => {
+    const typingVisible = state.active && !state.submitted && getIsChordRound() && isTypingEnabled();
+    if (typingZone) {
+        typingZone.hidden = !typingVisible;
+        typingZone.style.display = typingVisible ? "" : "none";
+    }
+    if (statusPanel) {
+        statusPanel.hidden = !state.active;
+        statusPanel.style.display = state.active ? "" : "none";
+    }
+    if (chordReadout) {
+        chordReadout.style.display = chordReadout.hidden ? "none" : "";
+    }
+    const keyboardZone = getKeyboardZoneEl();
+    if (keyboardZone) {
+        keyboardZone.hidden = state.active && isTypingOnlyMode() && !state.typingShowPiano;
+    }
 };
 
 const updatePrimaryAction = () => {
-    const label = state.active && !state.submitted ? "Submit (Enter)" : "New Round (Enter)";
+    const label = isTypingOnlyMode()
+        ? (state.active && !state.submitted ? "Check Chord (Enter)" : "New Round (Enter)")
+        : (state.active && !state.submitted ? "Submit (Enter)" : "New Round (Enter)");
     primaryActionButton.textContent = label;
 };
 
 const updateReplayAvailability = () => {
-    const allowReplay = state.active && (!state.blindMode || state.submitted);
+    const allowReplay = isTypingOnlyMode()
+        ? state.active
+        : state.active && (!getEffectiveBlindMode() || state.submitted);
     playSelectedButton.hidden = !allowReplay;
+    playSelectedButton.textContent = isTypingOnlyMode()
+        ? "Replay Chord (Space)"
+        : "Play Selected (Space)";
     return allowReplay;
 };
 
+const getChordHelperHints = () => {
+    if (!state.targetChord) return [];
+    const hints = [];
+    hints.push(`${state.targetChord.noteCount} notes`);
+    hints.push(`Type: ${state.targetChord.qualityHint}`);
+    hints.push(`Voicing: ${getVoicingHintLabel(state.targetChord.voicing)}`);
+    if (Number.isFinite(state.targetChord.intervalSpan)) {
+        hints.push(`Span: ${state.targetChord.intervalSpan} semitones`);
+    }
+    return hints;
+};
+
+const renderChordHelperBox = () => {
+    const hints = getChordHelperHints();
+    if (!hints.length) return "";
+    const indexSeed = Math.max(0, Number(state.round || 0)) + (state.targetNotes?.length || 0);
+    const hint = hints[indexSeed % hints.length];
+    return `<div class="helper-card"><div class="helper-title">Chord helper</div><div class="helper-value">${hint}</div></div>`;
+};
+
 const updateStatus = () => {
-    goalCountEl.textContent = String(state.noteCount);
-    modeLabelEl.textContent = state.blindMode ? "Blind" : "Normal";
+    const chordRound = getIsChordRound();
+    goalCountEl.textContent = chordRound ? "1" : String(state.noteCount);
+    if (goalLabelEl) {
+        goalLabelEl.textContent = chordRound ? "chord" : "notes";
+    }
+
+    if (isTypingOnlyMode()) {
+        modeLabelEl.textContent = "Type Chord";
+    } else if (state.trainingMode === "both" && chordRound) {
+        modeLabelEl.textContent = "Chord + Both";
+    } else if (chordRound && getEffectiveBlindMode()) {
+        modeLabelEl.textContent = "Chord + Blind";
+    } else if (chordRound) {
+        modeLabelEl.textContent = "Chord";
+    } else {
+        modeLabelEl.textContent = getEffectiveBlindMode() ? "Blind" : "Normal";
+    }
+
+    updateModeVisibility();
     document.body.classList.toggle("landing", !state.active);
     if (pedalTip) {
         pedalTip.hidden = state.active;
@@ -109,46 +660,85 @@ const updateStatus = () => {
     }
 
     if (!state.active) {
+        // Landing page is always free-play regardless of saved chord answer mode.
         setKeyboardEnabled(true);
         roundCountEl.textContent = "Not started";
         selectedListEl.textContent = "None";
-        resultEl.textContent = "Press New Round to begin.";
+        resultEl.textContent = isTypingOnlyMode()
+            ? "Press New Round to hear a chord, then type your answer."
+            : (state.trainingMode === "both" && chordRound)
+                ? "Press New Round to hear a chord, then play it, type it, or both."
+            : "Press New Round to begin.";
         revealEl.textContent = "";
         hintFlag.hidden = true;
         hintButton.hidden = true;
-        if (homeButton) {
-            homeButton.hidden = true;
-        }
         updateReplayAvailability();
+        updateChordReadout();
         updatePrimaryAction();
         return;
     }
 
     roundCountEl.textContent = String(state.round);
-    selectedListEl.textContent = state.selectedNotes.length ? state.selectedNotes.join(", ") : "None";
+    const typedSubmissionFinal = state.submitted && chordRound && state.submissionSource === "typing";
+    if (typedSubmissionFinal) {
+        const parsed = parseChordInput(state.typedAnswer);
+        selectedListEl.textContent = parsed?.label ? `${parsed.label} (typed)` : "Typed answer";
+    } else if (isTypingOnlyMode()) {
+        const parsed = parseChordInput(state.typedAnswer);
+        selectedListEl.textContent = parsed?.label || state.typedAnswer?.trim() || "None";
+    } else if (state.trainingMode === "both" && chordRound) {
+        const selectedChord = detectChordFromNoteIds(state.selectedNotes);
+        state.selectedChordLabel = selectedChord?.label ?? "";
+        const parsed = state.typedAnswer?.trim() ? parseChordInput(state.typedAnswer) : null;
+        const typedLabel = state.typedAnswer?.trim() ? (parsed?.label || state.typedAnswer.trim()) : "";
+        if (state.selectedChordLabel && typedLabel) {
+            selectedListEl.textContent = `${state.selectedChordLabel} | ${typedLabel} (typed)`;
+        } else if (typedLabel) {
+            selectedListEl.textContent = `${typedLabel} (typed)`;
+        } else if (state.selectedChordLabel) {
+            selectedListEl.textContent = state.selectedChordLabel;
+        } else {
+            selectedListEl.textContent = state.selectedNotes.length ? state.selectedNotes.join(", ") : "None";
+        }
+    } else if (chordRound) {
+        const selectedChord = detectChordFromNoteIds(state.selectedNotes);
+        state.selectedChordLabel = selectedChord?.label ?? "";
+        selectedListEl.textContent = state.selectedChordLabel || (state.selectedNotes.length ? state.selectedNotes.join(", ") : "None");
+    } else {
+        selectedListEl.textContent = state.selectedNotes.length ? state.selectedNotes.join(", ") : "None";
+    }
     hintButton.hidden = state.submitted;
     hintFlag.hidden = !(state.submitted && state.hintUsed);
-    if (homeButton) {
-        homeButton.hidden = false;
-    }
     updateReplayAvailability();
 
     if (!state.submitted) {
-        resultEl.textContent = "";
+        const shouldShowHelpers = getIsChordRound() && Boolean(state.chordExtraHelpers) && Boolean(state.targetChord);
+        resultEl.innerHTML = shouldShowHelpers ? renderChordHelperBox() : "";
         revealEl.textContent = "";
     }
+    updateChordReadout();
     updatePrimaryAction();
 };
 
 const updateKeyStates = () => {
-    const selectedSet = new Set(state.selectedNotes);
+    const evaluationNotes = state.submitted
+        ? (state.submittedComparisonNotes?.length ? state.submittedComparisonNotes : state.selectedNotes)
+        : state.selectedNotes;
+    const selectedSet = new Set(evaluationNotes);
+    const liveSelectedSet = new Set(state.selectedNotes);
     const targetSet = new Set(state.targetNotes);
+    const typedPreviewSet = new Set(
+        isTypingEnabled() && state.typingShowTyped ? state.typedPreviewNotes : []
+    );
 
     keyMap.forEach((key, id) => {
-        key.classList.remove("selected", "correct", "wrong", "missed");
+        key.classList.remove("selected", "correct", "wrong", "missed", "typed-preview");
 
         if (!state.active) {
             key.setAttribute("aria-pressed", "false");
+            if (typedPreviewSet.has(id) && isTypingEnabled()) {
+                key.classList.add("typed-preview");
+            }
             return;
         }
 
@@ -164,12 +754,16 @@ const updateKeyStates = () => {
             key.classList.add("selected");
         }
 
-        key.setAttribute("aria-pressed", selectedSet.has(id) ? "true" : "false");
+        if (typedPreviewSet.has(id)) {
+            key.classList.add("typed-preview");
+        }
+        key.setAttribute("aria-pressed", liveSelectedSet.has(id) ? "true" : "false");
     });
 };
 
 const setKeyboardEnabled = (enabled) => {
-    keyboardEl.classList.toggle("disabled", !enabled);
+    const effectiveEnabled = !(isTypingOnlyMode() && state.active) && enabled;
+    keyboardEl.classList.toggle("disabled", !effectiveEnabled);
 };
 
 const updateKeyboardScale = () => {
@@ -186,13 +780,14 @@ const updateKeyboardScale = () => {
 };
 
 const lockKeyboardForPlayback = (noteIds, mode) => {
+    if (isTypingOnlyMode()) return;
     if (!noteIds.length) return;
     if (keyboardUnlockTimer) {
         clearTimeout(keyboardUnlockTimer);
         keyboardUnlockTimer = null;
     }
     setKeyboardEnabled(false);
-    const duration = getPlaybackSpan(noteIds, mode) + 0.5;
+    const duration = getPlaybackSpan(noteIds, mode) + (getIsChordRound() ? 0.5 : 0);
     keyboardUnlockTimer = setTimeout(() => {
         setKeyboardEnabled(true);
         keyboardUnlockTimer = null;
@@ -215,30 +810,56 @@ const refreshTarget = () => {
         return;
     }
     state.selectedNotes = [];
+    state.selectedChordLabel = "";
+    state.submissionSource = null;
+    state.submittedComparisonNotes = [];
     setSubmitted(false);
     createTarget();
+    if (isTypingEnabled()) {
+        state.typedAnswer = "";
+        state.typedPreviewNotes = [];
+        if (chordAnswerInput) {
+            chordAnswerInput.value = "";
+        }
+    }
     updateStatus();
     updateKeyStates();
 };
 
 const startRound = (shouldPlay = false) => {
     abortPlayback();
+    clearTypingAutoNext();
     state.round = state.active ? state.round + 1 : 1;
     state.active = true;
     state.hintUsed = false;
     state.selectedNotes = [];
+    state.selectedChordLabel = "";
+    state.submissionSource = null;
+    state.submittedComparisonNotes = [];
     setSubmitted(false);
     createTarget();
-    setKeyboardEnabled(true);
+    if (isTypingEnabled()) {
+        state.typedAnswer = "";
+        state.typedPreviewNotes = [];
+        if (chordAnswerInput) {
+            chordAnswerInput.value = "";
+            if (state.active) {
+                chordAnswerInput.focus();
+            }
+        }
+    }
+    setKeyboardEnabled(!isTypingOnlyMode());
     updateStatus();
     updateKeyStates();
     pendingCriticalRestart = false;
     if (shouldPlay) {
         const ctx = ensureAudio();
-        lockKeyboardForPlayback(state.targetNotes, state.mode);
+        if (!isTypingOnlyMode()) {
+            lockKeyboardForPlayback(state.targetNotes, state.mode);
+        }
         playNotes(state.targetNotes, state.mode, ctx.currentTime + ROUND_START_DELAY, { animate: false });
     } else {
-        setKeyboardEnabled(true);
+        setKeyboardEnabled(!isTypingOnlyMode());
     }
 };
 
@@ -260,7 +881,9 @@ const playTarget = () => {
     }
     state.hintUsed = true;
     updateStatus();
-    lockKeyboardForPlayback(state.targetNotes, state.mode);
+    if (!isTypingOnlyMode()) {
+        lockKeyboardForPlayback(state.targetNotes, state.mode);
+    }
     playNotes(state.targetNotes, state.mode, undefined, {
         animate: state.submitted,
         animationHoldMs: ROUND_ANIM_HOLD_MS
@@ -276,8 +899,7 @@ const startManualNote = (noteId, options = {}) => {
     activateKey(noteId);
 
     const now = performance.now();
-    const isLanding = !state.active;
-    const durationMs = isLanding ? HOLD_BUFFER * 1000 : state.noteDuration * 1000;
+    const durationMs = state.noteDuration * 1000;
     if (playSound) {
         const ctx = ensureAudio();
         const durationOverride = state.noteDuration + HOLD_MAX_EXTRA;
@@ -285,7 +907,7 @@ const startManualNote = (noteId, options = {}) => {
             animate: false,
             durationOverride
         });
-    } else if (state.blindMode && state.active && !state.submitted) {
+    } else if (getEffectiveBlindMode() && state.active && !state.submitted) {
         resultEl.textContent = "Blind mode: notes are muted while selecting.";
     }
     const entry = {
@@ -308,7 +930,6 @@ const releaseManualNote = (noteId) => {
         entry.holdTimer = null;
     }
     const now = performance.now();
-    const isLanding = !state.active;
     const remainingMs = Math.max(0, entry.stopAt - now);
     const elapsedMs = Math.max(0, now - entry.pressAt);
     const animDelayMs = state.active ? Math.max(0, MIN_KEY_ANIM_MS - elapsedMs) : SHORT_PRESS_ANIM_MS;
@@ -320,7 +941,7 @@ const releaseManualNote = (noteId) => {
         manualNoteState.delete(noteId);
         return;
     }
-    const releaseDelayMs = remainingMs > 0 ? remainingMs : (isLanding ? HOLD_BUFFER * 1000 : SHORT_PRESS_ANIM_MS);
+    const releaseDelayMs = remainingMs > 0 ? remainingMs : 0;
     scheduleKeyRelease(noteId, animDelayMs);
     if (entry.playSound && audioContext) {
         setTimeout(() => {
@@ -361,6 +982,9 @@ const stopPedalHold = () => {
 };
 
 const toggleSelection = (noteId) => {
+    if (isTypingOnlyMode()) {
+        return;
+    }
     if (!state.active) {
         updateStatus();
         return;
@@ -377,7 +1001,10 @@ const toggleSelection = (noteId) => {
         return;
     }
 
-    while (state.selectedNotes.length >= state.noteCount) {
+    const maxSelection = getIsChordRound()
+        ? Math.max(6, state.targetNotes.length || 3)
+        : state.noteCount;
+    while (state.selectedNotes.length >= maxSelection) {
         state.selectedNotes.pop();
     }
 
@@ -388,6 +1015,17 @@ const toggleSelection = (noteId) => {
 };
 
 const isSelectionCorrect = () => {
+    if (getIsChordRound()) {
+        if (!state.targetChord) return false;
+        const selectedPcs = getPitchClassSetFromNoteIds(state.selectedNotes);
+        const targetPcs = new Set(state.targetChord.pitchClasses);
+        if (!selectedPcs.size) return false;
+        return (
+            Array.from(targetPcs).every((pc) => selectedPcs.has(pc)) &&
+            Array.from(selectedPcs).every((pc) => targetPcs.has(pc))
+        );
+    }
+
     const selectedSet = new Set(state.selectedNotes);
     return (
         state.selectedNotes.length === state.targetNotes.length &&
@@ -410,16 +1048,68 @@ const renderNotePills = (label, notes, toneClass) => {
     return `<div class="reveal-label">${label}</div><div class="note-pills">${pills}</div>`;
 };
 
+const renderChordPill = (label, chordLabel, toneClass) => {
+    if (!chordLabel) return "";
+    return `<div class="reveal-label">${label}</div><div class="note-pills"><span class="note-pill ${toneClass}">${chordLabel}</span></div>`;
+};
+
+const renderTonePills = (items, toneClassOrResolver = "good") => {
+    if (!items.length) return "";
+    return items.map((item) => {
+        const toneClass = typeof toneClassOrResolver === "function"
+            ? toneClassOrResolver(item)
+            : toneClassOrResolver;
+        return `<span class="note-pill ${toneClass}">${item}</span>`;
+    }).join("");
+};
+
+const renderRevealCell = (label, pillsHtml) => {
+    if (!pillsHtml) return "";
+    return `<div class="reveal-cell"><div class="reveal-label">${label}</div><div class="note-pills">${pillsHtml}</div></div>`;
+};
+
+const renderChordRevealGrid = (entries) => {
+    const cells = entries.filter(Boolean).join("");
+    return `<div class="reveal-grid compact">${cells}</div>`;
+};
+
+const renderChordDetectionMeta = (label, noteIds, toneClass = "good") => {
+    const detected = detectChordFromNoteIds(noteIds);
+    if (!detected) return "";
+    return renderChordPill(label, detected.label, toneClass);
+};
+
 const renderPressedPills = () => {
     if (!state.selectedNotes.length) return "";
     const targetSet = new Set(state.targetNotes);
-    const pills = state.selectedNotes
-        .map((note) => {
-            const toneClass = targetSet.has(note) ? "good" : "bad";
-            return `<span class="note-pill ${toneClass}">${note}</span>`;
-        })
-        .join("");
+    const pills = renderTonePills(state.selectedNotes, (note) => (targetSet.has(note) ? "good" : "bad"));
     return `<div>Your notes</div><div class="note-pills">${pills}</div>`;
+};
+
+const buildNoteComparison = (targetNotes, answerNotes) => {
+    const targetSet = new Set(targetNotes);
+    const answerSet = new Set(answerNotes);
+    const correct = answerNotes.filter((note) => targetSet.has(note));
+    const wrong = answerNotes.filter((note) => !targetSet.has(note));
+    const missed = targetNotes.filter((note) => !answerSet.has(note));
+    return { correct, wrong, missed };
+};
+
+const renderNoteComparisonCells = (targetNotes, answerNotes) => {
+    const comparison = buildNoteComparison(targetNotes, answerNotes);
+    const correctCell = renderRevealCell(
+        "Correct notes",
+        comparison.correct.length ? renderTonePills(comparison.correct, "good") : '<span class="note-pill neutral">None</span>'
+    );
+    const wrongCell = renderRevealCell(
+        "Wrong notes",
+        comparison.wrong.length ? renderTonePills(comparison.wrong, "bad") : '<span class="note-pill neutral">None</span>'
+    );
+    const missedCell = renderRevealCell(
+        "Missed notes",
+        comparison.missed.length ? renderTonePills(comparison.missed, "missed") : '<span class="note-pill neutral">None</span>'
+    );
+    return [correctCell, wrongCell, missedCell];
 };
 
 const playRevealSequence = (options = {}) => {
@@ -437,9 +1127,10 @@ const playRevealSequence = (options = {}) => {
     };
     const targetNotes = snapshot.target ?? [];
     const selectedNotes = snapshot.selected ?? [];
-    const isCorrect =
+    const isCorrect = options.isCorrect ?? (
         targetNotes.length === selectedNotes.length &&
-        targetNotes.every((noteId) => selectedNotes.includes(noteId));
+        targetNotes.every((noteId) => selectedNotes.includes(noteId))
+    );
     const revealDelayMs = (options.delay ?? 0.55) * 1000;
     const targetSpanMs = getPlaybackSpan(targetNotes, state.mode) * 1000;
     const selectedSpanMs = (isCorrect ? 0 : getPlaybackSpan(selectedNotes, state.mode)) * 1000;
@@ -479,6 +1170,12 @@ const playSelectedChord = () => {
         updateStatus();
         return;
     }
+    if (isTypingOnlyMode()) {
+        if (!playTypedInputChord()) {
+            resultEl.textContent = "Type a valid chord first.";
+        }
+        return;
+    }
     if (state.submitted) {
         abortPlayback();
         playRevealSequence({ delay: 0, snapshot: lastReveal });
@@ -495,9 +1192,31 @@ const playSelectedChord = () => {
     });
 };
 
+const playTypedInputChord = () => {
+    if (!state.active || state.submitted || !isTypingEnabled()) return false;
+    if (getEffectiveBlindMode()) return false;
+    const parsed = updateTypedPreviewFromInput();
+    if (!parsed) return false;
+    const noteIds = getTypedPreviewNoteIds(parsed);
+    if (!noteIds.length) return false;
+    playNotes(noteIds, "simultaneous", undefined, {
+        animate: true,
+        animationDelay: 0,
+        animationHoldMs: ROUND_ANIM_HOLD_MS
+    });
+    resultEl.textContent = `Preview: ${parsed.label}`;
+    return true;
+};
+
 const startHeldPlayback = () => {
     if (!state.active) return;
-    if (state.blindMode && !state.submitted) return;
+    if (getEffectiveBlindMode() && !state.submitted) return;
+    if (isTypingOnlyMode()) {
+        if (!playTypedInputChord()) {
+            resultEl.textContent = "Type a valid chord first.";
+        }
+        return;
+    }
     if (state.submitted) {
         if (revealPlaying) {
             abortPlayback();
@@ -534,6 +1253,9 @@ const startHeldPlayback = () => {
 };
 
 const releaseHeldPlayback = () => {
+    if (isTypingOnlyMode()) {
+        return;
+    }
     if (state.submitted) {
         return;
     }
@@ -562,23 +1284,157 @@ const releaseHeldPlayback = () => {
     holdState.noteIds = [];
 };
 
-const submitAnswer = () => {
+const buildTypingRevealDetail = (parsed) => {
+    if (!state.targetChord) return "";
+    if (!parsed) {
+        return "<div class=\"reveal-label\">Your answer could not be parsed.</div>";
+    }
+    const mismatches = [];
+    if (parsed.rootPc !== state.targetChord.rootPc) {
+        mismatches.push(`root should be ${state.targetChord.rootName}`);
+    }
+    if (parsed.quality.id !== state.targetChord.quality.id) {
+        mismatches.push(`quality should be ${state.targetChord.quality.suffix || "major"}`);
+    }
+    if (!mismatches.length) return "";
+    return `<div class="reveal-label">Difference: ${mismatches.join(", ")}.</div>`;
+};
+
+const submitTypedAnswer = () => {
     if (!ensureRound()) {
         return;
     }
     abortPlayback();
+    clearTypingAutoNext();
+    const parsed = updateTypedPreviewFromInput();
+    const target = state.targetChord;
+    if (!target) {
+        resultEl.textContent = "No target chord available. Start a new round.";
+        return;
+    }
+    const answerNotes = parsed ? getTypedPreviewNoteIds(parsed) : [];
+
+    const isCorrect = Boolean(
+        parsed &&
+        parsed.rootPc === target.rootPc &&
+        parsed.quality.id === target.quality.id
+    );
+    state.submissionSource = "typing";
+    state.submittedComparisonNotes = [...answerNotes];
+    setSubmitted(true);
+    if (isCorrect) {
+        resultEl.textContent = `Correct: ${target.label}`;
+        const targetChordCell = renderRevealCell(
+            "Target chord",
+            renderTonePills([target.label], "good")
+        );
+        const targetNotesCell = renderRevealCell(
+            "Target notes",
+            renderTonePills(state.targetNotes, "good")
+        );
+        revealEl.innerHTML = renderChordRevealGrid([targetChordCell, targetNotesCell]);
+        lastReveal = {
+            target: [...state.targetNotes],
+            selected: []
+        };
+        updateStatus();
+        updateKeyStates();
+        typingAutoNextTimer = setTimeout(() => {
+            typingAutoNextTimer = null;
+            if (isTypingOnlyMode()) {
+                startRound(true);
+            }
+        }, TYPE_SUCCESS_FLASH_MS);
+        return;
+    }
+
+    const answerLabel = parsed?.label || (state.typedAnswer?.trim() || "No answer");
+    const targetChordCell = renderRevealCell(
+        "Target chord",
+        renderTonePills([target.label], "good")
+    );
+    const targetNotesCell = renderRevealCell(
+        "Target notes",
+        renderTonePills(state.targetNotes, "good")
+    );
+    const answerChordCell = renderRevealCell(
+        "Your chord",
+        renderTonePills([answerLabel], "bad")
+    );
+    const detail = buildTypingRevealDetail(parsed);
+    revealEl.innerHTML = `${renderChordRevealGrid([targetChordCell, targetNotesCell, answerChordCell])}${detail}`;
+    resultEl.textContent = "Not quite. Compare the chord name and quality.";
+    lastReveal = {
+        target: [...state.targetNotes],
+        selected: [...answerNotes]
+    };
+    playRevealSequence({ snapshot: lastReveal, isCorrect: false });
+    updateStatus();
+    updateKeyStates();
+};
+
+const submitAnswer = () => {
+    if (isTypingOnlyMode()) {
+        submitTypedAnswer();
+        return;
+    }
+    if (state.trainingMode === "both") {
+        const hasTyped = Boolean(state.typedAnswer?.trim());
+        const typingFocused = document.activeElement === chordAnswerInput;
+        if (hasTyped && (typingFocused || !state.selectedNotes.length)) {
+            submitTypedAnswer();
+            return;
+        }
+    }
+    if (!ensureRound()) {
+        return;
+    }
+    abortPlayback();
+    state.submissionSource = "keyboard";
+    state.submittedComparisonNotes = [...state.selectedNotes];
     setSubmitted(true);
     const isCorrect = isSelectionCorrect();
 
-    resultEl.textContent = isCorrect ? "Correct. Great ear." : "Not quite. Listen closely.";
-    const targetHtml = renderNotePills("Target notes", state.targetNotes, "good");
-    const pressedHtml = renderPressedPills();
-    revealEl.innerHTML = `${targetHtml}${pressedHtml}`;
+    if (getIsChordRound()) {
+        const selectedChord = detectChordFromNoteIds(state.selectedNotes);
+        const targetLabel = state.targetChord?.label ?? "Unknown";
+        const selectedLabel = selectedChord?.label ?? "Unknown";
+        resultEl.textContent = isCorrect ? "Correct chord. Great ear." : "Not quite. Compare the chord quality.";
+        const targetSet = new Set(state.targetNotes);
+        const targetChordCell = renderRevealCell(
+            "Target chord",
+            renderTonePills([targetLabel], "good")
+        );
+        const targetNotesCell = renderRevealCell(
+            "Target notes",
+            renderTonePills(state.targetNotes, "good")
+        );
+        const selectedChordCell = renderRevealCell(
+            "Your chord",
+            renderTonePills([selectedLabel], isCorrect ? "good" : "bad")
+        );
+        const selectedNotesCell = renderRevealCell(
+            "Your notes",
+            state.selectedNotes.length
+                ? renderTonePills(state.selectedNotes, (note) => (targetSet.has(note) ? "good" : "bad"))
+                : '<span class="note-pill bad">None</span>'
+        );
+        const noteComparisonCells = renderNoteComparisonCells(state.targetNotes, state.selectedNotes);
+        revealEl.innerHTML = renderChordRevealGrid([targetChordCell, targetNotesCell, selectedChordCell, selectedNotesCell, ...noteComparisonCells]);
+    } else {
+        resultEl.textContent = isCorrect ? "Correct. Great ear." : "Not quite. Listen closely.";
+        const targetHtml = renderNotePills("Target notes", state.targetNotes, "good");
+        const pressedHtml = renderPressedPills();
+        const targetChordMeta = renderChordDetectionMeta("Detected target chord", state.targetNotes, "good");
+        const selectedChordMeta = renderChordDetectionMeta("Detected your chord", state.selectedNotes, isCorrect ? "good" : "bad");
+        revealEl.innerHTML = `${targetHtml}${pressedHtml}${targetChordMeta}${selectedChordMeta}`;
+    }
+
     lastReveal = {
         target: [...state.targetNotes],
         selected: [...state.selectedNotes]
     };
-    playRevealSequence({ snapshot: lastReveal });
+    playRevealSequence({ snapshot: lastReveal, isCorrect });
     updateKeyStates();
     updatePrimaryAction();
     updateStatus();
@@ -589,14 +1445,17 @@ Object.assign(App.game, {
     startRound,
     playTarget,
     playSelectedChord,
+    playTypedInputChord,
     startManualNote,
     releaseManualNote,
     startHeldPlayback,
     releaseHeldPlayback,
+    submitTypedAnswer,
+    updateTypedPreviewFromInput,
     submitAnswer,
     updateStatus,
     updateKeyStates,
     setKeyboardEnabled,
-    goHome
+    clearTypingAutoNext
 });
 

@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Note Recognition Piano Trainer</title>
-  <link rel="stylesheet" href="styles.css?v=20260305151105" />
+  <link rel="stylesheet" href="styles.css?v=20260305155236" />
 </head>
 
 <body>
@@ -27,25 +27,10 @@
     </svg>
   </button>
 
-  <button id="home-button" class="home-button" type="button" aria-label="Return to free roam" hidden>
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        d="M12 3.5 3.5 10a1 1 0 0 0 1.2 1.6l.8-.6V20a1 1 0 0 0 1 1h4.5a1 1 0 0 0 1-1v-4h2v4a1 1 0 0 0 1 1H18a1 1 0 0 0 1-1v-9l.8.6A1 1 0 1 0 21.5 10L12 3.5Z" />
-    </svg>
-  </button>
-
   <aside id="settings-panel" class="settings-panel" aria-hidden="true">
     <h2>Settings</h2>
     <div class="settings-body">
       <div class="settings-grid">
-        <div class="control">
-          <label for="note-count">Notes per round</label>
-          <div class="control-row">
-            <input id="note-count" type="range" min="1" max="6" step="1" value="2" />
-            <span class="volume-value" id="note-count-value">2 notes</span>
-          </div>
-        </div>
-
         <div class="control">
           <label>Game Settings</label>
           <div class="control-row">
@@ -216,6 +201,14 @@
             <option value="nice">Harmonic Notes</option>
             <option value="chord">Chord Practice</option>
           </select>
+        </div>
+      </div>
+
+      <div class="control compact" data-option-group="notes">
+        <label for="note-count">Notes per round</label>
+        <div class="control-row">
+          <input id="note-count" type="range" min="1" max="6" step="1" value="2" />
+          <span class="volume-value" id="note-count-value">2 notes</span>
         </div>
       </div>
 
@@ -444,13 +437,13 @@
     </div>
   </section>
 
-  <script src="vendor/libfluidsynth-2.4.6.js?v=20260305151105" defer></script>
-  <script src="vendor/js-synthesizer.min.js?v=20260305151105" defer></script>
-  <script src="js/core.js?v=20260305151105" defer></script>
-  <script src="js/audio.js?v=20260305151105" defer></script>
-  <script src="js/game.js?v=20260305151105" defer></script>
-  <script src="js/settings.js?v=20260305151105" defer></script>
-  <script src="js/events.js?v=20260305151105" defer></script>
+  <script src="vendor/libfluidsynth-2.4.6.js?v=20260305155236" defer></script>
+  <script src="vendor/js-synthesizer.min.js?v=20260305155236" defer></script>
+  <script src="js/core.js?v=20260305155236" defer></script>
+  <script src="js/audio.js?v=20260305155236" defer></script>
+  <script src="js/game.js?v=20260305155236" defer></script>
+  <script src="js/settings.js?v=20260305155236" defer></script>
+  <script src="js/events.js?v=20260305155236" defer></script>
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260305151105";
+const BUILD_ID = "20260305155236";
 App.buildId = BUILD_ID;
 
 const dom = {
@@ -33,7 +33,6 @@ const dom = {
     startNoteValue: document.getElementById("start-note-value"),
     hintButton: document.getElementById("hint-button"),
     hintFlag: document.getElementById("hint-flag"),
-    homeButton: document.getElementById("home-button"),
     optionsTrigger: document.getElementById("options-trigger"),
     optionsPanel: document.getElementById("options-panel"),
     advancedTrigger: document.getElementById("advanced-trigger"),
@@ -138,7 +137,6 @@ const {
     startNoteValue,
     hintButton,
     hintFlag,
-    homeButton,
     optionsTrigger,
     optionsPanel,
     advancedTrigger,
@@ -418,7 +416,9 @@ const state = {
     targetChord: null,
     selectedChordLabel: "",
     typedAnswer: "",
-    typedPreviewNotes: []
+    typedPreviewNotes: [],
+    submissionSource: null,
+    submittedComparisonNotes: []
 };
 App.defaults = DEFAULTS;
 App.state = state;
@@ -537,6 +537,8 @@ const resetAllSettings = () => {
     state.selectedChordLabel = "";
     state.typedAnswer = "";
     state.typedPreviewNotes = [];
+    state.submissionSource = null;
+    state.submittedComparisonNotes = [];
 };
 
 let audioContext;
