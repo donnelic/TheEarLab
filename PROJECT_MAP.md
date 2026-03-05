@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-05 23:39:58 +01:00
+Generated: 2026-03-05 23:41:11 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -37,7 +37,7 @@ Generated: 2026-03-05 23:39:58 +01:00
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1517 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 822 |
 | js/events.js | JavaScript | Browser runtime module | Yes | 1544 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 1564 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 1565 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1111 |
 | README.md | Markdown | Human + AI onboarding | Yes | 103 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
@@ -808,7 +808,7 @@ Event bindings:
 | pedalBox | pointerleave | 1490 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-1564
+File lines: 1-1565
 
 | Symbol | Lines |
 |---|---|
@@ -842,50 +842,50 @@ File lines: 1-1564
 | createNoteTarget | 462-495 |
 | createTarget | 497-503 |
 | clearTypingAutoNext | 505-509 |
-| getTypedPreviewNoteIds | 511-543 |
-| updateTypedPreviewFromInput | 545-555 |
-| updateChordReadout | 557-609 |
-| updateModeVisibility | 611-628 |
-| updatePrimaryAction | 630-635 |
-| updateReplayAvailability | 637-646 |
-| getChordHelperHints | 648-659 |
-| createDeterministicHelperMask | 668-690 |
-| renderChordHelperBox | 692-710 |
-| updateStatus | 712-805 |
-| updateKeyStates | 807-846 |
-| setKeyboardEnabled | 848-851 |
-| updateKeyboardScale | 853-864 |
-| lockKeyboardForPlayback | 866-879 |
-| setSubmitted | 881-888 |
-| refreshTarget | 890-911 |
-| startRound | 913-948 |
-| ensureRound | 950-959 |
-| playTarget | 961-975 |
-| startManualNote | 977-1007 |
-| releaseManualNote | 1009-1037 |
-| releasePedalNotes | 1039-1049 |
-| startPedalHold | 1051-1057 |
-| stopPedalHold | 1059-1066 |
-| toggleSelection | 1068-1099 |
-| isSelectionCorrect | 1101-1118 |
-| getPlaybackSpan | 1120-1125 |
-| renderNotePills | 1127-1133 |
-| renderChordPill | 1135-1138 |
-| renderTonePills | 1140-1148 |
-| renderRevealCell | 1150-1153 |
-| renderChordRevealGrid | 1155-1158 |
-| renderChordDetectionMeta | 1160-1164 |
-| renderPressedPills | 1166-1171 |
-| buildNoteComparison | 1173-1180 |
-| renderNoteComparisonCells | 1182-1197 |
-| playRevealSequence | 1199-1251 |
-| playSelectedChord | 1253-1278 |
-| playTypedInputChord | 1280-1294 |
-| startHeldPlayback | 1296-1338 |
-| releaseHeldPlayback | 1340-1373 |
-| buildTypingRevealDetail | 1375-1393 |
-| submitTypedAnswer | 1395-1472 |
-| submitAnswer | 1474-1543 |
+| getTypedPreviewNoteIds | 511-544 |
+| updateTypedPreviewFromInput | 546-556 |
+| updateChordReadout | 558-610 |
+| updateModeVisibility | 612-629 |
+| updatePrimaryAction | 631-636 |
+| updateReplayAvailability | 638-647 |
+| getChordHelperHints | 649-660 |
+| createDeterministicHelperMask | 669-691 |
+| renderChordHelperBox | 693-711 |
+| updateStatus | 713-806 |
+| updateKeyStates | 808-847 |
+| setKeyboardEnabled | 849-852 |
+| updateKeyboardScale | 854-865 |
+| lockKeyboardForPlayback | 867-880 |
+| setSubmitted | 882-889 |
+| refreshTarget | 891-912 |
+| startRound | 914-949 |
+| ensureRound | 951-960 |
+| playTarget | 962-976 |
+| startManualNote | 978-1008 |
+| releaseManualNote | 1010-1038 |
+| releasePedalNotes | 1040-1050 |
+| startPedalHold | 1052-1058 |
+| stopPedalHold | 1060-1067 |
+| toggleSelection | 1069-1100 |
+| isSelectionCorrect | 1102-1119 |
+| getPlaybackSpan | 1121-1126 |
+| renderNotePills | 1128-1134 |
+| renderChordPill | 1136-1139 |
+| renderTonePills | 1141-1149 |
+| renderRevealCell | 1151-1154 |
+| renderChordRevealGrid | 1156-1159 |
+| renderChordDetectionMeta | 1161-1165 |
+| renderPressedPills | 1167-1172 |
+| buildNoteComparison | 1174-1181 |
+| renderNoteComparisonCells | 1183-1198 |
+| playRevealSequence | 1200-1252 |
+| playSelectedChord | 1254-1279 |
+| playTypedInputChord | 1281-1295 |
+| startHeldPlayback | 1297-1339 |
+| releaseHeldPlayback | 1341-1374 |
+| buildTypingRevealDetail | 1376-1394 |
+| submitTypedAnswer | 1396-1473 |
+| submitAnswer | 1475-1544 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1111

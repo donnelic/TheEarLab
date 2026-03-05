@@ -526,6 +526,7 @@ const getTypedPreviewNoteIds = (parsed) => {
         preferredRootMidi = parsed.rootMidi;
     }
     if (
+        !Number.isFinite(parsed.rootMidi) &&
         state.active &&
         getIsChordRound() &&
         state.targetChord &&
