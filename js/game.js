@@ -31,6 +31,7 @@ const CHORD_QUALITIES = [
     { id: "min", suffix: "m", intervals: [0, 3, 7], aliases: ["m", "min", "minor", "-"] },
     { id: "sus2", suffix: "sus2", intervals: [0, 2, 7], aliases: ["sus2", "2sus"] },
     { id: "sus4", suffix: "sus4", intervals: [0, 5, 7], aliases: ["sus", "sus4", "4sus"] },
+    { id: "sus47", suffix: "7sus4", intervals: [0, 5, 7, 10], aliases: ["7sus4", "sus47", "domsus4"] },
     { id: "power5", suffix: "5", intervals: [0, 7], aliases: ["5", "power", "powerchord"] },
     { id: "maj7", suffix: "maj7", intervals: [0, 4, 7, 11], aliases: ["maj7", "major7", "ma7", "M7"] },
     { id: "min7", suffix: "m7", intervals: [0, 3, 7, 10], aliases: ["m7", "min7", "minor7", "-7"] },
@@ -40,9 +41,13 @@ const CHORD_QUALITIES = [
     { id: "m7b5", suffix: "m7b5", intervals: [0, 3, 6, 10], aliases: ["m7b5", "min7b5", "halfdim", "half-diminished"] },
     { id: "dim7", suffix: "dim7", intervals: [0, 3, 6, 9], aliases: ["dim7", "diminished7", "o7"] },
     { id: "six", suffix: "6", intervals: [0, 4, 7, 9], aliases: ["6", "maj6", "major6"] },
+    { id: "min6", suffix: "m6", intervals: [0, 3, 7, 9], aliases: ["m6", "min6", "minor6", "-6"] },
     { id: "sixNine", suffix: "6/9", intervals: [0, 4, 7, 9, 14], aliases: ["6/9", "69", "sixnine"] },
     { id: "nine", suffix: "9", intervals: [0, 4, 7, 10, 14], aliases: ["9", "dom9", "dominant9"] },
+    { id: "maj9", suffix: "maj9", intervals: [0, 4, 7, 11, 14], aliases: ["maj9", "major9", "ma9", "M9"] },
+    { id: "min9", suffix: "m9", intervals: [0, 3, 7, 10, 14], aliases: ["m9", "min9", "minor9", "-9"] },
     { id: "add9", suffix: "add9", intervals: [0, 2, 4, 7], aliases: ["add9"] },
+    { id: "add11", suffix: "add11", intervals: [0, 4, 5, 7], aliases: ["add11"] },
     { id: "mMaj7", suffix: "mMaj7", intervals: [0, 3, 7, 11], aliases: ["mmaj7", "minmaj7", "minormajor7"] },
     { id: "maj7#11", suffix: "maj7#11", intervals: [0, 4, 6, 11], aliases: ["maj7#11", "major7#11", "lydian"] },
     { id: "7b9", suffix: "7b9", intervals: [0, 1, 4, 7, 10], aliases: ["7b9", "dom7b9", "dominant7b9"] }
@@ -57,18 +62,18 @@ const CHORD_DIFFICULTY_CONFIG = {
         spacingChance: 0
     },
     medium: {
-        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "maj7", "min7", "dom7", "add9", "six", "dim", "aug"],
+        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "sus47", "maj7", "min7", "dom7", "add9", "six", "min6", "dim", "aug"],
         voicing: "root",
         spacingChance: 0
     },
     voiced: {
-        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "maj7", "min7", "dom7", "add9", "six"],
+        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "sus47", "maj7", "min7", "dom7", "add9", "six", "min6"],
         voicing: "spread",
         spacingChance: 0.55,
         maxInversion: 1
     },
     hard: {
-        qualityIds: ["maj7", "min7", "dom7", "dim", "aug", "m7b5", "dim7", "six", "sixNine", "nine", "add9", "mMaj7", "maj7#11", "7b9"],
+        qualityIds: ["maj7", "min7", "dom7", "sus47", "dim", "aug", "m7b5", "dim7", "six", "min6", "sixNine", "nine", "maj9", "min9", "add9", "add11", "mMaj7", "maj7#11", "7b9"],
         voicing: "advanced",
         spacingChance: 0.8,
         maxInversion: 2
@@ -81,6 +86,7 @@ const CHORD_QUALITY_HINTS = {
     power5: "power chord",
     sus2: "suspended 2",
     sus4: "suspended 4",
+    sus47: "dominant suspended 4",
     maj7: "major 7",
     min7: "minor 7",
     dom7: "dominant 7",
@@ -89,9 +95,13 @@ const CHORD_QUALITY_HINTS = {
     m7b5: "half-diminished",
     dim7: "diminished 7",
     six: "major 6",
+    min6: "minor 6",
     sixNine: "6/9",
     nine: "dominant 9",
+    maj9: "major 9",
+    min9: "minor 9",
     add9: "add 9",
+    add11: "add 11",
     mMaj7: "minor major 7",
     "maj7#11": "major 7 sharp 11",
     "7b9": "dominant 7 flat 9"
@@ -117,9 +127,14 @@ const normalizeQualityToken = (value) => {
 
 CHORD_QUALITIES.forEach((quality) => {
     quality.aliases.forEach((alias) => {
-        CHORD_QUALITY_ALIASES.set(normalizeQualityToken(alias), quality.id);
+        const normalizedAlias = normalizeQualityToken(alias);
+        if (!normalizedAlias) return;
+        CHORD_QUALITY_ALIASES.set(normalizedAlias, quality.id);
     });
-    CHORD_QUALITY_ALIASES.set(normalizeQualityToken(quality.suffix), quality.id);
+    const normalizedSuffix = normalizeQualityToken(quality.suffix);
+    if (normalizedSuffix) {
+        CHORD_QUALITY_ALIASES.set(normalizedSuffix, quality.id);
+    }
 });
 
 const isTypingEnabled = () => state.trainingMode === "type" || state.trainingMode === "both";
@@ -231,14 +246,17 @@ const getQualityPitchClassSet = (rootPc, quality) => {
 const parseChordInput = (raw, options = {}) => {
     const input = String(raw ?? "").trim();
     if (!input) return null;
-    const match = input.match(/^([A-Ga-g])\s*([#b♯♭]?)(.*)$/);
+    const normalizedInput = input.replace(/♯/g, "#").replace(/♭/g, "b");
+    const match = normalizedInput.match(/^([A-Ga-g])\s*([#b]?)(-?\d+)?\s*(.*)$/);
     if (!match) return null;
 
-    const rootToken = `${match[1].toUpperCase()}${(match[2] || "").replace("♯", "#").replace("♭", "b").toUpperCase()}`;
+    const rootToken = `${match[1].toUpperCase()}${(match[2] || "").toUpperCase()}`;
     const rootPc = CHORD_ROOT_ALIASES[rootToken];
     if (!Number.isFinite(rootPc)) return null;
+    const rootOctave = match[3] !== undefined ? Number.parseInt(match[3], 10) : null;
+    const rootMidi = Number.isFinite(rootOctave) ? ((rootOctave + 1) * 12) + rootPc : null;
 
-    const qualityToken = normalizeQualityToken(match[3] || "");
+    const qualityToken = normalizeQualityToken(match[4] || "");
     const fallbackQuality = qualityToken ? null : "maj";
     const qualityId = CHORD_QUALITY_ALIASES.get(qualityToken) ?? fallbackQuality;
     if (!qualityId) return null;
@@ -253,6 +271,8 @@ const parseChordInput = (raw, options = {}) => {
     return {
         rootPc,
         rootName: getRootName(rootPc),
+        rootOctave: Number.isFinite(rootOctave) ? rootOctave : null,
+        rootMidi: Number.isFinite(rootMidi) ? rootMidi : null,
         quality,
         label: buildChordLabel(rootPc, quality)
     };
@@ -379,6 +399,7 @@ const buildChordFromRoot = (rootNote, quality, intervals, difficultyId) => {
     const intervalSpan = normalizedIntervals[normalizedIntervals.length - 1] - normalizedIntervals[0];
     return {
         rootPc,
+        rootMidi: rootNote.midi,
         rootName: getRootName(rootPc),
         quality,
         noteIds: uniqueIds,
@@ -500,7 +521,21 @@ const getTypedPreviewNoteIds = (parsed) => {
     );
     if (!roots.length) return [];
 
-    roots.sort((a, b) => Math.abs(a.midi - centerMidi) - Math.abs(b.midi - centerMidi));
+    let preferredRootMidi = centerMidi;
+    if (Number.isFinite(parsed.rootMidi)) {
+        preferredRootMidi = parsed.rootMidi;
+    }
+    if (
+        state.active &&
+        getIsChordRound() &&
+        state.targetChord &&
+        parsed.rootPc === state.targetChord.rootPc &&
+        Number.isFinite(state.targetChord.rootMidi)
+    ) {
+        preferredRootMidi = state.targetChord.rootMidi;
+    }
+
+    roots.sort((a, b) => Math.abs(a.midi - preferredRootMidi) - Math.abs(b.midi - preferredRootMidi));
     const root = roots[0];
     return parsed.quality.intervals
         .map((interval) => getNoteIdByMidi(root.midi + interval))
@@ -523,7 +558,9 @@ const updateChordReadout = () => {
     if (!chordReadout) return;
     const hasKeyboardSelection = state.selectedNotes.length >= 2;
     const hasTypedInput = Boolean(state.typedAnswer?.trim());
-    const shouldShow = state.active && getIsChordRound() && (hasKeyboardSelection || (isTypingEnabled() && hasTypedInput));
+    const hideLivePreview = Boolean(state.hideLivePreview) && !state.submitted;
+    const shouldShow = state.active && getIsChordRound() && !hideLivePreview
+        && (hasKeyboardSelection || (isTypingEnabled() && hasTypedInput));
     chordReadout.hidden = !shouldShow;
     chordReadout.style.display = shouldShow ? "" : "none";
     if (!shouldShow) return;
@@ -621,13 +658,47 @@ const getChordHelperHints = () => {
     return hints;
 };
 
+const HELPER_MASK_LENGTHS = {
+    "Chord size": 12,
+    "Chord type": 12,
+    "Voicing": 13,
+    "Pitch span": 14
+};
+
+const createDeterministicHelperMask = (label) => {
+    const baseLength = HELPER_MASK_LENGTHS[label] ?? 12;
+    const rootPc = Number.isFinite(state.targetChord?.rootPc) ? state.targetChord.rootPc : 0;
+    const span = Number.isFinite(state.targetChord?.intervalSpan) ? state.targetChord.intervalSpan : 0;
+    const seedSource = `${label}|${state.round}|${rootPc}|${span}|${state.targetChord?.qualityHint ?? ""}`;
+
+    let seed = 2166136261;
+    for (let i = 0; i < seedSource.length; i += 1) {
+        seed ^= seedSource.charCodeAt(i);
+        seed = Math.imul(seed, 16777619);
+    }
+
+    const chars = "abcdefghijklmnopqrstuvwxyz";
+    let out = "";
+    for (let i = 0; i < baseLength; i += 1) {
+        seed ^= seed << 13;
+        seed ^= seed >>> 17;
+        seed ^= seed << 5;
+        const idx = Math.abs(seed) % chars.length;
+        out += chars[idx];
+    }
+    return out;
+};
+
 const renderChordHelperBox = () => {
     const hints = getChordHelperHints();
     if (!hints.length) return "";
     const rows = hints.map((hint) => `
         <div class="helper-item" tabindex="0">
             <div class="helper-label">${hint.label}</div>
-            <div class="helper-value">${hint.value}</div>
+            <div class="helper-value">
+                <span class="helper-mask" aria-hidden="true">${createDeterministicHelperMask(hint.label)}</span>
+                <span class="helper-real">${hint.value}</span>
+            </div>
         </div>
     `).join("");
     return `
@@ -640,6 +711,7 @@ const renderChordHelperBox = () => {
 
 const updateStatus = () => {
     const chordRound = getIsChordRound();
+    const hideLivePreview = Boolean(state.hideLivePreview) && !state.submitted;
     goalCountEl.textContent = chordRound ? "1" : String(state.noteCount);
     if (goalLabelEl) {
         goalLabelEl.textContent = chordRound ? "chord" : "notes";
@@ -690,7 +762,9 @@ const updateStatus = () => {
 
     roundCountEl.textContent = String(state.round);
     const typedSubmissionFinal = state.submitted && chordRound && state.submissionSource === "typing";
-    if (typedSubmissionFinal) {
+    if (hideLivePreview) {
+        selectedListEl.textContent = "Hidden";
+    } else if (typedSubmissionFinal) {
         const parsed = parseChordInput(state.typedAnswer);
         selectedListEl.textContent = parsed?.label ? `${parsed.label} (typed)` : "Typed answer";
     } else if (isTypingOnlyMode()) {
@@ -1143,7 +1217,8 @@ const playRevealSequence = (options = {}) => {
     );
     const revealDelayMs = (options.delay ?? 0.55) * 1000;
     const targetSpanMs = getPlaybackSpan(targetNotes, state.mode) * 1000;
-    const selectedSpanMs = (isCorrect ? 0 : getPlaybackSpan(selectedNotes, state.mode)) * 1000;
+    const playSelectedAfterTarget = Boolean(options.alwaysPlaySelected) || !isCorrect;
+    const selectedSpanMs = (playSelectedAfterTarget ? getPlaybackSpan(selectedNotes, state.mode) : 0) * 1000;
 
     const playTargetTimer = setTimeout(() => {
         if (seqId !== revealSequenceId) return;
@@ -1155,7 +1230,7 @@ const playRevealSequence = (options = {}) => {
     }, revealDelayMs);
     revealTimers.push(playTargetTimer);
 
-    if (!isCorrect && selectedNotes.length) {
+    if (playSelectedAfterTarget && selectedNotes.length) {
         const playSelectedTimer = setTimeout(() => {
             if (seqId !== revealSequenceId) return;
             playNotes(selectedNotes, state.mode, undefined, {
@@ -1306,6 +1381,14 @@ const buildTypingRevealDetail = (parsed) => {
     if (parsed.quality.id !== state.targetChord.quality.id) {
         mismatches.push(`quality should be ${state.targetChord.quality.suffix || "major"}`);
     }
+    if (state.typingRequireOctave) {
+        if (!Number.isFinite(parsed.rootMidi)) {
+            mismatches.push("include root octave (example: C4m, A#3maj7)");
+        } else if (Number.isFinite(state.targetChord.rootMidi) && parsed.rootMidi !== state.targetChord.rootMidi) {
+            const expectedOctave = Math.floor(state.targetChord.rootMidi / 12) - 1;
+            mismatches.push(`root octave should be ${state.targetChord.rootName}${expectedOctave}`);
+        }
+    }
     if (!mismatches.length) return "";
     return `<div class="reveal-label">Difference: ${mismatches.join(", ")}.</div>`;
 };
@@ -1323,14 +1406,22 @@ const submitTypedAnswer = () => {
         return;
     }
     const answerNotes = parsed ? getTypedPreviewNoteIds(parsed) : [];
+    const octaveValid = !state.typingRequireOctave
+        || (
+            parsed
+            && Number.isFinite(parsed.rootMidi)
+            && Number.isFinite(target.rootMidi)
+            && parsed.rootMidi === target.rootMidi
+        );
 
     const isCorrect = Boolean(
         parsed &&
         parsed.rootPc === target.rootPc &&
-        parsed.quality.id === target.quality.id
+        parsed.quality.id === target.quality.id &&
+        octaveValid
     );
     state.submissionSource = "typing";
-    state.submittedComparisonNotes = [...answerNotes];
+    state.submittedComparisonNotes = isCorrect ? [...state.targetNotes] : [...answerNotes];
     setSubmitted(true);
     if (isCorrect) {
         resultEl.textContent = `Correct: ${target.label}`;
@@ -1345,8 +1436,9 @@ const submitTypedAnswer = () => {
         revealEl.innerHTML = renderChordRevealGrid([targetChordCell, targetNotesCell]);
         lastReveal = {
             target: [...state.targetNotes],
-            selected: []
+            selected: answerNotes.length ? [...answerNotes] : [...state.targetNotes]
         };
+        playRevealSequence({ snapshot: lastReveal, isCorrect: true, alwaysPlaySelected: true });
         updateStatus();
         updateKeyStates();
         typingAutoNextTimer = setTimeout(() => {
@@ -1378,7 +1470,7 @@ const submitTypedAnswer = () => {
         target: [...state.targetNotes],
         selected: [...answerNotes]
     };
-    playRevealSequence({ snapshot: lastReveal, isCorrect: false });
+    playRevealSequence({ snapshot: lastReveal, isCorrect: false, alwaysPlaySelected: true });
     updateStatus();
     updateKeyStates();
 };
@@ -1444,7 +1536,11 @@ const submitAnswer = () => {
         target: [...state.targetNotes],
         selected: [...state.selectedNotes]
     };
-    playRevealSequence({ snapshot: lastReveal, isCorrect });
+    playRevealSequence({
+        snapshot: lastReveal,
+        isCorrect,
+        alwaysPlaySelected: getIsChordRound()
+    });
     updateKeyStates();
     updatePrimaryAction();
     updateStatus();
@@ -1468,4 +1564,5 @@ Object.assign(App.game, {
     setKeyboardEnabled,
     clearTypingAutoNext
 });
+
 

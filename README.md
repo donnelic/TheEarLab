@@ -57,7 +57,10 @@ Browser-based piano ear-training app for note and chord recognition.
   - save/discard if you manually changed profile sliders;
   - optional switch to instrument-recommended profile when a non-default profile is currently applied.
 - Last-used instrument/profile/settings persist across revisits.
+- Game settings include `Hide live answer preview`, which suppresses live selected/typed note/chord labels until submit.
 - Audio output uses headroom + light compression/high-pass filtering.
+- Startup is staged: first paint renders UI quickly, then only the selected/primary SF2 pack is loaded in the background; full multi-pack preset loading is deferred until opening the Instrument Browser.
+- First playback now gates on selected instrument readiness to avoid "short/cut first notes" while SF2 assets are still warming up.
 
 ## Chord Training Modes
 - Default behavior remains classic note training (`Training mode = Keyboard Select`, `Chord rounds = off`).
@@ -66,9 +69,10 @@ Browser-based piano ear-training app for note and chord recognition.
   - `Nice Notes (Harmonics)`: consonant/nice-note rounds,
   - `Chord Training`: reveals chord-only controls.
 - `Practice mode = Chord Training` switches round targets from loose notes to chord targets.
+- Chord parsing/training now includes broader common types (for example `m6`, `m9`, `maj9`, `7sus4`, `add11`, plus prior advanced variants like `m7b5`, `dim7`, `mMaj7`, `maj7#11`, `7b9`).
 - Live selected chord detection is shown below the keyboard while in chord rounds.
 - Reveal/check output shows chord names (target vs your chord) in chord rounds.
-- In chord rounds, helper hints are shown as delayed hover-reveal rows (all labels visible, each value revealed independently) when `Extra helpers` is enabled.
+- In chord rounds, helper hints are shown as delayed hover-reveal rows (all labels visible, each value revealed independently) when `Extra helpers` is enabled, with masked placeholder strings so value length is not leaked before reveal.
 - `Answer input` options in chord practice:
   - `Play on keyboard` (keyboard only),
   - `Type chord name` (typing only),
@@ -81,8 +85,11 @@ Browser-based piano ear-training app for note and chord recognition.
   - keeps hint/replay available,
   - supports optional visual piano and optional typed-chord key preview.
   - pressing `Space` inside the typing field previews the typed chord when parsing succeeds and blind mode is off; it will not auto-replay target notes when nothing is selected/typed.
-  - includes a built-in "Learn more about chord format" guided tutorial from the typing help popover.
-  - tutorial now has an interactive chord lab: root/quality selectors, hover-highlighted examples, click-to-play examples, and a visual piano that shows chord tones without allowing manual key play/selection.
+  - includes a built-in chord tutorial opened directly from the `?` button in typing mode and from `Game Settings -> Chord tutorial`.
+  - optional `Require octave in typed chord` mode enforces absolute roots (for example `C4m`, `A#3maj7`), so correct quality with wrong octave is graded incorrect.
+  - when a typed answer is correct, result key-highlighting uses the target-note mapping so octave placement chosen by typed preview does not produce false "missed notes".
+  - tutorial now uses a progressive root/quality matrix: all roots/qualities stay visible, locked items are greyed out until introduced, newly introduced items are highlighted, and each theory step explains specific chord families in plain language.
+  - typed chord parsing treats a bare root (for example `F`) as major (`F`), not minor.
 
 ## Maintenance Rules
 1. Update code.

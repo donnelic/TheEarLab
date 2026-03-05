@@ -768,6 +768,8 @@ const setPracticeMode = (mode, options = {}) => {
     state.chordExtraHelpers = Boolean(restored.chordExtraHelpers);
     state.typingShowPiano = restored.typingShowPiano !== false;
     state.typingShowTyped = restored.typingShowTyped !== false;
+    state.typingRequireOctave = Boolean(restored.typingRequireOctave);
+    state.hideLivePreview = Boolean(restored.hideLivePreview);
 
     if (normalized !== "chord") {
         state.trainingMode = "keyboard";
@@ -781,6 +783,9 @@ const setPracticeMode = (mode, options = {}) => {
     }
     if (blindToggle) {
         blindToggle.checked = state.blindMode;
+    }
+    if (hideLivePreviewToggle) {
+        hideLivePreviewToggle.checked = state.hideLivePreview;
     }
     if (trainingModeSelect) {
         trainingModeSelect.value = state.trainingMode;
@@ -796,6 +801,9 @@ const setPracticeMode = (mode, options = {}) => {
     }
     if (typingShowTypedToggle) {
         typingShowTypedToggle.checked = state.typingShowTyped;
+    }
+    if (typingRequireOctaveToggle) {
+        typingRequireOctaveToggle.checked = state.typingRequireOctave;
     }
     segmentedButtons.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.mode === state.mode);
@@ -833,6 +841,9 @@ const applyUiFromState = () => {
         startNoteValue.textContent = getMidiLabel(state.startMidi);
     }
     blindToggle.checked = state.blindMode;
+    if (hideLivePreviewToggle) {
+        hideLivePreviewToggle.checked = state.hideLivePreview;
+    }
     if (pianoLabel) {
         const preset = getTonePreset(state.pianoTone);
         pianoLabel.textContent = preset?.label ?? "No presets";
@@ -858,6 +869,9 @@ const applyUiFromState = () => {
     }
     if (typingShowTypedToggle) {
         typingShowTypedToggle.checked = state.typingShowTyped;
+    }
+    if (typingRequireOctaveToggle) {
+        typingRequireOctaveToggle.checked = state.typingRequireOctave;
     }
     if (practiceModeSelect) {
         practiceModeSelect.value = getEffectivePracticeMode();
@@ -1021,7 +1035,7 @@ const openPianoPanel = () => {
     pianoPanel.setAttribute("aria-hidden", "false");
     pianoTrigger.setAttribute("aria-expanded", "true");
     positionPianoPanel();
-    void refreshSoundfontCatalog();
+    void refreshSoundfontCatalog({ loadAllPacks: false });
 };
 
 const closePianoPanel = () => {
@@ -1045,7 +1059,7 @@ const openInstrumentBrowser = () => {
     instrumentBrowserPanel.setAttribute("aria-hidden", "false");
     instrumentBrowserTrigger.setAttribute("aria-expanded", "true");
     positionInstrumentBrowserPanel();
-    void refreshSoundfontCatalog().then(() => refreshInstrumentPresetBrowser());
+    void refreshSoundfontCatalog({ loadAllPacks: true }).then(() => refreshInstrumentPresetBrowser());
 };
 
 const closeInstrumentBrowser = () => {

@@ -136,6 +136,19 @@ if (typingShowTypedToggle) {
     });
 }
 
+if (typingRequireOctaveToggle) {
+    typingRequireOctaveToggle.addEventListener("change", (event) => {
+        state.typingRequireOctave = Boolean(event.target.checked);
+        refreshOptionsModeVisibility();
+        if (typeof App.game?.updateTypedPreviewFromInput === "function") {
+            App.game.updateTypedPreviewFromInput();
+        }
+        updateStatus();
+        updateKeyStates();
+        saveSettings();
+    });
+}
+
 resetSettingsButton.addEventListener("click", () => {
     resetAllSettings();
     rebuildKeyboard();

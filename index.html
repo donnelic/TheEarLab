@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Note Recognition Piano Trainer</title>
-  <link rel="stylesheet" href="styles.css?v=20260305162924" />
+  <link rel="stylesheet" href="styles.css?v=20260305231302" />
 </head>
 
 <body>
@@ -233,6 +233,19 @@
         </div>
       </div>
 
+      <div class="control compact">
+        <label for="hide-live-preview">Hide live answer preview</label>
+        <div class="control-row">
+          <label class="switch" for="hide-live-preview">
+            <input id="hide-live-preview" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">Hide selected/typed note names until you submit</span>
+        </div>
+      </div>
+
       <div class="control compact" data-option-group="legacy" hidden>
         <label for="nice-notes">Nice notes</label>
         <div class="control-row">
@@ -300,6 +313,13 @@
         </div>
       </div>
 
+      <div class="control compact" data-option-group="chord">
+        <label>Chord tutorial</label>
+        <div class="control-row">
+          <button id="chord-tutorial-open-options" class="advanced-trigger" type="button">Open chord guide</button>
+        </div>
+      </div>
+
       <div class="options-section-title" data-option-group="typing">Typing helpers</div>
 
       <div class="control compact" data-option-group="typing">
@@ -325,6 +345,19 @@
             </span>
           </label>
           <span class="unit">Highlight the notes detected from your typed chord name</span>
+        </div>
+      </div>
+
+      <div class="control compact" data-option-group="typing">
+        <label for="typing-require-octave">Require octave in typed chord</label>
+        <div class="control-row">
+          <label class="switch" for="typing-require-octave">
+            <input id="typing-require-octave" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">When enabled, answers must include root octave (example: A#3m, C4maj7)</span>
         </div>
       </div>
     </div>
@@ -362,16 +395,8 @@
       <div class="typing-row">
         <div class="typing-input-wrap">
           <input id="chord-answer" type="text" placeholder="Example: Cmaj7 or C major 7" autocomplete="off" />
-          <button id="typing-help-toggle" class="typing-help-toggle" type="button" aria-expanded="false"
-            aria-controls="typing-help-text" aria-label="Show typing help" title="Show typing help">?</button>
-        </div>
-      </div>
-      <div id="typing-help-text" class="typing-help-text" hidden>
-        Type a chord name like <strong>Cmaj7</strong> or <strong>F#m</strong>. Press <strong>Enter</strong> to submit.
-        Press <strong>Space</strong> to preview your typed chord (or replay target if typing is invalid). While typing mode
-        is active, letter/number keys automatically go to this field.
-        <div class="typing-help-actions">
-          <button id="chord-tutorial-open" class="typing-learn-btn" type="button">Learn more about chord format</button>
+          <button id="typing-help-toggle" class="typing-help-toggle" type="button"
+            aria-label="Open chord tutorial" title="Open chord tutorial">?</button>
         </div>
       </div>
     </section>
@@ -407,26 +432,19 @@
       <div id="chord-tutorial-step" class="tutorial-step"></div>
       <div class="tutorial-lab">
         <div id="chord-tutorial-current" class="tutorial-current">Current chord: C major</div>
-        <div class="tutorial-selectors">
-          <div class="tutorial-selector-block">
+        <div class="tutorial-piano-wrap">
+          <div class="tutorial-piano-title">Chord notes on piano</div>
+          <div id="chord-tutorial-piano" class="tutorial-piano" aria-hidden="true"></div>
+        </div>
+        <div class="tutorial-control-matrix">
+          <div id="tutorial-row-root" class="tutorial-control-row">
             <div class="tutorial-selector-title">Root</div>
             <div id="chord-tutorial-root-list" class="tutorial-chip-list"></div>
           </div>
-          <div class="tutorial-selector-block">
+          <div id="tutorial-row-quality" class="tutorial-control-row">
             <div class="tutorial-selector-title">Quality</div>
             <div id="chord-tutorial-quality-list" class="tutorial-chip-list"></div>
           </div>
-        </div>
-        <div class="tutorial-piano-wrap">
-          <div class="tutorial-piano-title">Chord tones on piano (preview only)</div>
-          <div id="chord-tutorial-piano" class="tutorial-piano" aria-hidden="true"></div>
-        </div>
-        <div class="tutorial-selector-block">
-          <div class="tutorial-selector-title">Examples (hover to highlight, click to play)</div>
-          <div id="chord-tutorial-examples" class="tutorial-chip-list examples"></div>
-        </div>
-        <div class="tutorial-lab-actions">
-          <button id="chord-tutorial-play" class="advanced-trigger" type="button">Play Current Chord</button>
         </div>
       </div>
       <div class="tutorial-actions">
@@ -437,16 +455,14 @@
     </div>
   </section>
 
-  <script src="vendor/libfluidsynth-2.4.6.js?v=20260305162924" defer></script>
-  <script src="vendor/js-synthesizer.min.js?v=20260305162924" defer></script>
-  <script src="js/core.js?v=20260305162924" defer></script>
-  <script src="js/audio.js?v=20260305162924" defer></script>
-  <script src="js/game.js?v=20260305162924" defer></script>
-  <script src="js/settings.js?v=20260305162924" defer></script>
-  <script src="js/events.js?v=20260305162924" defer></script>
+  <script src="vendor/libfluidsynth-2.4.6.js?v=20260305231302" defer></script>
+  <script src="vendor/js-synthesizer.min.js?v=20260305231302" defer></script>
+  <script src="js/core.js?v=20260305231302" defer></script>
+  <script src="js/audio.js?v=20260305231302" defer></script>
+  <script src="js/game.js?v=20260305231302" defer></script>
+  <script src="js/settings.js?v=20260305231302" defer></script>
+  <script src="js/events.js?v=20260305231302" defer></script>
 </body>
 
 </html>
-
-
 
