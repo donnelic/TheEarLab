@@ -69,7 +69,6 @@ const dom = {
     chordExtraHelpersToggle: document.getElementById("chord-extra-helpers"),
     typingShowPianoToggle: document.getElementById("typing-show-piano"),
     typingShowTypedToggle: document.getElementById("typing-show-typed"),
-    typingRequireOctaveToggle: document.getElementById("typing-require-octave"),
     typingZone: document.getElementById("typing-zone"),
     chordAnswerInput: document.getElementById("chord-answer"),
     typingHelpToggle: document.getElementById("typing-help-toggle"),
@@ -176,7 +175,6 @@ const {
     chordExtraHelpersToggle,
     typingShowPianoToggle,
     typingShowTypedToggle,
-    typingRequireOctaveToggle,
     typingZone,
     chordAnswerInput,
     typingHelpToggle,
@@ -294,7 +292,6 @@ const DEFAULT_RULE_CHORD_DIFFICULTY = "easy";
 const DEFAULT_RULE_CHORD_EXTRA_HELPERS = false;
 const DEFAULT_RULE_TYPING_SHOW_PIANO = true;
 const DEFAULT_RULE_TYPING_SHOW_TYPED = true;
-const DEFAULT_RULE_TYPING_REQUIRE_OCTAVE = false;
 const DEFAULT_RULE_HIDE_LIVE_PREVIEW = false;
 const PRACTICE_MODE_IDS = ["random", "nice", "chord"];
 const createDefaultPracticeProfile = (modeId) => ({
@@ -305,7 +302,6 @@ const createDefaultPracticeProfile = (modeId) => ({
     chordExtraHelpers: DEFAULT_RULE_CHORD_EXTRA_HELPERS,
     typingShowPiano: DEFAULT_RULE_TYPING_SHOW_PIANO,
     typingShowTyped: DEFAULT_RULE_TYPING_SHOW_TYPED,
-    typingRequireOctave: DEFAULT_RULE_TYPING_REQUIRE_OCTAVE,
     hideLivePreview: DEFAULT_RULE_HIDE_LIVE_PREVIEW
 });
 const createDefaultPracticeProfiles = () => ({
@@ -330,7 +326,6 @@ const normalizePracticeProfile = (value, modeId) => {
         chordExtraHelpers: Boolean(profile.chordExtraHelpers),
         typingShowPiano: profile.typingShowPiano !== false,
         typingShowTyped: profile.typingShowTyped !== false,
-        typingRequireOctave: Boolean(profile.typingRequireOctave),
         hideLivePreview: Boolean(profile.hideLivePreview)
     };
 };
@@ -368,7 +363,6 @@ const capturePracticeProfileFromState = (modeId, sourceState = state) => {
         chordExtraHelpers: Boolean(sourceState.chordExtraHelpers),
         typingShowPiano: sourceState.typingShowPiano !== false,
         typingShowTyped: sourceState.typingShowTyped !== false,
-        typingRequireOctave: Boolean(sourceState.typingRequireOctave),
         hideLivePreview: Boolean(sourceState.hideLivePreview)
     };
     return sourceState.practiceProfiles[safeMode];
@@ -395,7 +389,6 @@ const DEFAULTS = {
     chordExtraHelpers: false,
     typingShowPiano: true,
     typingShowTyped: true,
-    typingRequireOctave: false,
     hideLivePreview: false,
     practiceProfiles: createDefaultPracticeProfiles()
 };
@@ -428,7 +421,6 @@ const state = {
     chordExtraHelpers: DEFAULTS.chordExtraHelpers,
     typingShowPiano: DEFAULTS.typingShowPiano,
     typingShowTyped: DEFAULTS.typingShowTyped,
-    typingRequireOctave: DEFAULTS.typingRequireOctave,
     hideLivePreview: DEFAULTS.hideLivePreview,
     practiceProfiles: createDefaultPracticeProfiles(),
     targetChord: null,
@@ -466,7 +458,6 @@ const saveSettings = () => {
         chordExtraHelpers: state.chordExtraHelpers,
         typingShowPiano: state.typingShowPiano,
         typingShowTyped: state.typingShowTyped,
-        typingRequireOctave: state.typingRequireOctave,
         hideLivePreview: state.hideLivePreview
     };
     const modeId = getEffectivePracticeModeFromState(state);
@@ -510,7 +501,6 @@ const loadSettings = () => {
         state.chordExtraHelpers = Boolean(data.chordExtraHelpers);
         state.typingShowPiano = data.typingShowPiano !== false;
         state.typingShowTyped = data.typingShowTyped !== false;
-        state.typingRequireOctave = Boolean(data.typingRequireOctave);
         state.hideLivePreview = Boolean(data.hideLivePreview);
         state.practiceProfiles = normalizePracticeProfiles(data.practiceProfiles);
         const trim = data.adsrTrim ?? {};
@@ -554,7 +544,6 @@ const resetAllSettings = () => {
     state.chordExtraHelpers = DEFAULTS.chordExtraHelpers;
     state.typingShowPiano = DEFAULTS.typingShowPiano;
     state.typingShowTyped = DEFAULTS.typingShowTyped;
-    state.typingRequireOctave = DEFAULTS.typingRequireOctave;
     state.hideLivePreview = DEFAULTS.hideLivePreview;
     state.practiceProfiles = createDefaultPracticeProfiles();
     state.targetChord = null;

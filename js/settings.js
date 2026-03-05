@@ -768,7 +768,6 @@ const setPracticeMode = (mode, options = {}) => {
     state.chordExtraHelpers = Boolean(restored.chordExtraHelpers);
     state.typingShowPiano = restored.typingShowPiano !== false;
     state.typingShowTyped = restored.typingShowTyped !== false;
-    state.typingRequireOctave = Boolean(restored.typingRequireOctave);
     state.hideLivePreview = Boolean(restored.hideLivePreview);
 
     if (normalized !== "chord") {
@@ -801,9 +800,6 @@ const setPracticeMode = (mode, options = {}) => {
     }
     if (typingShowTypedToggle) {
         typingShowTypedToggle.checked = state.typingShowTyped;
-    }
-    if (typingRequireOctaveToggle) {
-        typingRequireOctaveToggle.checked = state.typingRequireOctave;
     }
     segmentedButtons.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.mode === state.mode);
@@ -869,9 +865,6 @@ const applyUiFromState = () => {
     }
     if (typingShowTypedToggle) {
         typingShowTypedToggle.checked = state.typingShowTyped;
-    }
-    if (typingRequireOctaveToggle) {
-        typingRequireOctaveToggle.checked = state.typingRequireOctave;
     }
     if (practiceModeSelect) {
         practiceModeSelect.value = getEffectivePracticeMode();

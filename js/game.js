@@ -1381,13 +1381,9 @@ const buildTypingRevealDetail = (parsed) => {
     if (parsed.quality.id !== state.targetChord.quality.id) {
         mismatches.push(`quality should be ${state.targetChord.quality.suffix || "major"}`);
     }
-    if (state.typingRequireOctave) {
-        if (!Number.isFinite(parsed.rootMidi)) {
-            mismatches.push("include root octave (example: C4m, A#3maj7)");
-        } else if (Number.isFinite(state.targetChord.rootMidi) && parsed.rootMidi !== state.targetChord.rootMidi) {
-            const expectedOctave = Math.floor(state.targetChord.rootMidi / 12) - 1;
-            mismatches.push(`root octave should be ${state.targetChord.rootName}${expectedOctave}`);
-        }
+    if (Number.isFinite(parsed.rootMidi) && Number.isFinite(state.targetChord.rootMidi) && parsed.rootMidi !== state.targetChord.rootMidi) {
+        const expectedOctave = Math.floor(state.targetChord.rootMidi / 12) - 1;
+        mismatches.push(`root octave should be ${state.targetChord.rootName}${expectedOctave}`);
     }
     if (!mismatches.length) return "";
     return `<div class="reveal-label">Difference: ${mismatches.join(", ")}.</div>`;
@@ -1406,13 +1402,10 @@ const submitTypedAnswer = () => {
         return;
     }
     const answerNotes = parsed ? getTypedPreviewNoteIds(parsed) : [];
-    const octaveValid = !state.typingRequireOctave
-        || (
-            parsed
-            && Number.isFinite(parsed.rootMidi)
-            && Number.isFinite(target.rootMidi)
-            && parsed.rootMidi === target.rootMidi
-        );
+    const octaveValid = !parsed
+        || !Number.isFinite(parsed.rootMidi)
+        || !Number.isFinite(target.rootMidi)
+        || parsed.rootMidi === target.rootMidi;
 
     const isCorrect = Boolean(
         parsed &&
