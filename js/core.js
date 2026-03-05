@@ -1,5 +1,7 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
+const BUILD_ID = "20260305144756";
+App.buildId = BUILD_ID;
 
 const dom = {
     settingsToggle: document.getElementById("settings-toggle"),
@@ -32,20 +34,63 @@ const dom = {
     hintButton: document.getElementById("hint-button"),
     hintFlag: document.getElementById("hint-flag"),
     homeButton: document.getElementById("home-button"),
+    optionsTrigger: document.getElementById("options-trigger"),
+    optionsPanel: document.getElementById("options-panel"),
     advancedTrigger: document.getElementById("advanced-trigger"),
     advancedPanel: document.getElementById("advanced-panel"),
+    instrumentBrowserTrigger: document.getElementById("instrument-browser-trigger"),
+    instrumentBrowserPanel: document.getElementById("instrument-browser-panel"),
     testEnvelopeButton: document.getElementById("test-envelope"),
     attackSlider: document.getElementById("attack-time"),
+    attackLabelValue: document.getElementById("attack-label-value"),
     attackValue: document.getElementById("attack-value"),
+    attackGhost: document.getElementById("attack-ghost"),
     decaySlider: document.getElementById("decay-rate"),
+    decayLabelValue: document.getElementById("decay-label-value"),
     decayValue: document.getElementById("decay-value"),
+    decayGhost: document.getElementById("decay-ghost"),
     releaseSlider: document.getElementById("release-rate"),
+    releaseLabelValue: document.getElementById("release-label-value"),
     releaseValue: document.getElementById("release-value"),
+    releaseGhost: document.getElementById("release-ghost"),
     sustainSlider: document.getElementById("sustain-length"),
+    sustainLabelValue: document.getElementById("sustain-label-value"),
     sustainValue: document.getElementById("sustain-value"),
+    sustainGhost: document.getElementById("sustain-ghost"),
+    profileSearch: document.getElementById("profile-search"),
+    profileList: document.getElementById("profile-list"),
+    profileApply: document.getElementById("profile-apply"),
+    profileSave: document.getElementById("profile-save"),
+    profileMeta: document.getElementById("profile-meta"),
+    chordRoundsToggle: document.getElementById("chord-rounds"),
+    practiceModeSelect: document.getElementById("practice-mode"),
+    trainingModeSelect: document.getElementById("training-mode"),
+    chordDifficultySelect: document.getElementById("chord-difficulty"),
+    chordExtraHelpersToggle: document.getElementById("chord-extra-helpers"),
+    typingShowPianoToggle: document.getElementById("typing-show-piano"),
+    typingShowTypedToggle: document.getElementById("typing-show-typed"),
+    typingZone: document.getElementById("typing-zone"),
+    chordAnswerInput: document.getElementById("chord-answer"),
+    typingHelpToggle: document.getElementById("typing-help-toggle"),
+    typingHelpText: document.getElementById("typing-help-text"),
+    chordTutorialOpen: document.getElementById("chord-tutorial-open"),
+    chordTutorialModal: document.getElementById("chord-tutorial-modal"),
+    chordTutorialBackdrop: document.getElementById("chord-tutorial-backdrop"),
+    chordTutorialClose: document.getElementById("chord-tutorial-close"),
+    chordTutorialPrev: document.getElementById("chord-tutorial-prev"),
+    chordTutorialNext: document.getElementById("chord-tutorial-next"),
+    chordTutorialStep: document.getElementById("chord-tutorial-step"),
+    chordTutorialProgress: document.getElementById("chord-tutorial-progress"),
+    chordReadout: document.getElementById("chord-readout"),
+    statusPanel: document.getElementById("status-panel"),
+    instrumentPresetSearch: document.getElementById("instrument-preset-search"),
+    instrumentPresetList: document.getElementById("instrument-preset-list"),
+    instrumentPresetApply: document.getElementById("instrument-preset-apply"),
+    instrumentPresetMeta: document.getElementById("instrument-preset-meta"),
     roundCountEl: document.getElementById("round-count"),
     selectedListEl: document.getElementById("selected-list"),
     goalCountEl: document.getElementById("goal-count"),
+    goalLabelEl: document.getElementById("goal-label"),
     modeLabelEl: document.getElementById("mode-label"),
     resultEl: document.getElementById("result"),
     revealEl: document.getElementById("reveal"),
@@ -88,20 +133,63 @@ const {
     hintButton,
     hintFlag,
     homeButton,
+    optionsTrigger,
+    optionsPanel,
     advancedTrigger,
     advancedPanel,
+    instrumentBrowserTrigger,
+    instrumentBrowserPanel,
     testEnvelopeButton,
     attackSlider,
+    attackLabelValue,
     attackValue,
+    attackGhost,
     decaySlider,
+    decayLabelValue,
     decayValue,
+    decayGhost,
     releaseSlider,
+    releaseLabelValue,
     releaseValue,
+    releaseGhost,
     sustainSlider,
+    sustainLabelValue,
     sustainValue,
+    sustainGhost,
+    profileSearch,
+    profileList,
+    profileApply,
+    profileSave,
+    profileMeta,
+    chordRoundsToggle,
+    practiceModeSelect,
+    trainingModeSelect,
+    chordDifficultySelect,
+    chordExtraHelpersToggle,
+    typingShowPianoToggle,
+    typingShowTypedToggle,
+    typingZone,
+    chordAnswerInput,
+    typingHelpToggle,
+    typingHelpText,
+    chordTutorialOpen,
+    chordTutorialModal,
+    chordTutorialBackdrop,
+    chordTutorialClose,
+    chordTutorialPrev,
+    chordTutorialNext,
+    chordTutorialStep,
+    chordTutorialProgress,
+    chordReadout,
+    statusPanel,
+    instrumentPresetSearch,
+    instrumentPresetList,
+    instrumentPresetApply,
+    instrumentPresetMeta,
     roundCountEl,
     selectedListEl,
     goalCountEl,
+    goalLabelEl,
     modeLabelEl,
     resultEl,
     revealEl,
@@ -166,127 +254,105 @@ const CONSTANTS = {
     SHORT_PRESS_ANIM_MS
 };
 App.constants = CONSTANTS;
-const PIANO_PRESETS = {
-    felt: {
-        label: "Felt Piano",
-        engine: "modal",
-        masterGain: 1.0,
-        velocityCurve: 2.0,
-        filterFrequency: 5800,
-        filterQ: 0.7,
-        attackNoise: { level: 0.08, decay: 0.03, hp: 1600 },
-        partials: [
-            { type: "sine", ratio: 1, gain: 1.0, adsr: { decay: 1.0, sustain: 0.7 } },
-            { type: "triangle", ratio: 2, gain: 0.32, adsr: { decay: 0.8, sustain: 0.4 } },
-            { type: "sine", ratio: 3, gain: 0.16, adsr: { decay: 0.6, sustain: 0.25 } }
-        ],
-        resonators: [
-            { ratio: 1.0, q: 18, decay: 2.4, gain: 0.45 },
-            { ratio: 1.7, q: 12, decay: 1.9, gain: 0.28 },
-            { ratio: 2.4, q: 9, decay: 1.3, gain: 0.18 }
-        ],
-        bodyResonance: { gain: 0.25, lowShelfFreq: 150, lowShelfGain: 3.0 }
-    },
-    piano: {
-        label: "Studio Piano",
-        engine: "modal",
-        masterGain: 1.0,
-        velocityCurve: 2.0,
-        filterFrequency: 7600,
-        filterQ: 0.8,
-        attackNoise: { level: 0.12, decay: 0.025, hp: 1400 },
-        partials: [
-            { type: "sine", ratio: 1, gain: 1.0, adsr: { decay: 1.1, sustain: 0.85 } },
-            { type: "triangle", ratio: 2, gain: 0.35, adsr: { decay: 0.9, sustain: 0.55 } },
-            { type: "sine", ratio: 3.01, gain: 0.2, adsr: { decay: 0.75, sustain: 0.35 } },
-            { type: "sine", ratio: 4.8, gain: 0.12, adsr: { decay: 0.55, sustain: 0.2 } }
-        ],
-        resonators: [
-            { ratio: 1.0, q: 20, decay: 2.6, gain: 0.55 },
-            { ratio: 1.6, q: 14, decay: 2.0, gain: 0.32 },
-            { ratio: 2.3, q: 12, decay: 1.5, gain: 0.22 },
-            { ratio: 3.8, q: 9, decay: 1.1, gain: 0.14 }
-        ],
-        bodyResonance: { gain: 0.3, lowShelfFreq: 140, lowShelfGain: 3.5 }
-    },
-    classical: {
-        label: "Concert Grand",
-        engine: "modal",
-        masterGain: 1.0,
-        velocityCurve: 2.0,
-        filterFrequency: 8200,
-        filterQ: 0.95,
-        attackNoise: { level: 0.1, decay: 0.02, hp: 1700 },
-        partials: [
-            { type: "sine", ratio: 1, gain: 1.0, adsr: { decay: 1.2, sustain: 0.9 } },
-            { type: "triangle", ratio: 2, gain: 0.28, adsr: { decay: 0.9, sustain: 0.45 } },
-            { type: "sine", ratio: 3.02, gain: 0.18, adsr: { decay: 0.7, sustain: 0.28 } },
-            { type: "sine", ratio: 5.1, gain: 0.1, adsr: { decay: 0.55, sustain: 0.18 } }
-        ],
-        resonators: [
-            { ratio: 1.0, q: 22, decay: 3.0, gain: 0.6 },
-            { ratio: 1.9, q: 16, decay: 2.2, gain: 0.35 },
-            { ratio: 2.7, q: 13, decay: 1.6, gain: 0.24 },
-            { ratio: 4.2, q: 10, decay: 1.2, gain: 0.16 }
-        ],
-        bodyResonance: { gain: 0.32, lowShelfFreq: 130, lowShelfGain: 4.0 }
-    },
-    nylon: {
-        label: "Nylon Guitar",
-        engine: "modal",
-        masterGain: 1.0,
-        velocityCurve: 2.0,
-        filterFrequency: 6400,
-        attackNoise: { level: 0.09, decay: 0.035, hp: 2200 },
-        partials: [
-            { type: "sine", ratio: 1, gain: 0.95, adsr: { decay: 1.0, sustain: 0.82 } },
-            { type: "triangle", ratio: 2, gain: 0.22, adsr: { decay: 0.8, sustain: 0.4 } },
-            { type: "sine", ratio: 3, gain: 0.12, adsr: { decay: 0.6, sustain: 0.2 } }
-        ],
-        resonators: [
-            { ratio: 1.0, q: 16, decay: 2.6, gain: 0.45 },
-            { ratio: 2.0, q: 12, decay: 1.8, gain: 0.28 },
-            { ratio: 3.1, q: 10, decay: 1.3, gain: 0.18 }
-        ],
-        bodyResonance: { gain: 0.22, lowShelfFreq: 180, lowShelfGain: 2.6 }
-    },
-    ep: {
-        label: "Electric Piano",
-        engine: "fm",
-        masterGain: 1.0,
-        velocityCurve: 2.0,
-        fm: { carrierType: "sine", modType: "sine", modRatio: 2.0, modIndex: 3.2, feedback: 0.1 },
-        tremolo: { rate: 5.2, depth: 0.05 },
-        filter: { frequency: 2400, q: 0.9 },
-        attackNoise: { level: 0.05, decay: 0.03, hp: 1200 }
-    },
-    bell: {
-        label: "Bell Pad",
-        engine: "modal",
-        masterGain: 1.0,
-        velocityCurve: 2.0,
-        filterFrequency: 9200,
-        partials: [
-            { type: "sine", ratio: 1, gain: 0.8, adsr: { decay: 1.9, sustain: 0.4 } },
-            { type: "sine", ratio: 2.7, gain: 0.42, adsr: { decay: 1.7, sustain: 0.32 } },
-            { type: "sine", ratio: 5.1, gain: 0.25, adsr: { decay: 1.4, sustain: 0.2 } },
-            { type: "sine", ratio: 7.2, gain: 0.14, adsr: { decay: 1.1, sustain: 0.12 } }
-        ],
-        resonators: [
-            { ratio: 1.0, q: 14, decay: 3.0, gain: 0.5 },
-            { ratio: 2.5, q: 12, decay: 2.2, gain: 0.3 },
-            { ratio: 4.0, q: 10, decay: 1.6, gain: 0.2 }
-        ],
-        attackNoise: { level: 0.07, decay: 0.04, hp: 2000 }
-    }
-};
+const SOUNDFONT_DIR = "soundfonts";
+const SOUNDFONT_MANIFEST = `${SOUNDFONT_DIR}/index.json`;
+
+const BUILTIN_SOUNDFONTS = {};
+const SF2_SIMPLE_PROGRAMS = [0, 4, 5, 9, 24, 33, 105, 11, 19, 72];
+App.sf2SimplePrograms = SF2_SIMPLE_PROGRAMS;
+
+let PIANO_PRESETS = {};
 App.presets = PIANO_PRESETS;
-const DEFAULT_PIANO = "felt";
+const DEFAULT_PIANO = `gm-program-${SF2_SIMPLE_PROGRAMS[0]}`;
+const ADSR_TRIM_DEFAULTS = {
+    attack: 0,
+    decay: 0,
+    release: 0,
+    length: 0
+};
 const DEFAULT_NOTE_DURATION = 1.2;
+const DEFAULT_RULE_MODE = "simultaneous";
+const DEFAULT_RULE_BLIND = false;
+const DEFAULT_RULE_TRAINING_MODE = "keyboard";
+const DEFAULT_RULE_CHORD_DIFFICULTY = "easy";
+const DEFAULT_RULE_CHORD_EXTRA_HELPERS = false;
+const DEFAULT_RULE_TYPING_SHOW_PIANO = true;
+const DEFAULT_RULE_TYPING_SHOW_TYPED = true;
+const PRACTICE_MODE_IDS = ["random", "nice", "chord"];
+const createDefaultPracticeProfile = (modeId) => ({
+    mode: DEFAULT_RULE_MODE,
+    blindMode: DEFAULT_RULE_BLIND,
+    trainingMode: modeId === "chord" ? DEFAULT_RULE_TRAINING_MODE : "keyboard",
+    chordDifficulty: DEFAULT_RULE_CHORD_DIFFICULTY,
+    chordExtraHelpers: DEFAULT_RULE_CHORD_EXTRA_HELPERS,
+    typingShowPiano: DEFAULT_RULE_TYPING_SHOW_PIANO,
+    typingShowTyped: DEFAULT_RULE_TYPING_SHOW_TYPED
+});
+const createDefaultPracticeProfiles = () => ({
+    random: createDefaultPracticeProfile("random"),
+    nice: createDefaultPracticeProfile("nice"),
+    chord: createDefaultPracticeProfile("chord")
+});
+const normalizePracticeProfile = (value, modeId) => {
+    const fallback = createDefaultPracticeProfile(modeId);
+    const profile = value && typeof value === "object" ? value : {};
+    const rawDifficulty = String(profile.chordDifficulty ?? "").trim().toLowerCase();
+    const chordDifficulty = rawDifficulty === "playful"
+        ? "voiced"
+        : (["easy", "medium", "voiced", "hard"].includes(rawDifficulty) ? rawDifficulty : fallback.chordDifficulty);
+    return {
+        mode: profile.mode === "ascending" ? "ascending" : fallback.mode,
+        blindMode: Boolean(profile.blindMode),
+        trainingMode: ["keyboard", "type", "both"].includes(profile.trainingMode)
+            ? profile.trainingMode
+            : fallback.trainingMode,
+        chordDifficulty,
+        chordExtraHelpers: Boolean(profile.chordExtraHelpers),
+        typingShowPiano: profile.typingShowPiano !== false,
+        typingShowTyped: profile.typingShowTyped !== false
+    };
+};
+const normalizePracticeProfiles = (value) => {
+    const source = value && typeof value === "object" ? value : {};
+    return {
+        random: normalizePracticeProfile(source.random, "random"),
+        nice: normalizePracticeProfile(source.nice, "nice"),
+        chord: normalizePracticeProfile(source.chord, "chord")
+    };
+};
+const getEffectivePracticeModeFromState = (sourceState = state) => {
+    if (sourceState.practiceMode === "chord" || sourceState.chordMode || sourceState.trainingMode === "type" || sourceState.trainingMode === "both") {
+        return "chord";
+    }
+    if (sourceState.practiceMode === "nice" || sourceState.niceMode) {
+        return "nice";
+    }
+    return "random";
+};
+const capturePracticeProfileFromState = (modeId, sourceState = state) => {
+    const safeMode = PRACTICE_MODE_IDS.includes(modeId) ? modeId : "random";
+    if (!sourceState.practiceProfiles || typeof sourceState.practiceProfiles !== "object") {
+        sourceState.practiceProfiles = createDefaultPracticeProfiles();
+    }
+    sourceState.practiceProfiles[safeMode] = {
+        mode: sourceState.mode === "ascending" ? "ascending" : "simultaneous",
+        blindMode: Boolean(sourceState.blindMode),
+        trainingMode: ["keyboard", "type", "both"].includes(sourceState.trainingMode)
+            ? sourceState.trainingMode
+            : "keyboard",
+        chordDifficulty: ["easy", "medium", "voiced", "hard", "playful"].includes(sourceState.chordDifficulty)
+            ? (sourceState.chordDifficulty === "playful" ? "voiced" : sourceState.chordDifficulty)
+            : DEFAULT_RULE_CHORD_DIFFICULTY,
+        chordExtraHelpers: Boolean(sourceState.chordExtraHelpers),
+        typingShowPiano: sourceState.typingShowPiano !== false,
+        typingShowTyped: sourceState.typingShowTyped !== false
+    };
+    return sourceState.practiceProfiles[safeMode];
+};
 const DEFAULTS = {
     noteCount: 2,
     mode: "simultaneous",
-    volume: 0.65,
+    volume: 0.75,
     noteDuration: DEFAULT_NOTE_DURATION,
     keyCount: 24,
     startMidi: DEFAULT_START_MIDI,
@@ -294,13 +360,18 @@ const DEFAULTS = {
     niceMode: false,
     theme: "light",
     pianoTone: DEFAULT_PIANO,
-    adsr: {
-        attack: 0.02,
-        decayRate: 0.5,
-        releaseRate: 15,
-        sustainLength: DEFAULT_NOTE_DURATION,
-        peak: 1
-    }
+    adsrTrim: { ...ADSR_TRIM_DEFAULTS },
+    responseProfileId: "instrument-default",
+    customResponseProfiles: {},
+    responseProfileDirty: false,
+    practiceMode: "random",
+    chordMode: false,
+    trainingMode: "keyboard",
+    chordDifficulty: "easy",
+    chordExtraHelpers: false,
+    typingShowPiano: true,
+    typingShowTyped: true,
+    practiceProfiles: createDefaultPracticeProfiles()
 };
 
 const state = {
@@ -320,7 +391,22 @@ const state = {
     niceMode: DEFAULTS.niceMode,
     theme: DEFAULTS.theme,
     pianoTone: DEFAULTS.pianoTone,
-    adsr: { ...DEFAULTS.adsr }
+    adsrTrim: { ...DEFAULTS.adsrTrim },
+    responseProfileId: DEFAULTS.responseProfileId,
+    customResponseProfiles: {},
+    responseProfileDirty: DEFAULTS.responseProfileDirty,
+    practiceMode: DEFAULTS.practiceMode,
+    chordMode: DEFAULTS.chordMode,
+    trainingMode: DEFAULTS.trainingMode,
+    chordDifficulty: DEFAULTS.chordDifficulty,
+    chordExtraHelpers: DEFAULTS.chordExtraHelpers,
+    typingShowPiano: DEFAULTS.typingShowPiano,
+    typingShowTyped: DEFAULTS.typingShowTyped,
+    practiceProfiles: createDefaultPracticeProfiles(),
+    targetChord: null,
+    selectedChordLabel: "",
+    typedAnswer: "",
+    typedPreviewNotes: []
 };
 App.defaults = DEFAULTS;
 App.state = state;
@@ -340,8 +426,21 @@ const saveSettings = () => {
         niceMode: state.niceMode,
         theme: state.theme,
         pianoTone: state.pianoTone,
-        adsr: { ...state.adsr }
+        adsrTrim: { ...state.adsrTrim },
+        responseProfileId: state.responseProfileId,
+        customResponseProfiles: { ...state.customResponseProfiles },
+        practiceMode: state.practiceMode,
+        chordMode: state.chordMode,
+        trainingMode: state.trainingMode,
+        chordDifficulty: state.chordDifficulty,
+        chordExtraHelpers: state.chordExtraHelpers,
+        typingShowPiano: state.typingShowPiano,
+        typingShowTyped: state.typingShowTyped
     };
+    const modeId = getEffectivePracticeModeFromState(state);
+    state.practiceProfiles = normalizePracticeProfiles(state.practiceProfiles);
+    capturePracticeProfileFromState(modeId, state);
+    payload.practiceProfiles = normalizePracticeProfiles(state.practiceProfiles);
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
 };
 
@@ -359,16 +458,41 @@ const loadSettings = () => {
         state.blindMode = Boolean(data.blindMode);
         state.niceMode = Boolean(data.niceMode);
         state.theme = data.theme === "dark" ? "dark" : DEFAULTS.theme;
-        state.pianoTone = PIANO_PRESETS[data.pianoTone] ? data.pianoTone : DEFAULTS.pianoTone;
-        state.adsr = {
-            attack: Number.isFinite(data.adsr?.attack) ? data.adsr.attack : DEFAULTS.adsr.attack,
-            decayRate: Number.isFinite(data.adsr?.decayRate) ? data.adsr.decayRate : DEFAULTS.adsr.decayRate,
-            releaseRate: Number.isFinite(data.adsr?.releaseRate) ? data.adsr.releaseRate : DEFAULTS.adsr.releaseRate,
-            sustainLength: Number.isFinite(data.adsr?.sustainLength)
-                ? data.adsr.sustainLength
-                : DEFAULTS.adsr.sustainLength,
-            peak: Number.isFinite(data.adsr?.peak) ? data.adsr.peak : DEFAULTS.adsr.peak
+        state.pianoTone = typeof data.pianoTone === "string" ? data.pianoTone : DEFAULTS.pianoTone;
+        state.responseProfileId = typeof data.responseProfileId === "string" && data.responseProfileId.trim()
+            ? data.responseProfileId.trim()
+            : DEFAULTS.responseProfileId;
+        const savedPracticeMode = String(data.practiceMode ?? "").trim();
+        state.practiceMode = ["random", "nice", "chord"].includes(savedPracticeMode)
+            ? savedPracticeMode
+            : (Boolean(data.chordMode) ? "chord" : (Boolean(data.niceMode) ? "nice" : DEFAULTS.practiceMode));
+        state.chordMode = Boolean(data.chordMode);
+        const trainingMode = String(data.trainingMode ?? "").trim();
+        state.trainingMode = ["keyboard", "type", "both"].includes(trainingMode)
+            ? trainingMode
+            : DEFAULTS.trainingMode;
+        const difficulty = String(data.chordDifficulty ?? "").trim().toLowerCase();
+        state.chordDifficulty = difficulty === "playful"
+            ? "voiced"
+            : (["easy", "medium", "voiced", "hard"].includes(difficulty) ? difficulty : DEFAULTS.chordDifficulty);
+        state.chordExtraHelpers = Boolean(data.chordExtraHelpers);
+        state.typingShowPiano = data.typingShowPiano !== false;
+        state.typingShowTyped = data.typingShowTyped !== false;
+        state.practiceProfiles = normalizePracticeProfiles(data.practiceProfiles);
+        const trim = data.adsrTrim ?? {};
+        state.adsrTrim = {
+            attack: Number.isFinite(trim.attack) ? Math.min(Math.max(trim.attack, -1), 1) : DEFAULTS.adsrTrim.attack,
+            decay: Number.isFinite(trim.decay) ? Math.min(Math.max(trim.decay, -1), 1) : DEFAULTS.adsrTrim.decay,
+            release: Number.isFinite(trim.release) ? Math.min(Math.max(trim.release, -1), 1) : DEFAULTS.adsrTrim.release,
+            length: Number.isFinite(trim.length) ? Math.min(Math.max(trim.length, -1), 1) : DEFAULTS.adsrTrim.length
         };
+        if (data.customResponseProfiles && typeof data.customResponseProfiles === "object") {
+            state.customResponseProfiles = { ...data.customResponseProfiles };
+        } else {
+            state.customResponseProfiles = {};
+        }
+        capturePracticeProfileFromState(getEffectivePracticeModeFromState(state), state);
+        state.responseProfileDirty = false;
     } catch (error) {
         // Ignore corrupted settings
     }
@@ -385,11 +509,29 @@ const resetAllSettings = () => {
     state.niceMode = DEFAULTS.niceMode;
     state.theme = DEFAULTS.theme;
     state.pianoTone = DEFAULTS.pianoTone;
-    state.adsr = { ...DEFAULTS.adsr };
+    state.adsrTrim = { ...DEFAULTS.adsrTrim };
+    state.responseProfileId = DEFAULTS.responseProfileId;
+    state.customResponseProfiles = {};
+    state.responseProfileDirty = DEFAULTS.responseProfileDirty;
+    state.practiceMode = DEFAULTS.practiceMode;
+    state.chordMode = DEFAULTS.chordMode;
+    state.trainingMode = DEFAULTS.trainingMode;
+    state.chordDifficulty = DEFAULTS.chordDifficulty;
+    state.chordExtraHelpers = DEFAULTS.chordExtraHelpers;
+    state.typingShowPiano = DEFAULTS.typingShowPiano;
+    state.typingShowTyped = DEFAULTS.typingShowTyped;
+    state.practiceProfiles = createDefaultPracticeProfiles();
+    state.targetChord = null;
+    state.selectedChordLabel = "";
+    state.typedAnswer = "";
+    state.typedPreviewNotes = [];
 };
 
 let audioContext;
 let masterGain;
+let masterHighpass;
+let masterCompressor;
+let masterOutputGain;
 const activeVoices = new Set();
 const activeVoicesById = new Map();
 const activeKeyTimers = new Set();
@@ -504,13 +646,62 @@ const getPanelBottomGap = () => {
     return getCssNumber(rootStyles.getPropertyValue("--panel-bottom-gap")) || 24;
 };
 
+const normalizeSoundfontDefinition = (entry) => {
+    if (!entry || typeof entry !== "object") return null;
+    const id = String(entry.id ?? "").trim();
+    if (!id) return null;
+    return {
+        ...entry,
+        id,
+        label: String(entry.label ?? id),
+        description: String(entry.description ?? entry.desc ?? ""),
+        baseAdsr: {
+            attack: Number.isFinite(entry.baseAdsr?.attack) ? entry.baseAdsr.attack : 0.016,
+            decay: Number.isFinite(entry.baseAdsr?.decay) ? entry.baseAdsr.decay : 0.95,
+            sustain: Number.isFinite(entry.baseAdsr?.sustain) ? entry.baseAdsr.sustain : 0.75,
+            release: Number.isFinite(entry.baseAdsr?.release) ? entry.baseAdsr.release : 1.2
+        },
+        volume: Number.isFinite(entry.volume) ? entry.volume : 1,
+        velocityCurve: Number.isFinite(entry.velocityCurve) ? entry.velocityCurve : 1.6
+    };
+};
+
+const setSoundfontCatalog = (items = []) => {
+    const nextCatalog = {};
+    Object.values(BUILTIN_SOUNDFONTS).forEach((entry) => {
+        const normalized = normalizeSoundfontDefinition(entry);
+        if (normalized) nextCatalog[normalized.id] = normalized;
+    });
+    Object.values(PIANO_PRESETS).forEach((entry) => {
+        if (!entry?.advancedOnly) return;
+        const normalized = normalizeSoundfontDefinition(entry);
+        if (normalized) nextCatalog[normalized.id] = normalized;
+    });
+    items.forEach((entry) => {
+        const normalized = normalizeSoundfontDefinition(entry);
+        if (!normalized) return;
+        nextCatalog[normalized.id] = normalized;
+    });
+    PIANO_PRESETS = nextCatalog;
+    App.presets = PIANO_PRESETS;
+    if (!PIANO_PRESETS[state.pianoTone]) {
+        state.pianoTone = PIANO_PRESETS[DEFAULT_PIANO] ? DEFAULT_PIANO : Object.keys(PIANO_PRESETS)[0];
+    }
+};
+
+const getSoundfontList = () => Object.values(PIANO_PRESETS);
+
 function renderPianoOptions() {
     if (!pianoOptionsContainer) return;
     pianoOptionsContainer.innerHTML = "";
     const fragment = document.createDocumentFragment();
     Object.entries(PIANO_PRESETS).forEach(([key, preset]) => {
+        if (preset.advancedOnly) return;
         const option = document.createElement("div");
         option.className = "piano-option";
+        if (preset.simple) {
+            option.classList.add("simple");
+        }
         option.dataset.piano = key;
         option.tabIndex = 0;
 
@@ -523,7 +714,7 @@ function renderPianoOptions() {
 
         const desc = document.createElement("div");
         desc.className = "piano-desc";
-        desc.textContent = preset.desc ?? preset.description ?? "";
+        desc.textContent = preset.description ?? "";
 
         info.appendChild(name);
         if (desc.textContent) {

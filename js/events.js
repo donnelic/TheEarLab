@@ -33,12 +33,100 @@ blindToggle.addEventListener("change", (event) => {
 });
 
 niceNotesToggle.addEventListener("change", (event) => {
-    state.niceMode = event.target.checked;
-    updateNoteCountMax();
-    handleCriticalSettingChange(200);
-    updateStatus();
-    saveSettings();
+    if (event.target.checked) {
+        setPracticeMode("nice");
+    } else if (getEffectivePracticeMode() === "nice") {
+        setPracticeMode("random");
+    } else {
+        state.niceMode = false;
+        updateNoteCountMax();
+        handleCriticalSettingChange(200);
+        updateStatus();
+        saveSettings();
+    }
 });
+
+if (chordRoundsToggle) {
+    chordRoundsToggle.addEventListener("change", (event) => {
+        setPracticeMode(event.target.checked ? "chord" : "random");
+    });
+}
+
+if (practiceModeSelect) {
+    practiceModeSelect.addEventListener("change", (event) => {
+        const value = String(event.target.value ?? "");
+        setPracticeMode(value);
+    });
+}
+
+if (trainingModeSelect) {
+    trainingModeSelect.addEventListener("change", (event) => {
+        const value = String(event.target.value ?? "");
+        const next = ["keyboard", "type", "both"].includes(value) ? value : "keyboard";
+        state.trainingMode = next;
+        if (getEffectivePracticeMode() !== "chord") {
+            state.trainingMode = "keyboard";
+        }
+        refreshOptionsModeVisibility();
+        if (typeof App.game?.clearTypingAutoNext === "function") {
+            App.game.clearTypingAutoNext();
+        }
+        handleCriticalSettingChange(200);
+        updateStatus();
+        updateKeyStates();
+        saveSettings();
+    });
+}
+
+if (chordDifficultySelect) {
+    chordDifficultySelect.addEventListener("change", (event) => {
+        const value = String(event.target.value ?? "").trim().toLowerCase();
+        state.chordDifficulty = value === "playful"
+            ? "voiced"
+            : (["easy", "medium", "voiced", "hard"].includes(value)
+                ? value
+                : DEFAULTS.chordDifficulty);
+        if (getIsChordRound()) {
+            handleCriticalSettingChange(200);
+        }
+        updateStatus();
+        saveSettings();
+    });
+}
+
+if (chordExtraHelpersToggle) {
+    chordExtraHelpersToggle.addEventListener("change", (event) => {
+        state.chordExtraHelpers = Boolean(event.target.checked);
+        if (getIsChordRound()) {
+            handleCriticalSettingChange(200);
+        }
+        updateStatus();
+        saveSettings();
+    });
+}
+
+if (typingShowPianoToggle) {
+    typingShowPianoToggle.addEventListener("change", (event) => {
+        state.typingShowPiano = Boolean(event.target.checked);
+        refreshOptionsModeVisibility();
+        updateStatus();
+        updateKeyStates();
+        saveSettings();
+    });
+}
+
+if (typingShowTypedToggle) {
+    typingShowTypedToggle.addEventListener("change", (event) => {
+        state.typingShowTyped = Boolean(event.target.checked);
+        refreshOptionsModeVisibility();
+        if (typeof App.game?.updateTypedPreviewFromInput === "function") {
+            App.game.updateTypedPreviewFromInput();
+        }
+        updateStatus();
+        updateKeyStates();
+        saveSettings();
+    });
+}
 
 resetSettingsButton.addEventListener("click", () => {
     resetAllSettings();
@@ -46,7 +134,7 @@ resetSettingsButton.addEventListener("click", () => {
     updateNoteCountMax();
     applyUiFromState();
     setVolume(state.volume);
-    setPianoTone(state.pianoTone, { save: false });
+    setPianoTone(state.pianoTone, { save: false, skipProfilePrompts: true });
     setNoteLength(state.noteDuration);
     setKeyCount(state.keyCount, { delayOverrideMs: 0 });
     saveSettings();
@@ -72,28 +160,60 @@ themeToggle.addEventListener("click", (event) => {
 });
 
 settingsPanel.addEventListener("click", (event) => {
+    if (!optionsPanel?.contains(event.target) && !optionsTrigger?.contains(event.target)) {
+        closeOptionsPanel();
+    }
     if (!advancedPanel.contains(event.target) && !advancedTrigger.contains(event.target)) {
         closeAdvanced();
     }
     if (!pianoPanel?.contains(event.target) && !pianoTrigger?.contains(event.target)) {
         closePianoPanel();
     }
+    if (!instrumentBrowserPanel?.contains(event.target) && !instrumentBrowserTrigger?.contains(event.target)) {
+        closeInstrumentBrowser();
+    }
     event.stopPropagation();
 });
 
+if (optionsTrigger) {
+    optionsTrigger.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (!optionsPanel) return;
+        if (optionsPanel.classList.contains("open")) {
+            closeOptionsPanel();
+        } else {
+            openOptionsPanel();
+        }
+    });
+}
+
+if (optionsPanel) {
+    optionsPanel.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+}
+
 document.addEventListener("click", () => {
     closeSettings();
+    closeOptionsPanel();
     closeAdvanced();
     closePianoPanel();
+    closeInstrumentBrowser();
 });
 
 window.addEventListener("resize", () => {
     updateKeyboardScale();
+    if (optionsPanel?.classList.contains("open")) {
+        positionOptionsPanel();
+    }
     if (advancedPanel?.classList.contains("open")) {
         positionFloatingPanel(advancedPanel, advancedTrigger);
     }
     if (pianoPanel?.classList.contains("open")) {
         positionPianoPanel();
+    }
+    if (instrumentBrowserPanel?.classList.contains("open")) {
+        positionInstrumentBrowserPanel();
     }
 });
 
@@ -135,30 +255,27 @@ lengthSlider.addEventListener("input", (event) => {
 });
 
 attackSlider.addEventListener("input", (event) => {
-    const raw = Number.parseFloat(event.target.value);
-    const next = Number.isFinite(raw) ? raw : state.adsr.attack;
-    setAdsrParam("attack", Math.min(Math.max(next, 0.01), 0.2));
-    attackValue.textContent = `${state.adsr.attack.toFixed(3)}s`;
+    const raw = Number.parseInt(event.target.value, 10);
+    const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.attack * 100);
+    setAdsrTrim("attack", next / 100);
 });
 
 decaySlider.addEventListener("input", (event) => {
-    const raw = Number.parseFloat(event.target.value);
-    const next = Number.isFinite(raw) ? raw : state.adsr.decayRate;
-    setAdsrParam("decayRate", Math.min(Math.max(next, 0.1), 2));
-    decayValue.textContent = `${state.adsr.decayRate.toFixed(1)}`;
+    const raw = Number.parseInt(event.target.value, 10);
+    const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.decay * 100);
+    setAdsrTrim("decay", next / 100);
 });
 
 releaseSlider.addEventListener("input", (event) => {
-    const raw = Number.parseFloat(event.target.value);
-    const next = Number.isFinite(raw) ? raw : state.adsr.releaseRate;
-    setAdsrParam("releaseRate", Math.min(Math.max(next, 5), 30));
-    releaseValue.textContent = `${state.adsr.releaseRate.toFixed(0)}`;
+    const raw = Number.parseInt(event.target.value, 10);
+    const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.release * 100);
+    setAdsrTrim("release", next / 100);
 });
 
 sustainSlider.addEventListener("input", (event) => {
-    const raw = Number.parseFloat(event.target.value);
-    const next = Number.isFinite(raw) ? raw : state.noteDuration;
-    setNoteLength(next);
+    const raw = Number.parseInt(event.target.value, 10);
+    const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.length * 100);
+    setAdsrTrim("length", next / 100);
 });
 
 keyCountSlider.addEventListener("input", (event) => {
@@ -180,9 +297,188 @@ hintButton.addEventListener("click", () => {
     playTarget();
 });
 
+if (chordAnswerInput) {
+    chordAnswerInput.addEventListener("input", () => {
+        if (typeof App.game?.updateTypedPreviewFromInput === "function") {
+            App.game.updateTypedPreviewFromInput();
+        }
+        updateStatus();
+        updateKeyStates();
+    });
+    chordAnswerInput.addEventListener("keydown", (event) => {
+        if (event.code === "Enter" || event.code === "Space") {
+            event.preventDefault();
+        }
+    });
+}
+
+if (typingHelpToggle && typingHelpText) {
+    typingHelpToggle.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const show = typingHelpText.hidden;
+        typingHelpText.hidden = !show;
+        typingHelpToggle.setAttribute("aria-expanded", show ? "true" : "false");
+    });
+}
+
+const CHORD_TUTORIAL_STEPS = [
+    {
+        title: "1. Root Note",
+        body: "Start with A through G. This is the chord root.",
+        examples: ["C", "A", "F"]
+    },
+    {
+        title: "2. Accidentals",
+        body: "Add # or b right after the root if needed.",
+        examples: ["F#", "Bb", "C#"]
+    },
+    {
+        title: "3. Basic Quality",
+        body: "No suffix means major. Use m for minor.",
+        examples: ["C = C major", "Cm = C minor", "F#m = F# minor"]
+    },
+    {
+        title: "4. Common Extensions",
+        body: "Add 7, maj7, m7, 9, 6 and related forms.",
+        examples: ["G7", "Cmaj7", "Dm7", "A9", "F6/9"]
+    },
+    {
+        title: "5. Other Qualities",
+        body: "You can also use sus2/sus4, dim, aug and power chords.",
+        examples: ["Dsus4", "Bdim", "Eaug", "A5"]
+    },
+    {
+        title: "6. Input Tips",
+        body: "Spaces are allowed and aliases are supported. Enter submits. Space previews typed chord if blind mode is off.",
+        examples: ["C major 7", "Bb min7", "F sharp minor"]
+    }
+];
+
+let chordTutorialStepIndex = 0;
+
+const isChordTutorialOpen = () => Boolean(chordTutorialModal && !chordTutorialModal.hidden);
+
+const renderChordTutorialStep = () => {
+    if (!chordTutorialStep || !chordTutorialProgress) return;
+    const total = CHORD_TUTORIAL_STEPS.length;
+    const safeIndex = Math.min(Math.max(chordTutorialStepIndex, 0), Math.max(0, total - 1));
+    chordTutorialStepIndex = safeIndex;
+    const step = CHORD_TUTORIAL_STEPS[safeIndex];
+    if (!step) return;
+
+    const examples = (step.examples || [])
+        .map((value) => `<li><code>${value}</code></li>`)
+        .join("");
+    chordTutorialStep.innerHTML = `
+        <div class="tutorial-step-title">${step.title}</div>
+        <div class="tutorial-step-body">${step.body}</div>
+        <ul class="tutorial-example-list">${examples}</ul>
+    `;
+    chordTutorialProgress.textContent = `Step ${safeIndex + 1}/${total}`;
+    if (chordTutorialPrev) chordTutorialPrev.disabled = safeIndex <= 0;
+    if (chordTutorialNext) chordTutorialNext.textContent = safeIndex >= total - 1 ? "Done" : "Next";
+};
+
+const closeChordTutorial = () => {
+    if (!chordTutorialModal) return;
+    chordTutorialModal.hidden = true;
+    chordTutorialModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("tutorial-open");
+    if (chordTutorialOpen && typeof chordTutorialOpen.focus === "function") {
+        chordTutorialOpen.focus();
+    }
+};
+
+const openChordTutorial = (stepIndex = 0) => {
+    if (!chordTutorialModal) return;
+    chordTutorialStepIndex = Number.isFinite(stepIndex) ? stepIndex : 0;
+    renderChordTutorialStep();
+    chordTutorialModal.hidden = false;
+    chordTutorialModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("tutorial-open");
+};
+
+if (chordTutorialOpen) {
+    chordTutorialOpen.addEventListener("click", (event) => {
+        event.preventDefault();
+        openChordTutorial(0);
+    });
+}
+
+if (chordTutorialClose) {
+    chordTutorialClose.addEventListener("click", (event) => {
+        event.preventDefault();
+        closeChordTutorial();
+    });
+}
+
+if (chordTutorialBackdrop) {
+    chordTutorialBackdrop.addEventListener("click", () => {
+        closeChordTutorial();
+    });
+}
+
+if (chordTutorialPrev) {
+    chordTutorialPrev.addEventListener("click", () => {
+        chordTutorialStepIndex = Math.max(0, chordTutorialStepIndex - 1);
+        renderChordTutorialStep();
+    });
+}
+
+if (chordTutorialNext) {
+    chordTutorialNext.addEventListener("click", () => {
+        if (chordTutorialStepIndex >= CHORD_TUTORIAL_STEPS.length - 1) {
+            closeChordTutorial();
+            return;
+        }
+        chordTutorialStepIndex += 1;
+        renderChordTutorialStep();
+    });
+}
+
+const isChordTypingCaptureActive = () => {
+    if (!state.active || state.submitted) return false;
+    if (!typingZone || typingZone.hidden) return false;
+    if (!getIsChordRound()) return false;
+    return state.trainingMode === "type" || state.trainingMode === "both";
+};
+
+const insertTypedCharacter = (character) => {
+    if (!chordAnswerInput) return;
+    chordAnswerInput.focus();
+    const start = Number.isFinite(chordAnswerInput.selectionStart) ? chordAnswerInput.selectionStart : chordAnswerInput.value.length;
+    const end = Number.isFinite(chordAnswerInput.selectionEnd) ? chordAnswerInput.selectionEnd : chordAnswerInput.value.length;
+    chordAnswerInput.setRangeText(character, start, end, "end");
+    chordAnswerInput.dispatchEvent(new Event("input", { bubbles: true }));
+};
+
+const tryPlayTypedChordPreview = () => {
+    if (typeof App.game?.playTypedInputChord !== "function") return false;
+    return App.game.playTypedInputChord();
+};
+
+const triggerPrimaryAction = () => {
+    if (state.active && !state.submitted) {
+        submitAnswer();
+    } else {
+        startRound(true);
+    }
+};
+
+const triggerReplayAction = (event) => {
+    if (updateReplayAvailability()) {
+        if (!event.repeat && !holdState.active) {
+            startHeldPlayback();
+        }
+    }
+};
+
 if (homeButton) {
     homeButton.addEventListener("click", () => {
-        goHome();
+        if (typeof App.settings?.goHome === "function") {
+            App.settings.goHome();
+        }
     });
 }
 
@@ -191,7 +487,11 @@ if (heroTitle) {
     heroTitle.setAttribute("role", "button");
     heroTitle.setAttribute("tabindex", "0");
     heroTitle.classList.add("hero-link");
-    const goHomeAction = () => goHome();
+    const goHomeAction = () => {
+        if (typeof App.settings?.goHome === "function") {
+            App.settings.goHome();
+        }
+    };
     heroTitle.addEventListener("click", goHomeAction);
     heroTitle.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -241,23 +541,88 @@ noteCountInput.addEventListener("dblclick", () => {
 });
 
 attackSlider.addEventListener("dblclick", () => {
-    setAdsrParam("attack", DEFAULTS.adsr.attack);
-    attackValue.textContent = `${state.adsr.attack.toFixed(3)}s`;
+    setAdsrTrim("attack", 0);
 });
 
 decaySlider.addEventListener("dblclick", () => {
-    setAdsrParam("decayRate", DEFAULTS.adsr.decayRate);
-    decayValue.textContent = `${state.adsr.decayRate.toFixed(1)}`;
+    setAdsrTrim("decay", 0);
 });
 
 releaseSlider.addEventListener("dblclick", () => {
-    setAdsrParam("releaseRate", DEFAULTS.adsr.releaseRate);
-    releaseValue.textContent = `${state.adsr.releaseRate.toFixed(0)}`;
+    setAdsrTrim("release", 0);
 });
 
 sustainSlider.addEventListener("dblclick", () => {
-    setNoteLength(DEFAULTS.noteDuration);
+    setAdsrTrim("length", 0);
 });
+
+if (profileSearch) {
+    profileSearch.addEventListener("input", () => {
+        renderResponseProfileBrowser();
+    });
+}
+
+if (profileList) {
+    profileList.addEventListener("click", (event) => {
+        const row = event.target.closest(".profile-row");
+        if (!row) return;
+        setResponseProfileSelection(row.dataset.key);
+    });
+    profileList.addEventListener("dblclick", () => {
+        applyResponseProfileSelection();
+    });
+    profileList.addEventListener("keydown", (event) => {
+        const row = event.target.closest(".profile-row");
+        if (!row) return;
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        setResponseProfileSelection(row.dataset.key);
+        applyResponseProfileSelection();
+    });
+}
+
+if (profileApply) {
+    profileApply.addEventListener("click", () => {
+        applyResponseProfileSelection();
+    });
+}
+
+if (profileSave) {
+    profileSave.addEventListener("click", () => {
+        void promptSaveCurrentResponseProfile();
+    });
+}
+
+if (instrumentPresetSearch) {
+    instrumentPresetSearch.addEventListener("input", () => {
+        renderInstrumentPresetBrowser();
+    });
+}
+
+if (instrumentPresetList) {
+    instrumentPresetList.addEventListener("click", (event) => {
+        const row = event.target.closest(".sf2-row");
+        if (!row) return;
+        setInstrumentPresetSelection(row.dataset.key);
+    });
+    instrumentPresetList.addEventListener("dblclick", () => {
+        void applyInstrumentPresetSelection();
+    });
+    instrumentPresetList.addEventListener("keydown", (event) => {
+        const row = event.target.closest(".sf2-row");
+        if (!row) return;
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        setInstrumentPresetSelection(row.dataset.key);
+        void applyInstrumentPresetSelection();
+    });
+}
+
+if (instrumentPresetApply) {
+    instrumentPresetApply.addEventListener("click", () => {
+        void applyInstrumentPresetSelection();
+    });
+}
 
 advancedTrigger.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -290,28 +655,49 @@ if (pianoPanel) {
     });
 }
 
+if (instrumentBrowserTrigger) {
+    instrumentBrowserTrigger.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (instrumentBrowserPanel.classList.contains("open")) {
+            closeInstrumentBrowser();
+        } else {
+            closeAdvanced();
+            closePianoPanel();
+            openInstrumentBrowser();
+        }
+    });
+}
+
+if (instrumentBrowserPanel) {
+    instrumentBrowserPanel.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+}
+
 const bindPianoOptionEvents = () => {
-    pianoOptions.forEach((option) => {
-        option.addEventListener("click", (event) => {
-            if (event.target.closest(".piano-preview")) return;
-            const tone = option.dataset.piano;
-            setPianoTone(tone);
-        });
-        option.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                const tone = option.dataset.piano;
-                setPianoTone(tone);
-            }
-        });
+    if (!pianoOptionsContainer) return;
+
+    pianoOptionsContainer.addEventListener("click", (event) => {
+        const previewButton = event.target.closest(".piano-preview");
+        if (previewButton) {
+            event.stopPropagation();
+            const tone = previewButton.dataset.piano;
+            playPianoPreview(tone);
+            return;
+        }
+        const option = event.target.closest(".piano-option");
+        if (!option) return;
+        const tone = option.dataset.piano;
+        setPianoTone(tone);
     });
 
-    pianoPreviewButtons.forEach((button) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const tone = button.dataset.piano;
-            playPianoPreview(tone);
-        });
+    pianoOptionsContainer.addEventListener("keydown", (event) => {
+        const option = event.target.closest(".piano-option");
+        if (!option) return;
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        const tone = option.dataset.piano;
+        setPianoTone(tone);
     });
 };
 
@@ -349,7 +735,8 @@ keyboardEl.addEventListener("pointerdown", (event) => {
         toggleSelection(noteId);
         return;
     }
-    const playSound = state.submitted || (!state.blindMode && !willDeselect);
+    const isTypingOnly = state.trainingMode === "type";
+    const playSound = state.submitted || (!(state.blindMode || isTypingOnly) && !willDeselect);
     if (state.submitted && revealPlaying) {
         abortPlayback([noteId]);
     }
@@ -379,12 +766,61 @@ keyboardEl.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
     const tag = event.target.tagName;
+    const chordInputFocused = event.target === chordAnswerInput;
+    if (event.code === "Escape" && isChordTutorialOpen()) {
+        event.preventDefault();
+        closeChordTutorial();
+        return;
+    }
+    if (isChordTutorialOpen()) {
+        if (event.code === "ArrowLeft") {
+            event.preventDefault();
+            if (chordTutorialPrev && !chordTutorialPrev.disabled) {
+                chordTutorialPrev.click();
+            }
+            return;
+        }
+        if (event.code === "ArrowRight" || event.code === "Enter") {
+            event.preventDefault();
+            if (chordTutorialNext && !chordTutorialNext.disabled) {
+                chordTutorialNext.click();
+            }
+            return;
+        }
+        if (event.code !== "Tab") {
+            event.preventDefault();
+            return;
+        }
+    }
     if (event.code === "Escape") {
         closeSettings();
+        closeOptionsPanel();
         closeAdvanced();
         closePianoPanel();
+        closeInstrumentBrowser();
     }
+
+    if (chordInputFocused && event.code === "Space") {
+        event.preventDefault();
+        if (!tryPlayTypedChordPreview()) {
+            triggerReplayAction(event);
+        }
+        return;
+    }
+
+    if (chordInputFocused && event.code === "Enter") {
+        event.preventDefault();
+        triggerPrimaryAction();
+        return;
+    }
+
     if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+    if (isChordTypingCaptureActive() && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && event.code !== "Space") {
+        event.preventDefault();
+        insertTypedCharacter(event.key);
+        return;
+    }
 
     if (!state.active && (event.code === "ShiftLeft" || event.code === "ShiftRight" || event.code === "ControlLeft" || event.code === "ControlRight")) {
         if (previewState.playing) {
@@ -399,20 +835,12 @@ document.addEventListener("keydown", (event) => {
 
     if (event.code === "Space") {
         event.preventDefault();
-        if (updateReplayAvailability()) {
-            if (!event.repeat && !holdState.active) {
-                startHeldPlayback();
-            }
-        }
+        triggerReplayAction(event);
     }
 
     if (event.code === "Enter") {
         event.preventDefault();
-        if (state.active && !state.submitted) {
-            submitAnswer();
-        } else {
-            startRound(true);
-        }
+        triggerPrimaryAction();
     }
 });
 
@@ -469,23 +897,33 @@ const setRandomBackgroundAngle = () => {
     document.documentElement.style.setProperty("--bg-angle", `${angle}deg`);
 };
 
-const init = () => {
+const init = async () => {
     loadSettings();
-    renderPianoOptions();
     bindPianoOptionEvents();
     setRandomBackgroundAngle();
     renderKeyboard();
     setKeyboardEnabled(true);
     updateNoteCountMax();
+    renderPianoOptions();
     applyUiFromState();
+    if (typeof App.game?.updateTypedPreviewFromInput === "function") {
+        App.game.updateTypedPreviewFromInput();
+    }
+    setPianoTone(state.pianoTone, { save: false, skipProfilePrompts: true });
+    await refreshSoundfontCatalog();
+    await refreshInstrumentPresetBrowser();
+    refreshResponseProfileBrowser();
     setVolume(state.volume);
     setNoteLength(state.noteDuration);
     setKeyCount(state.keyCount, { delayOverrideMs: 0 });
     updateStatus();
     updateKeyStates();
     updateKeyboardScale();
+    void ensureSoundfontReady(state.pianoTone);
 };
 
-init();
+init().catch((error) => {
+    console.error("App initialization failed:", error);
+});
 
 Object.assign(App.events, { bindPianoOptionEvents, init, setRandomBackgroundAngle });

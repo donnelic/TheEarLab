@@ -4,8 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Note Recognition Piano Trainer</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260305144756" />
 </head>
 
 <body>
@@ -44,36 +47,15 @@
         </div>
 
         <div class="control">
-          <label>Play style</label>
-          <div class="segmented" role="group" aria-label="Play style">
-            <button class="segmented-btn active" type="button" data-mode="simultaneous">Same time</button>
-            <button class="segmented-btn" type="button" data-mode="ascending">Low to high</button>
-          </div>
-        </div>
-
-        <div class="control compact">
-          <label for="blind-mode">Blind mode</label>
+          <label>Game Settings</label>
           <div class="control-row">
-            <label class="switch" for="blind-mode">
-              <input id="blind-mode" type="checkbox" />
-              <span class="switch-track">
-                <span class="switch-thumb"></span>
-              </span>
-            </label>
-            <span class="unit">No checks, no replay</span>
+            <button id="options-trigger" class="panel-trigger" type="button" aria-expanded="false"
+              aria-controls="options-panel">
+              Open game settings
+            </button>
           </div>
-        </div>
-
-        <div class="control compact">
-          <label for="nice-notes">Nice notes</label>
           <div class="control-row">
-            <label class="switch" for="nice-notes">
-              <input id="nice-notes" type="checkbox" />
-              <span class="switch-track">
-                <span class="switch-thumb"></span>
-              </span>
-            </label>
-            <span class="unit">Only harmonic combos</span>
+            <span class="unit">Opens a popup with mode-specific options</span>
           </div>
         </div>
 
@@ -86,16 +68,20 @@
         </div>
 
         <div class="control">
-          <label for="piano-trigger">Piano sound</label>
+          <label for="piano-trigger">Instrument</label>
           <div class="control-row">
             <button id="piano-trigger" class="dropdown-trigger" type="button" aria-expanded="false"
               aria-controls="piano-panel">
-              <span id="piano-label">Classical</span>
+              <span id="piano-label">Loading SF2...</span>
               <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                 <path d="M5 7.5 10 12.5 15 7.5" />
               </svg>
             </button>
             <button id="piano-preview-main" class="piano-preview main" type="button" aria-label="Play preview"></button>
+          </div>
+          <div class="control-row align-end">
+            <button id="instrument-browser-trigger" class="advanced-trigger" type="button"
+              aria-controls="instrument-browser-panel" aria-expanded="false">Browse All SF2 Presets</button>
           </div>
         </div>
 
@@ -138,34 +124,56 @@
   </aside>
 
   <section id="advanced-panel" class="advanced-panel" aria-hidden="true">
-    <h3>Advanced</h3>
+    <h3>Advanced Articulation</h3>
     <div class="advanced-grid">
       <div class="control">
-        <label for="attack-time">Attack (A)</label>
+        <label for="attack-time">Attack Time <span id="attack-label-value" class="inline-value">0.016s</span></label>
         <div class="control-row">
-          <input id="attack-time" type="range" min="0.005" max="0.08" step="0.001" value="0.02" />
-          <span class="volume-value" id="attack-value">0.02s</span>
+          <div class="slider-stack">
+            <input id="attack-time" type="range" min="-50" max="50" step="1" value="0" />
+            <span id="attack-ghost" class="slider-ghost" aria-hidden="true"></span>
+          </div>
+          <span class="volume-value" id="attack-value">0.016s</span>
         </div>
       </div>
       <div class="control">
-        <label for="decay-rate">Decay rate (Ks)</label>
+        <label for="decay-rate">Decay Time <span id="decay-label-value" class="inline-value">0.950s</span></label>
         <div class="control-row">
-          <input id="decay-rate" type="range" min="0.1" max="2" step="0.1" value="0.5" />
-          <span class="volume-value" id="decay-value">0.5</span>
+          <div class="slider-stack">
+            <input id="decay-rate" type="range" min="-50" max="50" step="1" value="0" />
+            <span id="decay-ghost" class="slider-ghost" aria-hidden="true"></span>
+          </div>
+          <span class="volume-value" id="decay-value">0.950s</span>
         </div>
       </div>
       <div class="control">
-        <label for="release-rate">Release rate (Kr)</label>
+        <label for="release-rate">Release Time <span id="release-label-value" class="inline-value">1.200s</span></label>
         <div class="control-row">
-          <input id="release-rate" type="range" min="5" max="30" step="1" value="15" />
-          <span class="volume-value" id="release-value">15</span>
+          <div class="slider-stack">
+            <input id="release-rate" type="range" min="-50" max="50" step="1" value="0" />
+            <span id="release-ghost" class="slider-ghost" aria-hidden="true"></span>
+          </div>
+          <span class="volume-value" id="release-value">1.200s</span>
         </div>
       </div>
       <div class="control">
-        <label for="sustain-length">Note length (L)</label>
+        <label for="sustain-length">Hold Duration <span id="sustain-label-value" class="inline-value">1.200s</span></label>
         <div class="control-row">
-          <input id="sustain-length" type="range" min="0.4" max="3.0" step="0.1" value="1.0" />
-          <span class="volume-value" id="sustain-value">1.0s</span>
+          <div class="slider-stack">
+            <input id="sustain-length" type="range" min="-50" max="50" step="1" value="0" />
+            <span id="sustain-ghost" class="slider-ghost" aria-hidden="true"></span>
+          </div>
+          <span class="volume-value" id="sustain-value">1.200s</span>
+        </div>
+      </div>
+      <div class="control profile-browser">
+        <label for="profile-search">Articulation Profiles</label>
+        <input id="profile-search" type="text" placeholder="Filter by profile name" />
+        <div id="profile-list" class="profile-list" role="listbox" aria-label="Articulation profile list"></div>
+        <div id="profile-meta" class="piano-desc">Select a profile to preview. Apply to use it.</div>
+        <div class="control-row align-end">
+          <button id="profile-save" class="advanced-trigger" type="button">Save Current Profile</button>
+          <button id="profile-apply" class="advanced-trigger" type="button">Apply Selected Profile</button>
         </div>
       </div>
     </div>
@@ -178,8 +186,155 @@
   </section>
 
   <section id="piano-panel" class="piano-panel" aria-hidden="true">
-    <h3>Piano</h3>
+    <h3>Simple Selector</h3>
     <div class="piano-options" id="piano-options"></div>
+  </section>
+
+  <section id="instrument-browser-panel" class="instrument-browser-panel" aria-hidden="true">
+    <h3>Instrument Browser</h3>
+    <div class="control sf2-browser">
+      <label for="instrument-preset-search">All SF2 Presets</label>
+      <input id="instrument-preset-search" type="text" placeholder="Filter by name/bank/program" />
+      <div id="instrument-preset-list" class="sf2-preset-list" role="listbox" aria-label="All SF2 presets"></div>
+      <div id="instrument-preset-meta" class="piano-desc">Select a preset to preview details. Apply to switch instrument.</div>
+      <div class="control-row align-end">
+        <button id="instrument-preset-apply" class="advanced-trigger" type="button">Apply Instrument</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="options-panel" class="options-panel" aria-hidden="true">
+    <h3>Game Settings</h3>
+    <div class="options-grid">
+      <div class="options-section-title">General</div>
+
+      <div class="control compact">
+        <label for="practice-mode">Practice mode</label>
+        <div class="control-row">
+          <select id="practice-mode">
+            <option value="random">Random Notes</option>
+            <option value="nice">Harmonic Notes</option>
+            <option value="chord">Chord Practice</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>Playback order</label>
+        <div class="segmented" role="group" aria-label="Play style">
+          <button class="segmented-btn active" type="button" data-mode="simultaneous">Together</button>
+          <button class="segmented-btn" type="button" data-mode="ascending">Low to high</button>
+        </div>
+      </div>
+
+      <div class="control compact">
+        <label for="blind-mode">Blind mode</label>
+        <div class="control-row">
+          <label class="switch" for="blind-mode">
+            <input id="blind-mode" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">Mute key sound while selecting notes</span>
+        </div>
+      </div>
+
+      <div class="control compact" data-option-group="legacy" hidden>
+        <label for="nice-notes">Nice notes</label>
+        <div class="control-row">
+          <label class="switch" for="nice-notes">
+            <input id="nice-notes" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">Consonant note targets</span>
+        </div>
+      </div>
+
+      <div class="control compact" data-option-group="legacy" hidden>
+        <label for="chord-rounds">Chord rounds</label>
+        <div class="control-row">
+          <label class="switch" for="chord-rounds">
+            <input id="chord-rounds" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">Generate chord targets</span>
+        </div>
+      </div>
+
+      <div class="options-section-title" data-option-group="chord">Chord mode</div>
+
+      <div class="control compact" data-option-group="chord">
+        <label for="training-mode">Answer input</label>
+        <div class="control-row">
+          <select id="training-mode">
+            <option value="keyboard">Play on keyboard</option>
+            <option value="type">Type chord name</option>
+            <option value="both">Keyboard + typing</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <span class="unit">In both mode, press Enter in the typing field for typed answers, or Submit for keyboard answers</span>
+        </div>
+      </div>
+
+      <div class="control compact" data-option-group="chord">
+        <label for="chord-difficulty">Chord set</label>
+        <div class="control-row">
+          <select id="chord-difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="voiced">Voiced (Easy/Medium)</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control compact" data-option-group="chord">
+        <label for="chord-extra-helpers">Extra helpers</label>
+        <div class="control-row">
+          <label class="switch" for="chord-extra-helpers">
+            <input id="chord-extra-helpers" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">Show hints like chord size, family and voicing style</span>
+        </div>
+      </div>
+
+      <div class="options-section-title" data-option-group="typing">Typing helpers</div>
+
+      <div class="control compact" data-option-group="typing">
+        <label for="typing-show-piano">Keyboard guide</label>
+        <div class="control-row">
+          <label class="switch" for="typing-show-piano">
+            <input id="typing-show-piano" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">In typing-only mode, keep the keyboard visible as a guide</span>
+        </div>
+      </div>
+
+      <div class="control compact" data-option-group="typing">
+        <label for="typing-show-typed">Typed chord preview</label>
+        <div class="control-row">
+          <label class="switch" for="typing-show-typed">
+            <input id="typing-show-typed" type="checkbox" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
+          <span class="unit">Highlight the notes detected from your typed chord name</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <main class="app">
@@ -208,12 +363,31 @@
         </div>
       </div>
     </section>
+    <section class="chord-readout" id="chord-readout" aria-live="polite" hidden>Selected chord: none</section>
+    <section class="typing-zone" id="typing-zone" hidden>
+      <label for="chord-answer">Type chord name</label>
+      <div class="typing-row">
+        <div class="typing-input-wrap">
+          <input id="chord-answer" type="text" placeholder="Example: Cmaj7 or C major 7" autocomplete="off" />
+          <button id="typing-help-toggle" class="typing-help-toggle" type="button" aria-expanded="false"
+            aria-controls="typing-help-text" aria-label="Show typing help" title="Show typing help">?</button>
+        </div>
+      </div>
+      <div id="typing-help-text" class="typing-help-text" hidden>
+        Type a chord name like <strong>Cmaj7</strong> or <strong>F#m</strong>. Press <strong>Enter</strong> to submit.
+        Press <strong>Space</strong> to preview your typed chord (or replay target if typing is invalid). While typing mode
+        is active, letter/number keys automatically go to this field.
+        <div class="typing-help-actions">
+          <button id="chord-tutorial-open" class="typing-learn-btn" type="button">Learn more about chord format</button>
+        </div>
+      </div>
+    </section>
 
-    <section class="status">
+    <section class="status" id="status-panel" hidden>
       <div class="status-row">
         <div><strong>Round</strong> <span id="round-count">1</span></div>
         <div><strong>Selected</strong> <span id="selected-list">None</span></div>
-        <div><strong>Goal</strong> <span id="goal-count">2</span> notes</div>
+        <div><strong>Goal</strong> <span id="goal-count">2</span> <span id="goal-label">notes</span></div>
         <div><strong>Mode</strong> <span id="mode-label">Normal</span></div>
       </div>
       <div class="status-actions">
@@ -230,11 +404,29 @@
     </footer>
   </main>
 
-  <script src="js/core.js" defer></script>
-  <script src="js/audio.js" defer></script>
-  <script src="js/game.js" defer></script>
-  <script src="js/settings.js" defer></script>
-  <script src="js/events.js" defer></script>
+  <section id="chord-tutorial-modal" class="tutorial-modal" aria-hidden="true" hidden>
+    <button id="chord-tutorial-backdrop" class="tutorial-backdrop" type="button" aria-label="Close chord tutorial"></button>
+    <div class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="chord-tutorial-title">
+      <div class="tutorial-head">
+        <h4 id="chord-tutorial-title">Chord Name Guide</h4>
+        <button id="chord-tutorial-close" class="typing-learn-btn tutorial-close" type="button">Close</button>
+      </div>
+      <div id="chord-tutorial-step" class="tutorial-step"></div>
+      <div class="tutorial-actions">
+        <button id="chord-tutorial-prev" class="advanced-trigger" type="button">Back</button>
+        <span id="chord-tutorial-progress" class="tutorial-progress">Step 1/1</span>
+        <button id="chord-tutorial-next" class="advanced-trigger" type="button">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="vendor/libfluidsynth-2.4.6.js?v=20260305144756" defer></script>
+  <script src="vendor/js-synthesizer.min.js?v=20260305144756" defer></script>
+  <script src="js/core.js?v=20260305144756" defer></script>
+  <script src="js/audio.js?v=20260305144756" defer></script>
+  <script src="js/game.js?v=20260305144756" defer></script>
+  <script src="js/settings.js?v=20260305144756" defer></script>
+  <script src="js/events.js?v=20260305144756" defer></script>
 </body>
 
 </html>
