@@ -441,6 +441,7 @@ h1 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
     align-items: start;
+    grid-row: 3;
 }
 
 .quick-mode-btn {
@@ -1363,6 +1364,7 @@ body:not(.landing) .quick-start {
             min-height: 0;
             max-height: none;
             overflow: visible;
+            align-self: start;
         }
 
 .status[hidden] {
@@ -2340,6 +2342,7 @@ body:not(.landing) .quick-start {
             overflow: visible;
             width: 100%;
             padding-block: 0;
+            grid-row: 4;
         }
 
         .keyboard-stack {
