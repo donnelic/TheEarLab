@@ -1065,7 +1065,7 @@ const triggerPrimaryAction = () => {
     if (state.active && !state.submitted) {
         submitAnswer();
     } else {
-        startRound(true);
+        void startRound(true);
     }
 };
 

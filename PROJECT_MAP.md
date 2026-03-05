@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-05 23:43:58 +01:00
+Generated: 2026-03-05 23:46:28 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -37,7 +37,7 @@ Generated: 2026-03-05 23:43:58 +01:00
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1517 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 822 |
 | js/events.js | JavaScript | Browser runtime module | Yes | 1544 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 1583 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 1608 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1111 |
 | README.md | Markdown | Human + AI onboarding | Yes | 103 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
@@ -808,84 +808,84 @@ Event bindings:
 | pedalBox | pointerleave | 1490 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-1583
+File lines: 1-1608
 
 | Symbol | Lines |
 |---|---|
-| normalizeQualityToken | 114-126 |
-| isTypingEnabled | 140-140 |
-| isTypingOnlyMode | 141-141 |
-| getIsChordRound | 142-142 |
-| getEffectiveBlindMode | 143-143 |
-| getKeyboardZoneEl | 144-144 |
-| normalizePitchClass | 145-145 |
-| getRootName | 146-146 |
-| getMidiFromNoteId | 147-147 |
-| buildChordLabel | 148-148 |
-| getPitchClassSetFromNoteIds | 150-158 |
-| getChordDifficultyId | 160-165 |
-| getChordDifficultyConfig | 167-170 |
-| getAllowedChordQualities | 172-177 |
-| getChordQualityHint | 179-182 |
-| getVoicingHintLabel | 184-188 |
-| randomSample | 190-197 |
-| getNiceTarget | 199-236 |
-| getQualityPitchClassSet | 238-244 |
-| parseChordInput | 246-279 |
-| detectChordFromNoteIds | 281-317 |
-| normalizeIntervals | 319-321 |
-| fitIntervalsToAvailableRange | 323-343 |
-| buildVoicedIntervals | 345-373 |
-| chooseRootCandidatesForIntervals | 375-384 |
-| buildChordFromRoot | 386-414 |
-| createChordTarget | 416-460 |
-| createNoteTarget | 462-495 |
-| createTarget | 497-503 |
-| clearTypingAutoNext | 505-509 |
-| getTypedPreviewNoteIds | 511-544 |
-| updateTypedPreviewFromInput | 546-556 |
-| updateChordReadout | 558-610 |
-| updateModeVisibility | 612-629 |
-| updatePrimaryAction | 631-636 |
-| updateReplayAvailability | 638-647 |
-| getChordHelperHints | 649-660 |
-| createDeterministicHelperMask | 669-691 |
-| renderChordHelperBox | 693-711 |
-| updateStatus | 713-806 |
-| updateKeyStates | 808-847 |
-| setKeyboardEnabled | 849-852 |
-| updateKeyboardScale | 854-865 |
-| lockKeyboardForPlayback | 867-880 |
-| setSubmitted | 882-889 |
-| refreshTarget | 891-912 |
-| startRound | 914-949 |
-| ensureRound | 951-960 |
-| playTarget | 962-976 |
-| startManualNote | 978-1008 |
-| releaseManualNote | 1010-1038 |
-| releasePedalNotes | 1040-1050 |
-| startPedalHold | 1052-1058 |
-| stopPedalHold | 1060-1067 |
-| toggleSelection | 1069-1100 |
-| isSelectionCorrect | 1102-1119 |
-| getPlaybackSpan | 1121-1126 |
-| renderNotePills | 1128-1134 |
-| renderChordPill | 1136-1139 |
-| renderTonePills | 1141-1149 |
-| renderRevealCell | 1151-1154 |
-| renderChordRevealGrid | 1156-1159 |
-| renderChordDetectionMeta | 1161-1165 |
-| renderPressedPills | 1167-1172 |
-| buildNoteComparison | 1174-1181 |
-| renderNoteComparisonCells | 1183-1198 |
-| playRevealSequence | 1200-1252 |
-| playSelectedChord | 1254-1279 |
-| playTypedInputChord | 1281-1295 |
-| startHeldPlayback | 1297-1363 |
-| releaseHeldPlayback | 1365-1392 |
-| buildTypingRevealDetail | 1394-1412 |
-| submitTypedAnswer | 1414-1491 |
-| submitAnswer | 1493-1562 |
+| normalizeQualityToken | 116-128 |
+| isTypingEnabled | 142-142 |
+| isTypingOnlyMode | 143-143 |
+| getIsChordRound | 144-144 |
+| getEffectiveBlindMode | 145-145 |
+| getKeyboardZoneEl | 146-146 |
+| normalizePitchClass | 147-147 |
+| getRootName | 148-148 |
+| getMidiFromNoteId | 149-149 |
+| buildChordLabel | 150-150 |
+| getPitchClassSetFromNoteIds | 152-160 |
+| getChordDifficultyId | 162-167 |
+| getChordDifficultyConfig | 169-172 |
+| getAllowedChordQualities | 174-179 |
+| getChordQualityHint | 181-184 |
+| getVoicingHintLabel | 186-190 |
+| randomSample | 192-199 |
+| getNiceTarget | 201-238 |
+| getQualityPitchClassSet | 240-246 |
+| parseChordInput | 248-281 |
+| detectChordFromNoteIds | 283-319 |
+| normalizeIntervals | 321-323 |
+| fitIntervalsToAvailableRange | 325-345 |
+| buildVoicedIntervals | 347-375 |
+| chooseRootCandidatesForIntervals | 377-386 |
+| buildChordFromRoot | 388-416 |
+| createChordTarget | 418-462 |
+| createNoteTarget | 464-497 |
+| createTarget | 499-505 |
+| clearTypingAutoNext | 507-511 |
+| getTypedPreviewNoteIds | 513-546 |
+| updateTypedPreviewFromInput | 548-558 |
+| updateChordReadout | 560-612 |
+| updateModeVisibility | 614-631 |
+| updatePrimaryAction | 633-638 |
+| updateReplayAvailability | 640-649 |
+| getChordHelperHints | 651-662 |
+| createDeterministicHelperMask | 671-693 |
+| renderChordHelperBox | 695-713 |
+| updateStatus | 715-808 |
+| updateKeyStates | 810-849 |
+| setKeyboardEnabled | 851-854 |
+| updateKeyboardScale | 856-867 |
+| lockKeyboardForPlayback | 869-882 |
+| setSubmitted | 884-891 |
+| refreshTarget | 893-914 |
+| startRound | 916-974 |
+| ensureRound | 976-985 |
+| playTarget | 987-1001 |
+| startManualNote | 1003-1033 |
+| releaseManualNote | 1035-1063 |
+| releasePedalNotes | 1065-1075 |
+| startPedalHold | 1077-1083 |
+| stopPedalHold | 1085-1092 |
+| toggleSelection | 1094-1125 |
+| isSelectionCorrect | 1127-1144 |
+| getPlaybackSpan | 1146-1151 |
+| renderNotePills | 1153-1159 |
+| renderChordPill | 1161-1164 |
+| renderTonePills | 1166-1174 |
+| renderRevealCell | 1176-1179 |
+| renderChordRevealGrid | 1181-1184 |
+| renderChordDetectionMeta | 1186-1190 |
+| renderPressedPills | 1192-1197 |
+| buildNoteComparison | 1199-1206 |
+| renderNoteComparisonCells | 1208-1223 |
+| playRevealSequence | 1225-1277 |
+| playSelectedChord | 1279-1304 |
+| playTypedInputChord | 1306-1320 |
+| startHeldPlayback | 1322-1388 |
+| releaseHeldPlayback | 1390-1417 |
+| buildTypingRevealDetail | 1419-1437 |
+| submitTypedAnswer | 1439-1516 |
+| submitAnswer | 1518-1587 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1111

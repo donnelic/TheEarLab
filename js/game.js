@@ -110,6 +110,8 @@ const TYPE_SUCCESS_FLASH_MS = 700;
 const CHORD_HISTORY_LIMIT = 8;
 const recentChordTargets = [];
 let typingAutoNextTimer = null;
+let roundStartInProgress = false;
+let roundStartToken = 0;
 
 const normalizeQualityToken = (value) => {
     return String(value ?? "")
@@ -911,7 +913,14 @@ const refreshTarget = () => {
     updateKeyStates();
 };
 
-const startRound = (shouldPlay = false) => {
+const startRound = async (shouldPlay = false) => {
+    if (shouldPlay && roundStartInProgress) {
+        return;
+    }
+    const token = ++roundStartToken;
+    if (shouldPlay) {
+        roundStartInProgress = true;
+    }
     abortPlayback();
     clearTypingAutoNext();
     state.round = state.active ? state.round + 1 : 1;
@@ -938,11 +947,27 @@ const startRound = (shouldPlay = false) => {
     updateKeyStates();
     pendingCriticalRestart = false;
     if (shouldPlay) {
+        if (typeof ensureSoundfontReady === "function") {
+            try {
+                await ensureSoundfontReady(state.pianoTone);
+            } catch (_error) {
+                // Keep flow moving; playNotes has its own readiness gate too.
+            }
+        }
+        if (token !== roundStartToken || !state.active) {
+            if (token === roundStartToken) {
+                roundStartInProgress = false;
+            }
+            return;
+        }
         const ctx = ensureAudio();
         if (!isTypingOnlyMode()) {
             lockKeyboardForPlayback(state.targetNotes, state.mode);
         }
         playNotes(state.targetNotes, state.mode, ctx.currentTime + ROUND_START_DELAY, { animate: false });
+        if (token === roundStartToken) {
+            roundStartInProgress = false;
+        }
     } else {
         setKeyboardEnabled(!isTypingOnlyMode());
     }
@@ -961,7 +986,7 @@ const ensureRound = () => {
 
 const playTarget = () => {
     if (!state.active) {
-        startRound(true);
+        void startRound(true);
         return;
     }
     state.hintUsed = true;
@@ -1459,7 +1484,7 @@ const submitTypedAnswer = () => {
         typingAutoNextTimer = setTimeout(() => {
             typingAutoNextTimer = null;
             if (isTypingOnlyMode()) {
-                startRound(true);
+                void startRound(true);
             }
         }, TYPE_SUCCESS_FLASH_MS);
         return;
