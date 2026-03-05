@@ -176,6 +176,20 @@ themeToggle.addEventListener("click", (event) => {
     saveSettings();
 });
 
+if (homeToggle) {
+    homeToggle.addEventListener("click", (event) => {
+        event.stopPropagation();
+        closeSettings();
+        closeOptionsPanel();
+        closeAdvanced();
+        closePianoPanel();
+        closeInstrumentBrowser();
+        if (typeof App.game?.goHome === "function") {
+            App.game.goHome();
+        }
+    });
+}
+
 settingsPanel.addEventListener("click", (event) => {
     if (!optionsPanel?.contains(event.target) && !optionsTrigger?.contains(event.target)) {
         closeOptionsPanel();

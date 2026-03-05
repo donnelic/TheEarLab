@@ -64,6 +64,7 @@ Browser-based piano ear-training app for note and chord recognition.
 
 ## Chord Training Modes
 - Landing page now includes quick-start cards for `Random Notes`, `Harmonic Notes`, and `Chord Practice`; pressing `Enter` still starts a round with your last-used mode profile.
+- Top-right `Home` button (under theme toggle) returns to landing/free-play from any round state.
 - Default behavior remains classic note training (`Training mode = Keyboard Select`, `Chord rounds = off`).
 - Settings now use one `Practice mode` selector:
   - `Random Notes`: classic random note rounds,

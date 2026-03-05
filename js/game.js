@@ -900,6 +900,54 @@ const setSubmitted = (value) => {
     updatePrimaryAction();
 };
 
+const goHome = () => {
+    abortPlayback();
+    clearTypingAutoNext();
+
+    if (keyboardUnlockTimer) {
+        clearTimeout(keyboardUnlockTimer);
+        keyboardUnlockTimer = null;
+    }
+
+    if (holdState.holdTimer) {
+        clearTimeout(holdState.holdTimer);
+        holdState.holdTimer = null;
+    }
+    if (holdState.noteIds.length) {
+        stopNotesById(holdState.noteIds);
+        holdState.noteIds.forEach((noteId) => scheduleKeyRelease(noteId, 0));
+    }
+    holdState.active = false;
+    holdState.holding = false;
+    holdState.noteIds = [];
+
+    if (pedalState.active || pedalState.keysDown.size || pedalState.pending.size) {
+        pedalState.active = false;
+        pedalState.keysDown.clear();
+        releasePedalNotes();
+        pedalIcon.classList.remove("active");
+    }
+
+    state.active = false;
+    state.hintUsed = false;
+    state.selectedNotes = [];
+    state.selectedChordLabel = "";
+    state.submissionSource = null;
+    state.submittedComparisonNotes = [];
+    state.targetNotes = [];
+    state.targetChord = null;
+    state.typedAnswer = "";
+    state.typedPreviewNotes = [];
+    if (chordAnswerInput) {
+        chordAnswerInput.value = "";
+    }
+
+    setSubmitted(false);
+    setKeyboardEnabled(true);
+    updateStatus();
+    updateKeyStates();
+};
+
 const refreshTarget = () => {
     if (!state.active) {
         updateStatus();
@@ -1599,6 +1647,7 @@ const submitAnswer = () => {
 Object.assign(App.game, {
     createTarget,
     startRound,
+    goHome,
     playTarget,
     playSelectedChord,
     playTypedInputChord,

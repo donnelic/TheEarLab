@@ -1,12 +1,13 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260305231302";
+const BUILD_ID = "20260306000059";
 App.buildId = BUILD_ID;
 
 const dom = {
     settingsToggle: document.getElementById("settings-toggle"),
     settingsPanel: document.getElementById("settings-panel"),
     themeToggle: document.getElementById("theme-toggle"),
+    homeToggle: document.getElementById("home-toggle"),
     appEl: document.querySelector(".app"),
     noteCountInput: document.getElementById("note-count"),
     noteCountValue: document.getElementById("note-count-value"),
@@ -115,6 +116,7 @@ const {
     settingsToggle,
     settingsPanel,
     themeToggle,
+    homeToggle,
     appEl,
     noteCountInput,
     noteCountValue,
