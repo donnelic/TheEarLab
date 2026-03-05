@@ -80,6 +80,7 @@ Browser-based piano ear-training app for note and chord recognition.
   - supports optional visual piano and optional typed-chord key preview.
   - pressing `Space` inside the typing field previews the typed chord when parsing succeeds and blind mode is off (otherwise it falls back to replay).
   - includes a built-in "Learn more about chord format" guided tutorial from the typing help popover.
+  - tutorial now has an interactive chord lab: root/quality selectors, hover-highlighted examples, click-to-play examples, and a visual piano that shows chord tones without allowing manual key play/selection.
 
 ## Maintenance Rules
 1. Update code.

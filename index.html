@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Note Recognition Piano Trainer</title>
-  <link rel="stylesheet" href="styles.css?v=20260305144756" />
+  <link rel="stylesheet" href="styles.css?v=20260305151105" />
 </head>
 
 <body>
@@ -412,6 +412,30 @@
         <button id="chord-tutorial-close" class="typing-learn-btn tutorial-close" type="button">Close</button>
       </div>
       <div id="chord-tutorial-step" class="tutorial-step"></div>
+      <div class="tutorial-lab">
+        <div id="chord-tutorial-current" class="tutorial-current">Current chord: C major</div>
+        <div class="tutorial-selectors">
+          <div class="tutorial-selector-block">
+            <div class="tutorial-selector-title">Root</div>
+            <div id="chord-tutorial-root-list" class="tutorial-chip-list"></div>
+          </div>
+          <div class="tutorial-selector-block">
+            <div class="tutorial-selector-title">Quality</div>
+            <div id="chord-tutorial-quality-list" class="tutorial-chip-list"></div>
+          </div>
+        </div>
+        <div class="tutorial-piano-wrap">
+          <div class="tutorial-piano-title">Chord tones on piano (preview only)</div>
+          <div id="chord-tutorial-piano" class="tutorial-piano" aria-hidden="true"></div>
+        </div>
+        <div class="tutorial-selector-block">
+          <div class="tutorial-selector-title">Examples (hover to highlight, click to play)</div>
+          <div id="chord-tutorial-examples" class="tutorial-chip-list examples"></div>
+        </div>
+        <div class="tutorial-lab-actions">
+          <button id="chord-tutorial-play" class="advanced-trigger" type="button">Play Current Chord</button>
+        </div>
+      </div>
       <div class="tutorial-actions">
         <button id="chord-tutorial-prev" class="advanced-trigger" type="button">Back</button>
         <span id="chord-tutorial-progress" class="tutorial-progress">Step 1/1</span>
@@ -420,13 +444,13 @@
     </div>
   </section>
 
-  <script src="vendor/libfluidsynth-2.4.6.js?v=20260305144756" defer></script>
-  <script src="vendor/js-synthesizer.min.js?v=20260305144756" defer></script>
-  <script src="js/core.js?v=20260305144756" defer></script>
-  <script src="js/audio.js?v=20260305144756" defer></script>
-  <script src="js/game.js?v=20260305144756" defer></script>
-  <script src="js/settings.js?v=20260305144756" defer></script>
-  <script src="js/events.js?v=20260305144756" defer></script>
+  <script src="vendor/libfluidsynth-2.4.6.js?v=20260305151105" defer></script>
+  <script src="vendor/js-synthesizer.min.js?v=20260305151105" defer></script>
+  <script src="js/core.js?v=20260305151105" defer></script>
+  <script src="js/audio.js?v=20260305151105" defer></script>
+  <script src="js/game.js?v=20260305151105" defer></script>
+  <script src="js/settings.js?v=20260305151105" defer></script>
+  <script src="js/events.js?v=20260305151105" defer></script>
 </body>
 
 </html>

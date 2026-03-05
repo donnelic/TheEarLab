@@ -1,6 +1,6 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260305144756";
+const BUILD_ID = "20260305151105";
 App.buildId = BUILD_ID;
 
 const dom = {
@@ -81,6 +81,12 @@ const dom = {
     chordTutorialNext: document.getElementById("chord-tutorial-next"),
     chordTutorialStep: document.getElementById("chord-tutorial-step"),
     chordTutorialProgress: document.getElementById("chord-tutorial-progress"),
+    chordTutorialCurrent: document.getElementById("chord-tutorial-current"),
+    chordTutorialRootList: document.getElementById("chord-tutorial-root-list"),
+    chordTutorialQualityList: document.getElementById("chord-tutorial-quality-list"),
+    chordTutorialExamples: document.getElementById("chord-tutorial-examples"),
+    chordTutorialPiano: document.getElementById("chord-tutorial-piano"),
+    chordTutorialPlay: document.getElementById("chord-tutorial-play"),
     chordReadout: document.getElementById("chord-readout"),
     statusPanel: document.getElementById("status-panel"),
     instrumentPresetSearch: document.getElementById("instrument-preset-search"),
@@ -180,6 +186,12 @@ const {
     chordTutorialNext,
     chordTutorialStep,
     chordTutorialProgress,
+    chordTutorialCurrent,
+    chordTutorialRootList,
+    chordTutorialQualityList,
+    chordTutorialExamples,
+    chordTutorialPiano,
+    chordTutorialPlay,
     chordReadout,
     statusPanel,
     instrumentPresetSearch,
