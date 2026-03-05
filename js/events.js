@@ -1057,7 +1057,11 @@ const tryPlayTypedChordPreview = () => {
     return App.game.playTypedInputChord();
 };
 
+let lastPrimaryActionAt = 0;
 const triggerPrimaryAction = () => {
+    const now = performance.now();
+    if (now - lastPrimaryActionAt < 140) return;
+    lastPrimaryActionAt = now;
     if (state.active && !state.submitted) {
         submitAnswer();
     } else {
@@ -1343,6 +1347,10 @@ keyboardEl.addEventListener("click", (event) => {
 document.addEventListener("keydown", (event) => {
     const tag = event.target.tagName;
     const chordInputFocused = event.target === chordAnswerInput;
+    if ((event.code === "Enter" || event.code === "Space") && event.repeat) {
+        event.preventDefault();
+        return;
+    }
     if (event.code === "Escape" && isChordTutorialOpen()) {
         event.preventDefault();
         closeChordTutorial();
@@ -1394,6 +1402,13 @@ document.addEventListener("keydown", (event) => {
     if (chordInputFocused && event.code === "Enter") {
         event.preventDefault();
         triggerPrimaryAction();
+        return;
+    }
+
+    if (
+        (event.code === "Enter" || event.code === "Space")
+        && (event.target.closest("button,[role=\"button\"],a[href]"))
+    ) {
         return;
     }
 

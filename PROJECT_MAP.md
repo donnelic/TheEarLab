@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-05 23:37:44 +01:00
+Generated: 2026-03-05 23:39:58 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -36,12 +36,12 @@ Generated: 2026-03-05 23:37:44 +01:00
 | styles.css | CSS | Loaded directly | Yes | 2699 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1517 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 822 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 1529 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 1561 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 1544 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 1564 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1111 |
 | README.md | Markdown | Human + AI onboarding | Yes | 103 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 969 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 967 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 500 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
 | soundfonts/index.json | JSON | Soundfont asset | Yes | 3 |
@@ -663,7 +663,7 @@ File lines: 1-822
 | rebuildKeyboard | 814-821 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-1529
+File lines: 1-1544
 
 | Symbol | Lines |
 |---|---|
@@ -699,12 +699,12 @@ File lines: 1-1529
 | isChordTypingCaptureActive | 1039-1044 |
 | insertTypedCharacter | 1046-1053 |
 | tryPlayTypedChordPreview | 1055-1058 |
-| triggerPrimaryAction | 1060-1066 |
-| triggerReplayAction | 1068-1074 |
-| bindPianoOptionEvents | 1249-1274 |
-| setRandomBackgroundAngle | 1482-1485 |
-| init | 1487-1523 |
-| runDeferredCatalogLoad | 1507-1516 |
+| triggerPrimaryAction | 1061-1070 |
+| triggerReplayAction | 1072-1078 |
+| bindPianoOptionEvents | 1253-1278 |
+| setRandomBackgroundAngle | 1497-1500 |
+| init | 1502-1538 |
+| runDeferredCatalogLoad | 1522-1531 |
 
 Event bindings:
 | Target | Event | Line |
@@ -763,52 +763,52 @@ Event bindings:
 | chordTutorialQualityList | focusin | 1015 |
 | chordTutorialQualityList | focusout | 1022 |
 | chordTutorialQualityList | click | 1025 |
-| volumeSlider | dblclick | 1076 |
-| lengthSlider | dblclick | 1080 |
-| keyCountSlider | dblclick | 1084 |
-| startNoteDownButton | click | 1090 |
-| startNoteUpButton | click | 1093 |
-| startNoteDownOctButton | click | 1099 |
-| startNoteUpOctButton | click | 1102 |
-| noteCountInput | dblclick | 1107 |
-| attackSlider | dblclick | 1115 |
-| decaySlider | dblclick | 1119 |
-| releaseSlider | dblclick | 1123 |
-| sustainSlider | dblclick | 1127 |
-| profileSearch | input | 1132 |
-| profileList | click | 1138 |
-| profileList | dblclick | 1143 |
-| profileList | keydown | 1146 |
-| profileApply | click | 1157 |
-| profileSave | click | 1163 |
-| instrumentPresetSearch | input | 1169 |
-| instrumentPresetList | click | 1175 |
-| instrumentPresetList | dblclick | 1180 |
-| instrumentPresetList | keydown | 1183 |
-| instrumentPresetApply | click | 1194 |
-| advancedTrigger | click | 1199 |
-| advancedPanel | click | 1208 |
-| pianoTrigger | click | 1213 |
-| pianoPanel | click | 1225 |
-| instrumentBrowserTrigger | click | 1231 |
-| instrumentBrowserPanel | click | 1244 |
-| pianoOptionsContainer | click | 1252 |
-| pianoOptionsContainer | keydown | 1266 |
-| pianoPreviewMain | click | 1277 |
-| testEnvelopeButton | click | 1284 |
-| keyboardEl | pointerdown | 1289 |
-| document | pointerup | 1325 |
-| document | pointercancel | 1332 |
-| keyboardEl | click | 1339 |
-| document | keydown | 1343 |
-| document | keyup | 1430 |
-| pedalBox | pointerdown | 1449 |
-| pedalBox | pointerup | 1458 |
-| pedalBox | pointercancel | 1467 |
-| pedalBox | pointerleave | 1475 |
+| volumeSlider | dblclick | 1080 |
+| lengthSlider | dblclick | 1084 |
+| keyCountSlider | dblclick | 1088 |
+| startNoteDownButton | click | 1094 |
+| startNoteUpButton | click | 1097 |
+| startNoteDownOctButton | click | 1103 |
+| startNoteUpOctButton | click | 1106 |
+| noteCountInput | dblclick | 1111 |
+| attackSlider | dblclick | 1119 |
+| decaySlider | dblclick | 1123 |
+| releaseSlider | dblclick | 1127 |
+| sustainSlider | dblclick | 1131 |
+| profileSearch | input | 1136 |
+| profileList | click | 1142 |
+| profileList | dblclick | 1147 |
+| profileList | keydown | 1150 |
+| profileApply | click | 1161 |
+| profileSave | click | 1167 |
+| instrumentPresetSearch | input | 1173 |
+| instrumentPresetList | click | 1179 |
+| instrumentPresetList | dblclick | 1184 |
+| instrumentPresetList | keydown | 1187 |
+| instrumentPresetApply | click | 1198 |
+| advancedTrigger | click | 1203 |
+| advancedPanel | click | 1212 |
+| pianoTrigger | click | 1217 |
+| pianoPanel | click | 1229 |
+| instrumentBrowserTrigger | click | 1235 |
+| instrumentBrowserPanel | click | 1248 |
+| pianoOptionsContainer | click | 1256 |
+| pianoOptionsContainer | keydown | 1270 |
+| pianoPreviewMain | click | 1281 |
+| testEnvelopeButton | click | 1288 |
+| keyboardEl | pointerdown | 1293 |
+| document | pointerup | 1329 |
+| document | pointercancel | 1336 |
+| keyboardEl | click | 1343 |
+| document | keydown | 1347 |
+| document | keyup | 1445 |
+| pedalBox | pointerdown | 1464 |
+| pedalBox | pointerup | 1473 |
+| pedalBox | pointercancel | 1482 |
+| pedalBox | pointerleave | 1490 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-1561
+File lines: 1-1564
 
 | Symbol | Lines |
 |---|---|
@@ -882,10 +882,10 @@ File lines: 1-1561
 | playSelectedChord | 1253-1278 |
 | playTypedInputChord | 1280-1294 |
 | startHeldPlayback | 1296-1338 |
-| releaseHeldPlayback | 1340-1370 |
-| buildTypingRevealDetail | 1372-1390 |
-| submitTypedAnswer | 1392-1469 |
-| submitAnswer | 1471-1540 |
+| releaseHeldPlayback | 1340-1373 |
+| buildTypingRevealDetail | 1375-1393 |
+| submitTypedAnswer | 1395-1472 |
+| submitAnswer | 1474-1543 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1111

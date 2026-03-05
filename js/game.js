@@ -1342,6 +1342,9 @@ const releaseHeldPlayback = () => {
         return;
     }
     if (state.submitted) {
+        if (revealPlaying) {
+            abortPlayback();
+        }
         return;
     }
     if (!holdState.active) return;
