@@ -224,7 +224,7 @@ window.addEventListener("resize", () => {
         positionInstrumentBrowserPanel();
     }
     if (isChordTutorialOpen()) {
-        fitTutorialLayout();
+        fitTutorialLayout({ recompute: false });
     }
 });
 
@@ -466,29 +466,50 @@ const tutorialState = {
     pendingNewQualities: new Set(),
     keySpecs: [],
     keyElsByMidi: new Map(),
-    previewToken: 0
+    previewToken: 0,
+    fitClass: ""
 };
 let tutorialReturnFocusEl = null;
 
 const isChordTutorialOpen = () => Boolean(chordTutorialModal && !chordTutorialModal.hidden);
 const TUTORIAL_FIT_CLASSES = ["tutorial-fit-1", "tutorial-fit-2", "tutorial-fit-3"];
 
-const fitTutorialLayout = () => {
+const fitTutorialLayout = ({ recompute = false } = {}) => {
     if (!isChordTutorialOpen()) return;
     const tutorialCard = chordTutorialModal?.querySelector(".tutorial-card");
     if (!tutorialCard) return;
     const tutorialLab = tutorialCard.querySelector(".tutorial-lab");
-    TUTORIAL_FIT_CLASSES.forEach((className) => tutorialCard.classList.remove(className));
-    tutorialCard.classList.remove("tutorial-overflow-scroll");
-    const maxLevel = TUTORIAL_FIT_CLASSES.length;
-    for (let level = 0; level <= maxLevel; level += 1) {
-        if (tutorialCard.scrollHeight <= tutorialCard.clientHeight + 1) {
-            break;
+
+    const clearFitClasses = () => {
+        TUTORIAL_FIT_CLASSES.forEach((className) => tutorialCard.classList.remove(className));
+        tutorialCard.classList.remove("tutorial-overflow-scroll");
+    };
+
+    const applyFitClass = (fitClass) => {
+        clearFitClasses();
+        if (fitClass) {
+            tutorialCard.classList.add(fitClass);
         }
-        if (level < maxLevel) {
-            tutorialCard.classList.add(TUTORIAL_FIT_CLASSES[level]);
+    };
+
+    if (recompute || !tutorialState.fitClass) {
+        let chosenFitClass = "";
+        applyFitClass("");
+        const maxLevel = TUTORIAL_FIT_CLASSES.length;
+        for (let level = 0; level <= maxLevel; level += 1) {
+            if (tutorialCard.scrollHeight <= tutorialCard.clientHeight + 1) {
+                break;
+            }
+            if (level < maxLevel) {
+                chosenFitClass = TUTORIAL_FIT_CLASSES[level];
+                applyFitClass(chosenFitClass);
+            }
         }
+        tutorialState.fitClass = chosenFitClass;
+    } else {
+        applyFitClass(tutorialState.fitClass);
     }
+
     const cardOverflow = tutorialCard.scrollHeight > tutorialCard.clientHeight + 1;
     const labOverflow = Boolean(tutorialLab && (tutorialLab.scrollHeight > tutorialLab.clientHeight + 1));
     if (cardOverflow || labOverflow) {
@@ -832,7 +853,7 @@ const renderChordTutorialStep = () => {
     tutorialState.previousUnlockedQualityIds = new Set(unlockedQualities);
     tutorialState.previousStepIndex = tutorialState.stepIndex;
     refreshTutorialVisuals();
-    fitTutorialLayout();
+    fitTutorialLayout({ recompute: false });
 };
 
 const closeChordTutorial = () => {
@@ -858,11 +879,12 @@ const openChordTutorial = (stepIndex = 0, sourceEl = null) => {
     tutorialState.previousUnlockedQualityIds = new Set();
     tutorialState.pendingNewRoots = new Set();
     tutorialState.pendingNewQualities = new Set();
+    tutorialState.fitClass = "";
     chordTutorialModal.hidden = false;
     chordTutorialModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("tutorial-open");
     renderChordTutorialStep();
-    requestAnimationFrame(() => fitTutorialLayout());
+    requestAnimationFrame(() => fitTutorialLayout({ recompute: true }));
 };
 
 const registerTutorialOpenTrigger = (triggerEl, stepIndex = 0) => {
