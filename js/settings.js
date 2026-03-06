@@ -122,7 +122,7 @@ const getBaseEnvelope = (toneId = state.pianoTone) => {
     };
 };
 
-const resolveEnvelopeMetrics = (trim, toneId = state.pianoTone, requestedDuration = state.noteDuration) => {
+const resolveSettingsEnvelopeMetrics = (trim, toneId = state.pianoTone, requestedDuration = state.noteDuration) => {
     const normalized = cloneTrim(trim);
     const base = getBaseEnvelope(toneId);
     if (typeof SETTINGS_ENVELOPE_API.resolveEnvelopeMetrics === "function") {
@@ -244,7 +244,7 @@ const applyAdsrTrimUi = () => {
     releaseSlider.value = trimToSliderValue(state.adsrTrim.release);
     sustainSlider.value = trimToSliderValue(state.adsrTrim.length);
 
-    const metrics = resolveEnvelopeMetrics(state.adsrTrim);
+    const metrics = resolveSettingsEnvelopeMetrics(state.adsrTrim);
     const attackText = formatSeconds(metrics.attack);
     const decayText = formatSeconds(metrics.decay);
     const releaseText = formatSeconds(metrics.release);
@@ -387,7 +387,7 @@ const updateProfileMeta = () => {
     }
 
     const isApplied = selected.id === state.responseProfileId && !state.responseProfileDirty;
-    const metrics = resolveEnvelopeMetrics(selected.trim);
+    const metrics = resolveSettingsEnvelopeMetrics(selected.trim);
     const status = isApplied
         ? (BROWSER_COPY.applied || "Applied.")
         : (BROWSER_COPY.selectedPending || "Selected only, not applied yet.");

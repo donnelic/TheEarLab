@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-06 09:04:16 +01:00
+Generated: 2026-03-06 09:05:53 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -159,13 +159,13 @@ File: index.html (1-478)
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306090108 | 469 |
-| 2 | vendor/js-synthesizer.min.js?v=20260306090108 | 470 |
-| 3 | js/core.js?v=20260306090108 | 471 |
-| 4 | js/audio.js?v=20260306090108 | 472 |
-| 5 | js/game.js?v=20260306090108 | 473 |
-| 6 | js/settings.js?v=20260306090108 | 474 |
-| 7 | js/events.js?v=20260306090108 | 475 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306090416 | 469 |
+| 2 | vendor/js-synthesizer.min.js?v=20260306090416 | 470 |
+| 3 | js/core.js?v=20260306090416 | 471 |
+| 4 | js/audio.js?v=20260306090416 | 472 |
+| 5 | js/game.js?v=20260306090416 | 473 |
+| 6 | js/settings.js?v=20260306090416 | 474 |
+| 7 | js/events.js?v=20260306090416 | 475 |
 
 ## styles.css Map
 File: styles.css (1-2780)
@@ -921,7 +921,7 @@ File lines: 1-1125
 | formatBankId | 93-93 |
 | getSf2PresetGroupName | 100-106 |
 | getBaseEnvelope | 111-123 |
-| resolveEnvelopeMetrics | 125-141 |
+| resolveSettingsEnvelopeMetrics | 125-141 |
 | sanitizeCustomProfile | 151-166 |
 | normalizeCustomProfiles | 168-183 |
 | getAllProfiles | 185-197 |
