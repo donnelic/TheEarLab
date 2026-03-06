@@ -1326,8 +1326,8 @@ body:not(.landing) .quick-start {
     background: color-mix(in oklab, var(--panel) 78%, transparent);
 }
 
-.helper-item:hover,
-.helper-item:hover * {
+.helper-item.helper-cursor-hidden,
+.helper-item.helper-cursor-hidden * {
     cursor: none;
 }
 

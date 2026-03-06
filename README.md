@@ -80,7 +80,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - Reveal/check output shows chord names (target vs your chord) in chord rounds.
 - Post-submit replay now follows the target with your submitted answer whenever the answer was incomplete or wrong, not only when extra wrong notes were pressed.
 - In chord rounds, helper hints are shown as delayed hover-reveal rows (all labels visible, each value revealed independently) when `Extra helpers` is enabled, with masked placeholder strings so value length is not leaked before reveal.
-- Helper masks now vary slightly by hint type and may include spacing so the blurred placeholders look less uniform; hovering a helper also hides the mouse cursor until you move off that hint.
+- Helper masks now vary slightly by hint type and may include spacing so the blurred placeholders look less uniform; the cursor now drops out only once the helper reveal delay starts, instead of disappearing immediately on hover.
 - Chord mode also includes `Reveal root note`, which shows the target root in the helper card without giving away the full chord quality.
 - `Answer input` options in chord practice:
   - `Play on keyboard` (keyboard only),

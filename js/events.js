@@ -1135,6 +1135,32 @@ const blurPointerActivatedControl = () => {
         control.blur();
     }
 };
+const HELPER_CURSOR_SYNC_DELAY_MS = 340;
+const helperCursorTimers = new WeakMap();
+const clearHelperCursorTimer = (item) => {
+    const timer = helperCursorTimers.get(item);
+    if (timer) {
+        clearTimeout(timer);
+        helperCursorTimers.delete(item);
+    }
+};
+const scheduleHelperCursorHide = (item) => {
+    if (!item) return;
+    clearHelperCursorTimer(item);
+    item.classList.remove("helper-cursor-hidden");
+    const timer = setTimeout(() => {
+        helperCursorTimers.delete(item);
+        if (item.matches(":hover")) {
+            item.classList.add("helper-cursor-hidden");
+        }
+    }, HELPER_CURSOR_SYNC_DELAY_MS);
+    helperCursorTimers.set(item, timer);
+};
+const resetHelperCursorState = (item) => {
+    if (!item) return;
+    clearHelperCursorTimer(item);
+    item.classList.remove("helper-cursor-hidden");
+};
 
 const triggerReplayAction = (event) => {
     if (updateReplayAvailability()) {
@@ -1414,6 +1440,24 @@ document.addEventListener("pointerdown", (event) => {
 document.addEventListener("click", () => {
     requestAnimationFrame(blurPointerActivatedControl);
 }, true);
+
+if (helperSlotEl) {
+    helperSlotEl.addEventListener("pointerover", (event) => {
+        const item = event.target.closest(".helper-item");
+        if (!item || !helperSlotEl.contains(item)) return;
+        const fromItem = event.relatedTarget?.closest?.(".helper-item") ?? null;
+        if (fromItem === item) return;
+        scheduleHelperCursorHide(item);
+    });
+
+    helperSlotEl.addEventListener("pointerout", (event) => {
+        const item = event.target.closest(".helper-item");
+        if (!item || !helperSlotEl.contains(item)) return;
+        const toItem = event.relatedTarget?.closest?.(".helper-item") ?? null;
+        if (toItem === item) return;
+        resetHelperCursorState(item);
+    });
+}
 
 keyboardEl.addEventListener("click", (event) => {
     event.preventDefault();

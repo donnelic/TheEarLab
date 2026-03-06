@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-06 09:38:32 +01:00
+Generated: 2026-03-06 09:46:59 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -36,12 +36,12 @@ Generated: 2026-03-06 09:38:32 +01:00
 | styles.css | CSS | Loaded directly | Yes | 2786 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1526 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1003 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 1615 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 1659 |
 | js/game.js | JavaScript | Browser runtime module | Yes | 1839 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1142 |
 | README.md | Markdown | Human + AI onboarding | Yes | 112 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 993 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 998 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 500 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
 | soundfonts/index.json | JSON | Soundfont asset | Yes | 3 |
@@ -160,13 +160,13 @@ File: index.html (1-491)
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306093823 | 482 |
-| 2 | vendor/js-synthesizer.min.js?v=20260306093823 | 483 |
-| 3 | js/core.js?v=20260306093823 | 484 |
-| 4 | js/audio.js?v=20260306093823 | 485 |
-| 5 | js/game.js?v=20260306093823 | 486 |
-| 6 | js/settings.js?v=20260306093823 | 487 |
-| 7 | js/events.js?v=20260306093823 | 488 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306094634 | 482 |
+| 2 | vendor/js-synthesizer.min.js?v=20260306094634 | 483 |
+| 3 | js/core.js?v=20260306094634 | 484 |
+| 4 | js/audio.js?v=20260306094634 | 485 |
+| 5 | js/game.js?v=20260306094634 | 486 |
+| 6 | js/settings.js?v=20260306094634 | 487 |
+| 7 | js/events.js?v=20260306094634 | 488 |
 
 ## styles.css Map
 File: styles.css (1-2786)
@@ -337,7 +337,7 @@ File: styles.css (1-2786)
 | .helper-item::after | 1310-1318 |
 | .helper-item:last-child::after | 1320-1322 |
 | .helper-item:hover, .helper-item:focus-within | 1325-1327 |
-| .helper-item:hover, .helper-item:hover * | 1330-1332 |
+| .helper-item.helper-cursor-hidden, .helper-item.helper-cursor-hidden * | 1330-1332 |
 | .helper-label | 1334-1340 |
 | .helper-item .helper-value | 1342-1350 |
 | .helper-item .helper-mask | 1352-1360 |
@@ -680,7 +680,7 @@ File lines: 1-1003
 | rebuildKeyboard | 995-1002 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-1615
+File lines: 1-1659
 
 | Symbol | Lines |
 |---|---|
@@ -719,11 +719,14 @@ File lines: 1-1615
 | triggerPrimaryAction | 1117-1126 |
 | getButtonLikeTarget | 1129-1129 |
 | blurPointerActivatedControl | 1130-1137 |
-| triggerReplayAction | 1139-1145 |
-| bindPianoOptionEvents | 1320-1345 |
-| setRandomBackgroundAngle | 1568-1571 |
-| init | 1573-1609 |
-| runDeferredCatalogLoad | 1593-1602 |
+| clearHelperCursorTimer | 1140-1146 |
+| scheduleHelperCursorHide | 1147-1158 |
+| resetHelperCursorState | 1159-1163 |
+| triggerReplayAction | 1165-1171 |
+| bindPianoOptionEvents | 1346-1371 |
+| setRandomBackgroundAngle | 1612-1615 |
+| init | 1617-1653 |
+| runDeferredCatalogLoad | 1637-1646 |
 
 Event bindings:
 | Target | Event | Line |
@@ -788,51 +791,53 @@ Event bindings:
 | chordTutorialQualityList | focusin | 1064 |
 | chordTutorialQualityList | focusout | 1071 |
 | chordTutorialQualityList | click | 1074 |
-| volumeSlider | dblclick | 1147 |
-| lengthSlider | dblclick | 1151 |
-| keyCountSlider | dblclick | 1155 |
-| startNoteDownButton | click | 1161 |
-| startNoteUpButton | click | 1164 |
-| startNoteDownOctButton | click | 1170 |
-| startNoteUpOctButton | click | 1173 |
-| noteCountInput | dblclick | 1178 |
-| attackSlider | dblclick | 1186 |
-| decaySlider | dblclick | 1190 |
-| releaseSlider | dblclick | 1194 |
-| sustainSlider | dblclick | 1198 |
-| profileSearch | input | 1203 |
-| profileList | click | 1209 |
-| profileList | dblclick | 1214 |
-| profileList | keydown | 1217 |
-| profileApply | click | 1228 |
-| profileSave | click | 1234 |
-| instrumentPresetSearch | input | 1240 |
-| instrumentPresetList | click | 1246 |
-| instrumentPresetList | dblclick | 1251 |
-| instrumentPresetList | keydown | 1254 |
-| instrumentPresetApply | click | 1265 |
-| advancedTrigger | click | 1270 |
-| advancedPanel | click | 1279 |
-| pianoTrigger | click | 1284 |
-| pianoPanel | click | 1296 |
-| instrumentBrowserTrigger | click | 1302 |
-| instrumentBrowserPanel | click | 1315 |
-| pianoOptionsContainer | click | 1323 |
-| pianoOptionsContainer | keydown | 1337 |
-| pianoPreviewMain | click | 1348 |
-| testEnvelopeButton | click | 1355 |
-| keyboardEl | pointerdown | 1360 |
-| document | pointerup | 1396 |
-| document | pointercancel | 1403 |
-| document | pointerdown | 1410 |
-| document | click | 1414 |
-| keyboardEl | click | 1418 |
-| document | keydown | 1422 |
-| document | keyup | 1516 |
-| pedalBox | pointerdown | 1535 |
-| pedalBox | pointerup | 1544 |
-| pedalBox | pointercancel | 1553 |
-| pedalBox | pointerleave | 1561 |
+| volumeSlider | dblclick | 1173 |
+| lengthSlider | dblclick | 1177 |
+| keyCountSlider | dblclick | 1181 |
+| startNoteDownButton | click | 1187 |
+| startNoteUpButton | click | 1190 |
+| startNoteDownOctButton | click | 1196 |
+| startNoteUpOctButton | click | 1199 |
+| noteCountInput | dblclick | 1204 |
+| attackSlider | dblclick | 1212 |
+| decaySlider | dblclick | 1216 |
+| releaseSlider | dblclick | 1220 |
+| sustainSlider | dblclick | 1224 |
+| profileSearch | input | 1229 |
+| profileList | click | 1235 |
+| profileList | dblclick | 1240 |
+| profileList | keydown | 1243 |
+| profileApply | click | 1254 |
+| profileSave | click | 1260 |
+| instrumentPresetSearch | input | 1266 |
+| instrumentPresetList | click | 1272 |
+| instrumentPresetList | dblclick | 1277 |
+| instrumentPresetList | keydown | 1280 |
+| instrumentPresetApply | click | 1291 |
+| advancedTrigger | click | 1296 |
+| advancedPanel | click | 1305 |
+| pianoTrigger | click | 1310 |
+| pianoPanel | click | 1322 |
+| instrumentBrowserTrigger | click | 1328 |
+| instrumentBrowserPanel | click | 1341 |
+| pianoOptionsContainer | click | 1349 |
+| pianoOptionsContainer | keydown | 1363 |
+| pianoPreviewMain | click | 1374 |
+| testEnvelopeButton | click | 1381 |
+| keyboardEl | pointerdown | 1386 |
+| document | pointerup | 1422 |
+| document | pointercancel | 1429 |
+| document | pointerdown | 1436 |
+| document | click | 1440 |
+| helperSlotEl | pointerover | 1445 |
+| helperSlotEl | pointerout | 1453 |
+| keyboardEl | click | 1462 |
+| document | keydown | 1466 |
+| document | keyup | 1560 |
+| pedalBox | pointerdown | 1579 |
+| pedalBox | pointerup | 1588 |
+| pedalBox | pointercancel | 1597 |
+| pedalBox | pointerleave | 1605 |
 
 ### js/game.js (Active Runtime)
 File lines: 1-1839
