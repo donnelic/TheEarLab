@@ -78,7 +78,9 @@ Browser-based piano ear-training app for note and chord recognition.
 - Chord parsing/training now includes broader common types (for example `m6`, `m9`, `maj9`, `7sus4`, `add11`, plus prior advanced variants like `m7b5`, `dim7`, `mMaj7`, `maj7#11`, `7b9`).
 - Live selected chord detection is shown below the keyboard while in chord rounds.
 - Reveal/check output shows chord names (target vs your chord) in chord rounds.
+- Post-submit replay now follows the target with your submitted answer whenever the answer was incomplete or wrong, not only when extra wrong notes were pressed.
 - In chord rounds, helper hints are shown as delayed hover-reveal rows (all labels visible, each value revealed independently) when `Extra helpers` is enabled, with masked placeholder strings so value length is not leaked before reveal.
+- Chord mode also includes `Reveal root note`, which shows the target root in the helper card without giving away the full chord quality.
 - `Answer input` options in chord practice:
   - `Play on keyboard` (keyboard only),
   - `Type chord name` (typing only),

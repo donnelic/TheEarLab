@@ -1,6 +1,6 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260306090553";
+const BUILD_ID = "20260306093345";
 App.buildId = BUILD_ID;
 
 const dom = {
@@ -69,6 +69,7 @@ const dom = {
     trainingModeSelect: document.getElementById("training-mode"),
     chordDifficultySelect: document.getElementById("chord-difficulty"),
     chordExtraHelpersToggle: document.getElementById("chord-extra-helpers"),
+    chordRootHintToggle: document.getElementById("chord-root-hint"),
     typingShowPianoToggle: document.getElementById("typing-show-piano"),
     typingShowTypedToggle: document.getElementById("typing-show-typed"),
     typingZone: document.getElementById("typing-zone"),
@@ -178,6 +179,7 @@ const {
     trainingModeSelect,
     chordDifficultySelect,
     chordExtraHelpersToggle,
+    chordRootHintToggle,
     typingShowPianoToggle,
     typingShowTypedToggle,
     typingZone,
@@ -326,6 +328,7 @@ const UI_COPY = {
     },
     helpers: {
         title: "Chord helper",
+        rootNote: "Root note",
         chordSize: "Chord size",
         chordType: "Chord type",
         voicing: "Voicing",
@@ -364,6 +367,7 @@ const DEFAULT_RULE_BLIND = false;
 const DEFAULT_RULE_TRAINING_MODE = "keyboard";
 const DEFAULT_RULE_CHORD_DIFFICULTY = "easy";
 const DEFAULT_RULE_CHORD_EXTRA_HELPERS = false;
+const DEFAULT_RULE_CHORD_ROOT_HINT = false;
 const DEFAULT_RULE_TYPING_SHOW_PIANO = true;
 const DEFAULT_RULE_TYPING_SHOW_TYPED = true;
 const DEFAULT_RULE_HIDE_LIVE_PREVIEW = false;
@@ -374,6 +378,7 @@ const createDefaultPracticeProfile = (modeId) => ({
     trainingMode: modeId === "chord" ? DEFAULT_RULE_TRAINING_MODE : "keyboard",
     chordDifficulty: DEFAULT_RULE_CHORD_DIFFICULTY,
     chordExtraHelpers: DEFAULT_RULE_CHORD_EXTRA_HELPERS,
+    chordRootHint: DEFAULT_RULE_CHORD_ROOT_HINT,
     typingShowPiano: DEFAULT_RULE_TYPING_SHOW_PIANO,
     typingShowTyped: DEFAULT_RULE_TYPING_SHOW_TYPED,
     hideLivePreview: DEFAULT_RULE_HIDE_LIVE_PREVIEW
@@ -398,6 +403,7 @@ const normalizePracticeProfile = (value, modeId) => {
             : fallback.trainingMode,
         chordDifficulty,
         chordExtraHelpers: Boolean(profile.chordExtraHelpers),
+        chordRootHint: Boolean(profile.chordRootHint),
         typingShowPiano: profile.typingShowPiano !== false,
         typingShowTyped: profile.typingShowTyped !== false,
         hideLivePreview: Boolean(profile.hideLivePreview)
@@ -443,6 +449,7 @@ const capturePracticeProfileFromState = (modeId, sourceState = state) => {
             ? (sourceState.chordDifficulty === "playful" ? "voiced" : sourceState.chordDifficulty)
             : DEFAULT_RULE_CHORD_DIFFICULTY,
         chordExtraHelpers: Boolean(sourceState.chordExtraHelpers),
+        chordRootHint: Boolean(sourceState.chordRootHint),
         typingShowPiano: sourceState.typingShowPiano !== false,
         typingShowTyped: sourceState.typingShowTyped !== false,
         hideLivePreview: Boolean(sourceState.hideLivePreview)
@@ -469,6 +476,7 @@ const DEFAULTS = {
     trainingMode: "keyboard",
     chordDifficulty: "easy",
     chordExtraHelpers: false,
+    chordRootHint: false,
     typingShowPiano: true,
     typingShowTyped: true,
     hideLivePreview: false,
@@ -501,6 +509,7 @@ const state = {
     trainingMode: DEFAULTS.trainingMode,
     chordDifficulty: DEFAULTS.chordDifficulty,
     chordExtraHelpers: DEFAULTS.chordExtraHelpers,
+    chordRootHint: DEFAULTS.chordRootHint,
     typingShowPiano: DEFAULTS.typingShowPiano,
     typingShowTyped: DEFAULTS.typingShowTyped,
     hideLivePreview: DEFAULTS.hideLivePreview,
@@ -625,6 +634,7 @@ const saveSettings = () => {
         trainingMode: state.trainingMode,
         chordDifficulty: state.chordDifficulty,
         chordExtraHelpers: state.chordExtraHelpers,
+        chordRootHint: state.chordRootHint,
         typingShowPiano: state.typingShowPiano,
         typingShowTyped: state.typingShowTyped,
         hideLivePreview: state.hideLivePreview
@@ -668,6 +678,7 @@ const loadSettings = () => {
             ? "voiced"
             : (["easy", "medium", "voiced", "hard"].includes(difficulty) ? difficulty : DEFAULTS.chordDifficulty);
         state.chordExtraHelpers = Boolean(data.chordExtraHelpers);
+        state.chordRootHint = Boolean(data.chordRootHint);
         state.typingShowPiano = data.typingShowPiano !== false;
         state.typingShowTyped = data.typingShowTyped !== false;
         state.hideLivePreview = Boolean(data.hideLivePreview);
@@ -711,6 +722,7 @@ const resetAllSettings = () => {
     state.trainingMode = DEFAULTS.trainingMode;
     state.chordDifficulty = DEFAULTS.chordDifficulty;
     state.chordExtraHelpers = DEFAULTS.chordExtraHelpers;
+    state.chordRootHint = DEFAULTS.chordRootHint;
     state.typingShowPiano = DEFAULTS.typingShowPiano;
     state.typingShowTyped = DEFAULTS.typingShowTyped;
     state.hideLivePreview = DEFAULTS.hideLivePreview;

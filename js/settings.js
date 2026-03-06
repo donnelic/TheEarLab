@@ -263,6 +263,14 @@ const applyAdsrTrimUi = () => {
     updateGhostMarkers();
 };
 
+const clearPendingCriticalRestart = () => {
+    if (criticalChangeTimer) {
+        clearTimeout(criticalChangeTimer);
+        criticalChangeTimer = null;
+    }
+    pendingCriticalRestart = false;
+};
+
 const updateInstrumentPresetMeta = () => {
     if (!instrumentPresetMeta) return;
     const selected = sf2PresetLookup.get(selectedInstrumentPresetKey);
@@ -780,6 +788,7 @@ const setPracticeMode = (mode, options = {}) => {
         ? restored.chordDifficulty
         : DEFAULTS.chordDifficulty;
     state.chordExtraHelpers = Boolean(restored.chordExtraHelpers);
+    state.chordRootHint = Boolean(restored.chordRootHint);
     state.typingShowPiano = restored.typingShowPiano !== false;
     state.typingShowTyped = restored.typingShowTyped !== false;
     state.hideLivePreview = Boolean(restored.hideLivePreview);
@@ -808,6 +817,9 @@ const setPracticeMode = (mode, options = {}) => {
     }
     if (chordExtraHelpersToggle) {
         chordExtraHelpersToggle.checked = state.chordExtraHelpers;
+    }
+    if (chordRootHintToggle) {
+        chordRootHintToggle.checked = state.chordRootHint;
     }
     if (typingShowPianoToggle) {
         typingShowPianoToggle.checked = state.typingShowPiano;
@@ -874,6 +886,9 @@ const applyUiFromState = () => {
     if (chordExtraHelpersToggle) {
         chordExtraHelpersToggle.checked = state.chordExtraHelpers;
     }
+    if (chordRootHintToggle) {
+        chordRootHintToggle.checked = state.chordRootHint;
+    }
     if (typingShowPianoToggle) {
         typingShowPianoToggle.checked = state.typingShowPiano;
     }
@@ -920,12 +935,12 @@ const commitNoteCountChange = (delayOverrideMs = null) => {
 
 const handleCriticalSettingChange = (delayOverrideMs = null) => {
     if (state.active) {
-        if (criticalChangeTimer) {
-            clearTimeout(criticalChangeTimer);
-        }
+        clearPendingCriticalRestart();
         pendingCriticalRestart = true;
         const delayMs = delayOverrideMs ?? 700;
         criticalChangeTimer = setTimeout(() => {
+            criticalChangeTimer = null;
+            pendingCriticalRestart = false;
             startRound(true);
         }, delayMs);
     } else {
@@ -952,10 +967,11 @@ const closeSettings = () => {
     commitCriticalChange(200);
     commitNoteCountChange(200);
     if (state.active && pendingCriticalRestart) {
-        if (criticalChangeTimer) {
-            clearTimeout(criticalChangeTimer);
-        }
+        clearPendingCriticalRestart();
+        pendingCriticalRestart = true;
         criticalChangeTimer = setTimeout(() => {
+            criticalChangeTimer = null;
+            pendingCriticalRestart = false;
             startRound(true);
         }, 200);
     }
@@ -1091,6 +1107,7 @@ Object.assign(App.settings, {
     commitCriticalChange,
     commitNoteCountChange,
     handleCriticalSettingChange,
+    clearPendingCriticalRestart,
     openSettings,
     closeSettings,
     positionFloatingPanel,

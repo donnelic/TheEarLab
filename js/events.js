@@ -138,6 +138,14 @@ if (chordExtraHelpersToggle) {
     });
 }
 
+if (chordRootHintToggle) {
+    chordRootHintToggle.addEventListener("change", (event) => {
+        state.chordRootHint = Boolean(event.target.checked);
+        updateStatus();
+        saveSettings();
+    });
+}
+
 if (typingShowPianoToggle) {
     typingShowPianoToggle.addEventListener("change", (event) => {
         state.typingShowPiano = Boolean(event.target.checked);

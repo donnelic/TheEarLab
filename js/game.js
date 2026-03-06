@@ -122,6 +122,7 @@ const FEEDBACK_COPY = GAME_UI_COPY.feedback || {};
 const REVEAL_COPY = GAME_UI_COPY.reveal || {};
 const HELPER_COPY = GAME_UI_COPY.helpers || {};
 const HELPER_LABELS = {
+    rootNote: HELPER_COPY.rootNote || "Root note",
     chordSize: HELPER_COPY.chordSize || "Chord size",
     chordType: HELPER_COPY.chordType || "Chord type",
     voicing: HELPER_COPY.voicing || "Voicing",
@@ -134,6 +135,8 @@ const PRESS_BEHAVIOR = {
 
 const normalizeQualityToken = (value) => {
     return String(value ?? "")
+        .replace(/\u266f/g, "#")
+        .replace(/\u266d/g, "b")
         .replace(/[♯]/g, "#")
         .replace(/[♭]/g, "b")
         .replace(/major/gi, "maj")
@@ -145,6 +148,13 @@ const normalizeQualityToken = (value) => {
         .replace(/[^a-zA-Z0-9#b+/]/g, "")
         .toLowerCase();
 };
+
+const escapeHtml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
 CHORD_QUALITIES.forEach((quality) => {
     quality.aliases.forEach((alias) => {
@@ -805,18 +815,25 @@ const updateReplayAvailability = () => {
 
 const getChordHelperHints = () => {
     if (!state.targetChord) return [];
-    const hints = [
-        { label: HELPER_LABELS.chordSize, value: `${state.targetChord.noteCount} notes` },
-        { label: HELPER_LABELS.chordType, value: state.targetChord.qualityHint },
-        { label: HELPER_LABELS.voicing, value: getVoicingHintLabel(state.targetChord.voicing) }
-    ];
-    if (Number.isFinite(state.targetChord.intervalSpan)) {
-        hints.push({ label: HELPER_LABELS.pitchSpan, value: `${state.targetChord.intervalSpan} semitones` });
+    const hints = [];
+    if (state.chordRootHint) {
+        hints.push({ label: HELPER_LABELS.rootNote, value: state.targetChord.rootName });
+    }
+    if (state.chordExtraHelpers) {
+        hints.push(
+            { label: HELPER_LABELS.chordSize, value: `${state.targetChord.noteCount} notes` },
+            { label: HELPER_LABELS.chordType, value: state.targetChord.qualityHint },
+            { label: HELPER_LABELS.voicing, value: getVoicingHintLabel(state.targetChord.voicing) }
+        );
+        if (Number.isFinite(state.targetChord.intervalSpan)) {
+            hints.push({ label: HELPER_LABELS.pitchSpan, value: `${state.targetChord.intervalSpan} semitones` });
+        }
     }
     return hints;
 };
 
 const HELPER_MASK_LENGTHS = {
+    [HELPER_LABELS.rootNote]: 10,
     [HELPER_LABELS.chordSize]: 12,
     [HELPER_LABELS.chordType]: 12,
     [HELPER_LABELS.voicing]: 13,
@@ -852,16 +869,16 @@ const renderChordHelperBox = () => {
     if (!hints.length) return "";
     const rows = hints.map((hint) => `
         <div class="helper-item" tabindex="0">
-            <div class="helper-label">${hint.label}</div>
+            <div class="helper-label">${escapeHtml(hint.label)}</div>
             <div class="helper-value">
                 <span class="helper-mask" aria-hidden="true">${createDeterministicHelperMask(hint.label)}</span>
-                <span class="helper-real">${hint.value}</span>
+                <span class="helper-real">${escapeHtml(hint.value)}</span>
             </div>
         </div>
     `).join("");
     return `
         <div class="helper-card">
-            <div class="helper-title">${HELPER_COPY.title || "Chord helper"}</div>
+            <div class="helper-title">${escapeHtml(HELPER_COPY.title || "Chord helper")}</div>
             <div class="helper-list">${rows}</div>
         </div>
     `;
@@ -961,7 +978,7 @@ const updateStatus = () => {
 
     const shouldShowHelpers = !state.submitted
         && getIsChordRound()
-        && Boolean(state.chordExtraHelpers)
+        && Boolean(state.chordExtraHelpers || state.chordRootHint)
         && Boolean(state.targetChord);
     if (helperSlotEl) {
         helperSlotEl.hidden = !shouldShowHelpers;
@@ -1060,6 +1077,9 @@ const setSubmitted = (value) => {
 const goHome = () => {
     abortPlayback();
     clearTypingAutoNext();
+    if (typeof App.settings?.clearPendingCriticalRestart === "function") {
+        App.settings.clearPendingCriticalRestart();
+    }
 
     if (keyboardUnlockTimer) {
         clearTimeout(keyboardUnlockTimer);
@@ -1339,14 +1359,14 @@ const getPlaybackSpan = (noteIds, mode) => {
 const renderNotePills = (label, notes, toneClass) => {
     if (!notes.length) return "";
     const pills = notes
-        .map((note) => `<span class="note-pill ${toneClass}">${note}</span>`)
+        .map((note) => `<span class="note-pill ${toneClass}">${escapeHtml(note)}</span>`)
         .join("");
-    return `<div class="reveal-label">${label}</div><div class="note-pills">${pills}</div>`;
+    return `<div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${pills}</div>`;
 };
 
 const renderChordPill = (label, chordLabel, toneClass) => {
     if (!chordLabel) return "";
-    return `<div class="reveal-label">${label}</div><div class="note-pills"><span class="note-pill ${toneClass}">${chordLabel}</span></div>`;
+    return `<div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills"><span class="note-pill ${toneClass}">${escapeHtml(chordLabel)}</span></div>`;
 };
 
 const renderTonePills = (items, toneClassOrResolver = "good") => {
@@ -1355,13 +1375,13 @@ const renderTonePills = (items, toneClassOrResolver = "good") => {
         const toneClass = typeof toneClassOrResolver === "function"
             ? toneClassOrResolver(item)
             : toneClassOrResolver;
-        return `<span class="note-pill ${toneClass}">${item}</span>`;
+        return `<span class="note-pill ${toneClass}">${escapeHtml(item)}</span>`;
     }).join("");
 };
 
 const renderRevealCell = (label, pillsHtml) => {
     if (!pillsHtml) return "";
-    return `<div class="reveal-cell"><div class="reveal-label">${label}</div><div class="note-pills">${pillsHtml}</div></div>`;
+    return `<div class="reveal-cell"><div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${pillsHtml}</div></div>`;
 };
 
 const renderChordRevealGrid = (entries) => {
@@ -1463,10 +1483,11 @@ const getSubmittedReplaySnapshot = () => {
     const targetNotes = snapshot.target ?? [];
     const answerNotes = snapshot.selected ?? [];
     const comparison = buildNoteComparison(targetNotes, answerNotes);
+    const isCorrect = comparison.wrong.length === 0 && comparison.missed.length === 0;
     return {
         target: [...targetNotes],
-        selected: [...comparison.wrong],
-        isCorrect: comparison.wrong.length === 0
+        selected: isCorrect ? [] : [...answerNotes],
+        isCorrect
     };
 };
 
@@ -1624,7 +1645,7 @@ const releaseHeldPlayback = () => {
 const buildTypingRevealDetail = (parsed) => {
     if (!state.targetChord) return "";
     if (!parsed) {
-        return "<div class=\"reveal-label\">Your answer could not be parsed.</div>";
+        return `<div class="reveal-label">${escapeHtml("Your answer could not be parsed.")}</div>`;
     }
     const mismatches = [];
     if (parsed.rootPc !== state.targetChord.rootPc) {
@@ -1638,7 +1659,7 @@ const buildTypingRevealDetail = (parsed) => {
         mismatches.push(`root octave should be ${state.targetChord.rootName}${expectedOctave}`);
     }
     if (!mismatches.length) return "";
-    return `<div class="reveal-label">${REVEAL_COPY.differencePrefix || "Difference"}: ${mismatches.join(", ")}.</div>`;
+    return `<div class="reveal-label">${escapeHtml(REVEAL_COPY.differencePrefix || "Difference")}: ${escapeHtml(mismatches.join(", "))}.</div>`;
 };
 
 const submitTypedAnswer = () => {
