@@ -1,12 +1,11 @@
 var App = window.App || (window.App = {});
 App.settings = App.settings || {};
 
-const TRIM_STRENGTH = typeof ADSR_TRIM_STRENGTH !== "undefined"
-    ? ADSR_TRIM_STRENGTH
-    : { attack: 0.55, decay: 0.55, release: 0.6, length: 0.6 };
-const ENVELOPE_DEFAULTS = typeof DEFAULT_SOUNDFONT_ENVELOPE !== "undefined"
-    ? DEFAULT_SOUNDFONT_ENVELOPE
-    : { attack: 0.016, decay: 0.95, sustain: 0.75, release: 1.2 };
+const MODE_POLICY = App.modePolicy || {};
+const ENVELOPE_API = App.envelope || {};
+const UI_COPY = App.uiCopy || {};
+const BROWSER_COPY = UI_COPY.browsers || {};
+const ENVELOPE_DEFAULTS = ENVELOPE_API.DEFAULT_SOUNDFONT_ENVELOPE || { attack: 0.016, decay: 0.95, sustain: 0.75, release: 1.2 };
 const PROFILE_EPSILON = 0.0001;
 
 const GM_FAMILY_RANGES = [
@@ -111,6 +110,9 @@ const getTonePreset = (toneId = state.pianoTone) =>
 
 const getBaseEnvelope = (toneId = state.pianoTone) => {
     const preset = getTonePreset(toneId);
+    if (typeof ENVELOPE_API.normalizeEnvelopeBase === "function") {
+        return ENVELOPE_API.normalizeEnvelopeBase(preset?.baseAdsr ?? ENVELOPE_DEFAULTS);
+    }
     const base = preset?.baseAdsr ?? ENVELOPE_DEFAULTS;
     return {
         attack: Number.isFinite(base.attack) ? base.attack : ENVELOPE_DEFAULTS.attack,
@@ -123,11 +125,18 @@ const getBaseEnvelope = (toneId = state.pianoTone) => {
 const resolveEnvelopeMetrics = (trim, toneId = state.pianoTone, requestedDuration = state.noteDuration) => {
     const normalized = cloneTrim(trim);
     const base = getBaseEnvelope(toneId);
-    const attack = clampMetricValue(base.attack * (1 + normalized.attack * TRIM_STRENGTH.attack), 0.003, 0.18);
-    const decay = clampMetricValue(base.decay * (1 + normalized.decay * TRIM_STRENGTH.decay), 0.08, 3.2);
-    const release = clampMetricValue(base.release * (1 + normalized.release * TRIM_STRENGTH.release), 0.08, 4.5);
-    const holdMultiplier = clampMetricValue(1 + normalized.length * TRIM_STRENGTH.length, 0.12, 1.9);
-    const holdDuration = clampMetricValue(requestedDuration * holdMultiplier, 0.06, 8);
+    if (typeof ENVELOPE_API.resolveEnvelopeMetrics === "function") {
+        return ENVELOPE_API.resolveEnvelopeMetrics({
+            baseEnvelope: base,
+            trim: normalized,
+            requestedDuration
+        });
+    }
+    const attack = clampMetricValue(base.attack, 0.003, 0.18);
+    const decay = clampMetricValue(base.decay, 0.08, 3.2);
+    const release = clampMetricValue(base.release, 0.08, 4.5);
+    const holdMultiplier = 1;
+    const holdDuration = clampMetricValue(requestedDuration, 0.06, 8);
     return { attack, decay, release, holdDuration, holdMultiplier };
 };
 
@@ -259,7 +268,7 @@ const updateInstrumentPresetMeta = () => {
     const selected = sf2PresetLookup.get(selectedInstrumentPresetKey);
     if (!selected) {
         instrumentPresetMeta.classList.remove("pending");
-        instrumentPresetMeta.textContent = "Select a preset to preview details. Apply to switch instrument.";
+        instrumentPresetMeta.textContent = BROWSER_COPY.instrumentMetaIdle || "Select a preset to preview details. Apply to switch instrument.";
         return;
     }
 
@@ -275,7 +284,9 @@ const updateInstrumentPresetMeta = () => {
         ? App.audio.getBaseAdsrForProgram(selected.program)
         : ENVELOPE_DEFAULTS;
     const hold = formatHold(state.noteDuration, 1);
-    const status = isApplied ? "Applied now." : "Selected only, not applied yet.";
+    const status = isApplied
+        ? (BROWSER_COPY.appliedNow || "Applied now.")
+        : (BROWSER_COPY.selectedPending || "Selected only, not applied yet.");
 
     instrumentPresetMeta.classList.toggle("pending", !isApplied);
     instrumentPresetMeta.textContent =
@@ -313,7 +324,7 @@ const renderInstrumentPresetBrowser = () => {
     if (!filtered.length) {
         const empty = document.createElement("div");
         empty.className = "sf2-empty";
-        empty.textContent = "No presets match this filter.";
+        empty.textContent = BROWSER_COPY.noInstrumentPresets || "No presets match this filter.";
         fragment.appendChild(empty);
     } else {
         grouped.forEach((entries, groupName) => {
@@ -370,14 +381,16 @@ const updateProfileMeta = () => {
     const selected = profileLookup.get(selectedProfileKey);
     if (!selected) {
         profileMeta.classList.remove("pending");
-        profileMeta.textContent = "Select a profile to preview. Apply to use it.";
+        profileMeta.textContent = BROWSER_COPY.profileMetaIdle || "Select a profile to preview. Apply to use it.";
         if (profileApply) profileApply.disabled = true;
         return;
     }
 
     const isApplied = selected.id === state.responseProfileId && !state.responseProfileDirty;
     const metrics = resolveEnvelopeMetrics(selected.trim);
-    const status = isApplied ? "Applied." : "Selected only, not applied yet.";
+    const status = isApplied
+        ? (BROWSER_COPY.applied || "Applied.")
+        : (BROWSER_COPY.selectedPending || "Selected only, not applied yet.");
     const source = selected.custom ? "Custom" : "Built-in";
     const dirty = state.responseProfileDirty ? " Manual slider edits pending save/discard." : "";
 
@@ -414,7 +427,7 @@ const renderResponseProfileBrowser = () => {
     if (!filtered.length) {
         const empty = document.createElement("div");
         empty.className = "sf2-empty";
-        empty.textContent = "No profiles match this filter.";
+        empty.textContent = BROWSER_COPY.noProfiles || "No profiles match this filter.";
         fragment.appendChild(empty);
     } else {
         filtered.forEach((entry) => {
@@ -711,16 +724,17 @@ const setKeyCountVisual = (value) => {
     keyCountSlider.value = String(clamped);
 };
 
-const getEffectivePracticeMode = () => {
-    if (state.practiceMode === "chord" || state.chordMode || state.trainingMode === "type" || state.trainingMode === "both") return "chord";
-    if (state.practiceMode === "nice" || state.niceMode) return "nice";
-    return "random";
-};
+const getEffectivePracticeMode = () => MODE_POLICY.getEffectivePracticeModeFromState
+    ? MODE_POLICY.getEffectivePracticeModeFromState(state)
+    : "random";
+const isTypingEnabled = () => MODE_POLICY.isTypingEnabledFromState
+    ? MODE_POLICY.isTypingEnabledFromState(state)
+    : (state.trainingMode === "type" || state.trainingMode === "both");
 
 const refreshOptionsModeVisibility = () => {
     const mode = getEffectivePracticeMode();
     const showChord = mode === "chord";
-    const showTyping = showChord && (state.trainingMode === "type" || state.trainingMode === "both");
+    const showTyping = showChord && isTypingEnabled();
     const showNoteCount = mode !== "chord";
 
     document.querySelectorAll('[data-option-group="legacy"]').forEach((el) => {

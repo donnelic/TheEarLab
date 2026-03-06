@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-06 08:41:10 +01:00
+Generated: 2026-03-06 08:53:19 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -34,14 +34,14 @@ Generated: 2026-03-06 08:41:10 +01:00
 |---|---|---|---|---:|
 | index.html | HTML | Loaded directly | Yes | 478 |
 | styles.css | CSS | Loaded directly | Yes | 2780 |
-| js/audio.js | JavaScript | Browser runtime module | Yes | 1517 |
-| js/core.js | JavaScript | Browser runtime module | Yes | 886 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 1560 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 1756 |
-| js/settings.js | JavaScript | Browser runtime module | Yes | 1111 |
+| js/audio.js | JavaScript | Browser runtime module | Yes | 1525 |
+| js/core.js | JavaScript | Browser runtime module | Yes | 991 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 1572 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 1796 |
+| js/settings.js | JavaScript | Browser runtime module | Yes | 1125 |
 | README.md | Markdown | Human + AI onboarding | Yes | 109 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 981 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 984 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 500 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
 | soundfonts/index.json | JSON | Soundfont asset | Yes | 3 |
@@ -159,13 +159,13 @@ File: index.html (1-478)
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306083127 | 469 |
-| 2 | vendor/js-synthesizer.min.js?v=20260306083127 | 470 |
-| 3 | js/core.js?v=20260306083127 | 471 |
-| 4 | js/audio.js?v=20260306083127 | 472 |
-| 5 | js/game.js?v=20260306083127 | 473 |
-| 6 | js/settings.js?v=20260306083127 | 474 |
-| 7 | js/events.js?v=20260306083127 | 475 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306084111 | 469 |
+| 2 | vendor/js-synthesizer.min.js?v=20260306084111 | 470 |
+| 3 | js/core.js?v=20260306084111 | 471 |
+| 4 | js/audio.js?v=20260306084111 | 472 |
+| 5 | js/game.js?v=20260306084111 | 473 |
+| 6 | js/settings.js?v=20260306084111 | 474 |
+| 7 | js/events.js?v=20260306084111 | 475 |
 
 ## styles.css Map
 File: styles.css (1-2780)
@@ -556,125 +556,129 @@ File: tools/generate-project-map.ps1 (1-500)
 
 ## JavaScript Maps
 ### js/audio.js (Active Runtime)
-File lines: 1-1517
+File lines: 1-1525
 
 | Symbol | Lines |
 |---|---|
-| clampValue | 61-61 |
-| releaseRateToSeconds | 62-62 |
-| getBaseAdsrForProgram | 63-68 |
-| toUnixPath | 75-75 |
-| getDirectoryPath | 77-81 |
-| resolveRelativePath | 83-90 |
-| normalizeManifestPath | 92-105 |
-| fetchTextSafe | 107-122 |
-| fetchJsonSafe | 124-139 |
-| parseDirectoryListing | 141-152 |
-| noteIdToMidi | 174-185 |
-| frequencyToMidi | 187-190 |
-| normalizeSampleEntries | 192-223 |
-| normalizeSoundfontConfig | 225-247 |
-| getFilenameFromPath | 249-253 |
-| toManifestRelativePath | 255-265 |
-| getManifestEntries | 267-270 |
-| getManifestConfigPaths | 272-289 |
-| getManifestSf2Paths | 291-308 |
-| getDirectoryEntries | 310-313 |
-| getDirectoryConfigPaths | 315-333 |
-| getDirectorySf2Paths | 335-345 |
-| discoverExternalSoundfonts | 347-361 |
-| discoverSf2Paths | 363-367 |
-| getSf2SimplePrograms | 369-377 |
-| findSf2PresetName | 379-383 |
-| createSf2SimplePresets | 385-407 |
-| makeSf2PresetKey | 409-409 |
-| ensureSf2SynthReady | 411-437 |
-| loadSf2Pack | 439-471 |
-| rebuildSf2PresetBrowser | 473-494 |
-| refreshSf2PresetBrowserEntries | 496-499 |
-| getSf2PresetBrowserEntries | 501-506 |
-| selectSf2BrowserPreset | 508-538 |
-| refreshSoundfontCatalog | 540-613 |
-| ensureAudio | 615-652 |
-| getSelectedSoundfont | 654-666 |
-| getSourceEntry | 668-673 |
-| removeVoice | 675-717 |
-| releaseVoice | 719-766 |
-| releaseVoices | 768-773 |
-| stopAllNotes | 775-824 |
-| stopNotesById | 826-838 |
-| abortPlayback | 840-842 |
-| getSoundfontEnvelope | 844-860 |
-| scheduleSampleEnvelope | 862-879 |
-| createGeneratedSampleBuffer | 881-924 |
-| buildGeneratedSampleSet | 926-936 |
-| decodeAudioBuffer | 938-945 |
-| buildExternalSampleSet | 947-968 |
-| applySf2TrimGenerators | 970-978 |
-| getSf2NoteDuration | 980-984 |
-| ensureSf2PresetReady | 986-1000 |
-| ensureSoundfontReady | 1002-1078 |
-| findNearestSample | 1080-1093 |
-| scheduleSf2Note | 1095-1150 |
-| noteOff | 1136-1142 |
-| scheduleWithEntry | 1171-1216 |
-| registerKeyTimer | 1231-1238 |
-| unregisterKeyTimer | 1240-1249 |
-| clearKeyTimersForNote | 1251-1259 |
-| activateKey | 1261-1267 |
-| scheduleKeyRelease | 1269-1282 |
-| scheduleKeyAnimation | 1284-1295 |
-| playNotes | 1297-1347 |
-| playNotesNow | 1349-1352 |
-| clearPreviewTimers | 1354-1357 |
-| stopPreviewPlayback | 1359-1385 |
-| schedulePreviewEvent | 1387-1393 |
-| previewNoteOn | 1395-1406 |
-| previewNoteOff | 1408-1417 |
-| previewPedalOn | 1419-1438 |
-| activate | 1423-1428 |
-| previewPedalOff | 1440-1454 |
-| buildPreviewSequence | 1456-1500 |
+| clampValue | 62-62 |
+| releaseRateToSeconds | 63-63 |
+| getBaseAdsrForProgram | 64-69 |
+| toUnixPath | 76-76 |
+| getDirectoryPath | 78-82 |
+| resolveRelativePath | 84-91 |
+| normalizeManifestPath | 93-106 |
+| fetchTextSafe | 108-123 |
+| fetchJsonSafe | 125-140 |
+| parseDirectoryListing | 142-153 |
+| noteIdToMidi | 175-186 |
+| frequencyToMidi | 188-191 |
+| normalizeSampleEntries | 193-224 |
+| normalizeSoundfontConfig | 226-248 |
+| getFilenameFromPath | 250-254 |
+| toManifestRelativePath | 256-266 |
+| getManifestEntries | 268-271 |
+| getManifestConfigPaths | 273-290 |
+| getManifestSf2Paths | 292-309 |
+| getDirectoryEntries | 311-314 |
+| getDirectoryConfigPaths | 316-334 |
+| getDirectorySf2Paths | 336-346 |
+| discoverExternalSoundfonts | 348-362 |
+| discoverSf2Paths | 364-368 |
+| getSf2SimplePrograms | 370-378 |
+| findSf2PresetName | 380-384 |
+| createSf2SimplePresets | 386-408 |
+| makeSf2PresetKey | 410-410 |
+| ensureSf2SynthReady | 412-438 |
+| loadSf2Pack | 440-472 |
+| rebuildSf2PresetBrowser | 474-495 |
+| refreshSf2PresetBrowserEntries | 497-500 |
+| getSf2PresetBrowserEntries | 502-507 |
+| selectSf2BrowserPreset | 509-539 |
+| refreshSoundfontCatalog | 541-614 |
+| ensureAudio | 616-653 |
+| getSelectedSoundfont | 655-667 |
+| getSourceEntry | 669-674 |
+| removeVoice | 676-718 |
+| releaseVoice | 720-767 |
+| releaseVoices | 769-774 |
+| stopAllNotes | 776-825 |
+| stopNotesById | 827-839 |
+| abortPlayback | 841-843 |
+| getSoundfontEnvelope | 845-862 |
+| scheduleSampleEnvelope | 864-881 |
+| createGeneratedSampleBuffer | 883-926 |
+| buildGeneratedSampleSet | 928-938 |
+| decodeAudioBuffer | 940-947 |
+| buildExternalSampleSet | 949-970 |
+| applySf2TrimGenerators | 972-980 |
+| getSf2NoteDuration | 982-992 |
+| ensureSf2PresetReady | 994-1008 |
+| ensureSoundfontReady | 1010-1086 |
+| findNearestSample | 1088-1101 |
+| scheduleSf2Note | 1103-1158 |
+| noteOff | 1144-1150 |
+| scheduleWithEntry | 1179-1224 |
+| registerKeyTimer | 1239-1246 |
+| unregisterKeyTimer | 1248-1257 |
+| clearKeyTimersForNote | 1259-1267 |
+| activateKey | 1269-1275 |
+| scheduleKeyRelease | 1277-1290 |
+| scheduleKeyAnimation | 1292-1303 |
+| playNotes | 1305-1355 |
+| playNotesNow | 1357-1360 |
+| clearPreviewTimers | 1362-1365 |
+| stopPreviewPlayback | 1367-1393 |
+| schedulePreviewEvent | 1395-1401 |
+| previewNoteOn | 1403-1414 |
+| previewNoteOff | 1416-1425 |
+| previewPedalOn | 1427-1446 |
+| activate | 1431-1436 |
+| previewPedalOff | 1448-1462 |
+| buildPreviewSequence | 1464-1508 |
 
 Event bindings:
 | Target | Event | Line |
 |---|---|---:|
-| source | ended | 1213 |
+| source | ended | 1221 |
 
 ### js/core.js (Active Runtime)
-File lines: 1-886
+File lines: 1-991
 
 | Symbol | Lines |
 |---|---|
-| normalizePracticeProfile | 376-395 |
-| normalizePracticeProfiles | 396-403 |
-| getEffectivePracticeModeFromState | 404-412 |
-| capturePracticeProfileFromState | 413-433 |
-| saveSettings | 503-532 |
-| loadSettings | 534-587 |
-| resetAllSettings | 589-619 |
-| buildNotes | 667-682 |
-| getNoteIdByMidi | 684-691 |
-| isConsonant | 703-706 |
-| getNicePool | 708-708 |
-| getNoteCountMax | 710-714 |
-| updateNoteCountMax | 716-724 |
-| getCssNumber | 726-726 |
-| clamp | 727-727 |
-| getMaxStartMidi | 728-728 |
-| clampStartMidi | 729-729 |
-| getMidiLabel | 730-734 |
-| getPanelBottomGap | 735-738 |
-| normalizeSoundfontDefinition | 740-758 |
-| setSoundfontCatalog | 760-781 |
-| getSoundfontList | 783-783 |
-| renderPianoOptions | 785-829 |
-| createKey | 831-842 |
-| renderKeyboard | 844-876 |
-| rebuildKeyboard | 878-885 |
+| normalizePracticeProfile | 386-405 |
+| normalizePracticeProfiles | 406-413 |
+| isTypingOnlyModeFromState | 417-417 |
+| getEffectiveBlindModeFromState | 421-421 |
+| getEffectivePracticeModeFromState | 422-430 |
+| capturePracticeProfileFromState | 431-451 |
+| clampEnvelopeValue | 546-546 |
+| resolveEnvelopeMetrics | 559-594 |
+| saveSettings | 608-637 |
+| loadSettings | 639-692 |
+| resetAllSettings | 694-724 |
+| buildNotes | 772-787 |
+| getNoteIdByMidi | 789-796 |
+| isConsonant | 808-811 |
+| getNicePool | 813-813 |
+| getNoteCountMax | 815-819 |
+| updateNoteCountMax | 821-829 |
+| getCssNumber | 831-831 |
+| clamp | 832-832 |
+| getMaxStartMidi | 833-833 |
+| clampStartMidi | 834-834 |
+| getMidiLabel | 835-839 |
+| getPanelBottomGap | 840-843 |
+| normalizeSoundfontDefinition | 845-863 |
+| setSoundfontCatalog | 865-886 |
+| getSoundfontList | 888-888 |
+| renderPianoOptions | 890-934 |
+| createKey | 936-947 |
+| renderKeyboard | 949-981 |
+| rebuildKeyboard | 983-990 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-1560
+File lines: 1-1572
 
 | Symbol | Lines |
 |---|---|
@@ -707,14 +711,14 @@ File lines: 1-1560
 | closeChordTutorial | 914-924 |
 | openChordTutorial | 926-943 |
 | registerTutorialOpenTrigger | 945-952 |
-| isChordTypingCaptureActive | 1064-1069 |
-| insertTypedCharacter | 1071-1078 |
-| triggerPrimaryAction | 1081-1090 |
-| triggerReplayAction | 1092-1098 |
-| bindPianoOptionEvents | 1273-1298 |
-| setRandomBackgroundAngle | 1513-1516 |
-| init | 1518-1554 |
-| runDeferredCatalogLoad | 1538-1547 |
+| isChordTypingCaptureActive | 1076-1081 |
+| insertTypedCharacter | 1083-1090 |
+| triggerPrimaryAction | 1093-1102 |
+| triggerReplayAction | 1104-1110 |
+| bindPianoOptionEvents | 1285-1310 |
+| setRandomBackgroundAngle | 1525-1528 |
+| init | 1530-1566 |
+| runDeferredCatalogLoad | 1550-1559 |
 
 Event bindings:
 | Target | Event | Line |
@@ -775,206 +779,202 @@ Event bindings:
 | chordTutorialQualityList | focusin | 1040 |
 | chordTutorialQualityList | focusout | 1047 |
 | chordTutorialQualityList | click | 1050 |
-| volumeSlider | dblclick | 1100 |
-| lengthSlider | dblclick | 1104 |
-| keyCountSlider | dblclick | 1108 |
-| startNoteDownButton | click | 1114 |
-| startNoteUpButton | click | 1117 |
-| startNoteDownOctButton | click | 1123 |
-| startNoteUpOctButton | click | 1126 |
-| noteCountInput | dblclick | 1131 |
-| attackSlider | dblclick | 1139 |
-| decaySlider | dblclick | 1143 |
-| releaseSlider | dblclick | 1147 |
-| sustainSlider | dblclick | 1151 |
-| profileSearch | input | 1156 |
-| profileList | click | 1162 |
-| profileList | dblclick | 1167 |
-| profileList | keydown | 1170 |
-| profileApply | click | 1181 |
-| profileSave | click | 1187 |
-| instrumentPresetSearch | input | 1193 |
-| instrumentPresetList | click | 1199 |
-| instrumentPresetList | dblclick | 1204 |
-| instrumentPresetList | keydown | 1207 |
-| instrumentPresetApply | click | 1218 |
-| advancedTrigger | click | 1223 |
-| advancedPanel | click | 1232 |
-| pianoTrigger | click | 1237 |
-| pianoPanel | click | 1249 |
-| instrumentBrowserTrigger | click | 1255 |
-| instrumentBrowserPanel | click | 1268 |
-| pianoOptionsContainer | click | 1276 |
-| pianoOptionsContainer | keydown | 1290 |
-| pianoPreviewMain | click | 1301 |
-| testEnvelopeButton | click | 1308 |
-| keyboardEl | pointerdown | 1313 |
-| document | pointerup | 1349 |
-| document | pointercancel | 1356 |
-| keyboardEl | click | 1363 |
-| document | keydown | 1367 |
-| document | keyup | 1461 |
-| pedalBox | pointerdown | 1480 |
-| pedalBox | pointerup | 1489 |
-| pedalBox | pointercancel | 1498 |
-| pedalBox | pointerleave | 1506 |
+| volumeSlider | dblclick | 1112 |
+| lengthSlider | dblclick | 1116 |
+| keyCountSlider | dblclick | 1120 |
+| startNoteDownButton | click | 1126 |
+| startNoteUpButton | click | 1129 |
+| startNoteDownOctButton | click | 1135 |
+| startNoteUpOctButton | click | 1138 |
+| noteCountInput | dblclick | 1143 |
+| attackSlider | dblclick | 1151 |
+| decaySlider | dblclick | 1155 |
+| releaseSlider | dblclick | 1159 |
+| sustainSlider | dblclick | 1163 |
+| profileSearch | input | 1168 |
+| profileList | click | 1174 |
+| profileList | dblclick | 1179 |
+| profileList | keydown | 1182 |
+| profileApply | click | 1193 |
+| profileSave | click | 1199 |
+| instrumentPresetSearch | input | 1205 |
+| instrumentPresetList | click | 1211 |
+| instrumentPresetList | dblclick | 1216 |
+| instrumentPresetList | keydown | 1219 |
+| instrumentPresetApply | click | 1230 |
+| advancedTrigger | click | 1235 |
+| advancedPanel | click | 1244 |
+| pianoTrigger | click | 1249 |
+| pianoPanel | click | 1261 |
+| instrumentBrowserTrigger | click | 1267 |
+| instrumentBrowserPanel | click | 1280 |
+| pianoOptionsContainer | click | 1288 |
+| pianoOptionsContainer | keydown | 1302 |
+| pianoPreviewMain | click | 1313 |
+| testEnvelopeButton | click | 1320 |
+| keyboardEl | pointerdown | 1325 |
+| document | pointerup | 1361 |
+| document | pointercancel | 1368 |
+| keyboardEl | click | 1375 |
+| document | keydown | 1379 |
+| document | keyup | 1473 |
+| pedalBox | pointerdown | 1492 |
+| pedalBox | pointerup | 1501 |
+| pedalBox | pointercancel | 1510 |
+| pedalBox | pointerleave | 1518 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-1756
+File lines: 1-1796
 
 | Symbol | Lines |
 |---|---|
-| normalizeQualityToken | 134-146 |
-| isTypingEnabled | 160-160 |
-| isTypingOnlyMode | 161-161 |
-| getIsChordRound | 162-162 |
-| getEffectiveBlindMode | 163-163 |
-| getKeyboardZoneEl | 164-164 |
-| normalizePitchClass | 165-165 |
-| getRootName | 166-166 |
-| getMidiFromNoteId | 167-167 |
-| buildChordLabel | 168-168 |
-| getPitchClassSetFromNoteIds | 170-178 |
-| getChordDifficultyId | 180-185 |
-| getChordDifficultyConfig | 187-190 |
-| getAllowedChordQualities | 192-197 |
-| getChordQualityHint | 199-202 |
-| getConsistentPreviewDuration | 210-213 |
-| playConsistentPreview | 219-237 |
-| releaseInteractivePressSession | 274-302 |
-| getReplayNoteIds | 304-327 |
-| getVoicingHintLabel | 329-333 |
-| randomSample | 335-342 |
-| getNiceTarget | 344-381 |
-| getQualityPitchClassSet | 383-389 |
-| parseChordInput | 391-424 |
-| detectChordFromNoteIds | 426-462 |
-| normalizeIntervals | 464-466 |
-| fitIntervalsToAvailableRange | 468-488 |
-| buildVoicedIntervals | 490-518 |
-| chooseRootCandidatesForIntervals | 520-529 |
-| buildChordFromRoot | 531-559 |
-| createChordTarget | 561-605 |
-| createNoteTarget | 607-640 |
-| createTarget | 642-648 |
-| clearTypingAutoNext | 650-654 |
-| getTypedPreviewNoteIds | 656-689 |
-| updateTypedPreviewFromInput | 691-701 |
-| updateChordReadout | 703-758 |
-| updateModeVisibility | 760-777 |
-| updatePrimaryAction | 779-784 |
-| updateReplayAvailability | 786-795 |
-| getChordHelperHints | 797-808 |
-| createDeterministicHelperMask | 817-839 |
-| renderChordHelperBox | 841-859 |
-| updateStatus | 861-966 |
-| updateKeyStates | 968-1007 |
-| setKeyboardEnabled | 1009-1012 |
-| updateKeyboardScale | 1014-1025 |
-| lockKeyboardForPlayback | 1027-1040 |
-| setSubmitted | 1042-1049 |
-| goHome | 1051-1097 |
-| refreshTarget | 1099-1120 |
-| startRound | 1122-1183 |
-| ensureRound | 1185-1194 |
-| playTarget | 1196-1210 |
-| startManualNote | 1212-1230 |
-| releaseManualNote | 1232-1240 |
-| releasePedalNotes | 1242-1252 |
-| startPedalHold | 1254-1260 |
-| stopPedalHold | 1262-1269 |
-| toggleSelection | 1271-1302 |
-| isSelectionCorrect | 1304-1321 |
-| getPlaybackSpan | 1323-1328 |
-| renderNotePills | 1330-1336 |
-| renderChordPill | 1338-1341 |
-| renderTonePills | 1343-1351 |
-| renderRevealCell | 1353-1356 |
-| renderChordRevealGrid | 1358-1361 |
-| renderChordDetectionMeta | 1363-1367 |
-| renderPressedPills | 1369-1374 |
-| buildNoteComparison | 1376-1383 |
-| renderNoteComparisonCells | 1385-1400 |
-| playRevealSequence | 1402-1452 |
-| playSelectedChord | 1454-1478 |
-| playTypedInputChord | 1480-1493 |
-| startHeldPlayback | 1495-1542 |
-| releaseHeldPlayback | 1544-1558 |
-| buildTypingRevealDetail | 1560-1578 |
-| submitTypedAnswer | 1580-1657 |
-| submitAnswer | 1659-1732 |
+| normalizeQualityToken | 135-147 |
+| getKeyboardZoneEl | 173-173 |
+| normalizePitchClass | 174-174 |
+| getRootName | 175-175 |
+| getMidiFromNoteId | 176-176 |
+| buildChordLabel | 177-177 |
+| getPitchClassSetFromNoteIds | 179-187 |
+| getChordDifficultyId | 189-194 |
+| getChordDifficultyConfig | 196-199 |
+| getAllowedChordQualities | 201-206 |
+| getChordQualityHint | 208-211 |
+| getConsistentPreviewDuration | 219-222 |
+| playConsistentPreview | 228-246 |
+| releaseInteractivePressSession | 283-311 |
+| getReplayNoteIds | 313-336 |
+| getVoicingHintLabel | 338-342 |
+| randomSample | 344-351 |
+| getNiceTarget | 353-390 |
+| getQualityPitchClassSet | 392-398 |
+| parseChordInput | 400-433 |
+| detectChordFromNoteIds | 435-471 |
+| normalizeIntervals | 473-475 |
+| fitIntervalsToAvailableRange | 477-497 |
+| buildVoicedIntervals | 499-527 |
+| chooseRootCandidatesForIntervals | 529-538 |
+| buildChordFromRoot | 540-568 |
+| createChordTarget | 570-614 |
+| createNoteTarget | 616-649 |
+| createTarget | 651-657 |
+| clearTypingAutoNext | 659-663 |
+| getTypedPreviewNoteIds | 665-698 |
+| updateTypedPreviewFromInput | 700-710 |
+| updateChordReadout | 712-767 |
+| updateModeVisibility | 769-786 |
+| updatePrimaryAction | 788-793 |
+| updateReplayAvailability | 795-804 |
+| getChordHelperHints | 806-817 |
+| createDeterministicHelperMask | 826-848 |
+| renderChordHelperBox | 850-868 |
+| updateStatus | 870-975 |
+| updateKeyStates | 977-1016 |
+| setKeyboardEnabled | 1018-1021 |
+| updateKeyboardScale | 1023-1034 |
+| lockKeyboardForPlayback | 1036-1049 |
+| setSubmitted | 1051-1058 |
+| goHome | 1060-1106 |
+| refreshTarget | 1108-1129 |
+| startRound | 1131-1192 |
+| ensureRound | 1194-1203 |
+| playTarget | 1205-1219 |
+| startManualNote | 1221-1239 |
+| releaseManualNote | 1241-1249 |
+| releasePedalNotes | 1251-1261 |
+| startPedalHold | 1263-1269 |
+| stopPedalHold | 1271-1278 |
+| toggleSelection | 1280-1311 |
+| isSelectionCorrect | 1313-1330 |
+| getPlaybackSpan | 1332-1337 |
+| renderNotePills | 1339-1345 |
+| renderChordPill | 1347-1350 |
+| renderTonePills | 1352-1360 |
+| renderRevealCell | 1362-1365 |
+| renderChordRevealGrid | 1367-1370 |
+| renderChordDetectionMeta | 1372-1376 |
+| renderPressedPills | 1378-1383 |
+| buildNoteComparison | 1385-1392 |
+| renderNoteComparisonCells | 1394-1409 |
+| buildAnswerNoteCell | 1411-1419 |
+| playRevealSequence | 1458-1508 |
+| playSelectedChord | 1510-1534 |
+| playTypedInputChord | 1536-1549 |
+| startHeldPlayback | 1551-1598 |
+| releaseHeldPlayback | 1600-1614 |
+| buildTypingRevealDetail | 1616-1634 |
+| submitTypedAnswer | 1636-1709 |
+| submitAnswer | 1711-1772 |
 
 ### js/settings.js (Active Runtime)
-File lines: 1-1111
+File lines: 1-1125
 
 | Symbol | Lines |
 |---|---|
-| clampNoteCount | 63-69 |
-| clampTrim | 71-71 |
-| clampMetricValue | 84-84 |
-| trimToSliderValue | 85-85 |
-| sliderToTrim | 86-90 |
-| formatSeconds | 91-91 |
-| formatHold | 92-92 |
-| formatProgramId | 93-93 |
-| formatBankId | 94-94 |
-| getSf2PresetGroupName | 101-107 |
-| getBaseEnvelope | 112-121 |
-| resolveEnvelopeMetrics | 123-132 |
-| sanitizeCustomProfile | 142-157 |
-| normalizeCustomProfiles | 159-174 |
-| getAllProfiles | 176-188 |
-| getProfileById | 190-194 |
-| setGhostMarker | 196-201 |
-| clearGhostMarker | 203-206 |
-| updateGhostMarkers | 208-221 |
-| syncDirtyFromApplied | 223-230 |
-| applyAdsrTrimUi | 232-255 |
-| updateInstrumentPresetMeta | 257-285 |
-| renderInstrumentPresetBrowser | 287-348 |
-| refreshInstrumentPresetBrowser | 350-360 |
-| setInstrumentPresetSelection | 362-366 |
-| updateProfileMeta | 368-393 |
-| renderResponseProfileBrowser | 395-441 |
-| refreshResponseProfileBrowser | 443-457 |
-| setResponseProfileSelection | 459-463 |
-| applyResponseProfileById | 465-476 |
-| applyResponseProfileSelection | 478-481 |
-| saveCurrentResponseProfile | 483-505 |
-| promptSaveCurrentResponseProfile | 507-511 |
-| discardManualProfileChanges | 513-525 |
-| resetAdsrTrim | 527-529 |
-| resolveInstrumentSwitchProfileAction | 531-558 |
-| applyInstrumentPresetSelection | 560-566 |
-| setVolume | 568-578 |
-| setPianoTone | 580-633 |
-| setNoteLength | 635-644 |
-| setAdsrTrim | 646-653 |
-| playPianoPreview | 655-678 |
-| setKeyCount | 680-695 |
-| setStartMidi | 697-706 |
-| setKeyCountVisual | 708-712 |
-| getEffectivePracticeMode | 714-718 |
-| refreshOptionsModeVisibility | 720-742 |
-| setPracticeMode | 744-819 |
-| applyUiFromState | 821-882 |
-| commitCriticalChange | 889-894 |
-| commitNoteCountChange | 896-905 |
-| handleCriticalSettingChange | 907-921 |
-| openSettings | 923-928 |
-| closeSettings | 930-949 |
-| positionFloatingPanel | 951-977 |
-| positionOptionsPanel | 979-982 |
-| openOptionsPanel | 984-993 |
-| closeOptionsPanel | 995-1000 |
-| openAdvanced | 1002-1010 |
-| closeAdvanced | 1012-1015 |
-| positionPianoPanel | 1017-1020 |
-| openPianoPanel | 1022-1032 |
-| closePianoPanel | 1034-1039 |
-| positionInstrumentBrowserPanel | 1041-1044 |
-| openInstrumentBrowser | 1046-1056 |
-| closeInstrumentBrowser | 1058-1063 |
+| clampNoteCount | 62-68 |
+| clampTrim | 70-70 |
+| clampMetricValue | 83-83 |
+| trimToSliderValue | 84-84 |
+| sliderToTrim | 85-89 |
+| formatSeconds | 90-90 |
+| formatHold | 91-91 |
+| formatProgramId | 92-92 |
+| formatBankId | 93-93 |
+| getSf2PresetGroupName | 100-106 |
+| getBaseEnvelope | 111-123 |
+| resolveEnvelopeMetrics | 125-141 |
+| sanitizeCustomProfile | 151-166 |
+| normalizeCustomProfiles | 168-183 |
+| getAllProfiles | 185-197 |
+| getProfileById | 199-203 |
+| setGhostMarker | 205-210 |
+| clearGhostMarker | 212-215 |
+| updateGhostMarkers | 217-230 |
+| syncDirtyFromApplied | 232-239 |
+| applyAdsrTrimUi | 241-264 |
+| updateInstrumentPresetMeta | 266-296 |
+| renderInstrumentPresetBrowser | 298-359 |
+| refreshInstrumentPresetBrowser | 361-371 |
+| setInstrumentPresetSelection | 373-377 |
+| updateProfileMeta | 379-406 |
+| renderResponseProfileBrowser | 408-454 |
+| refreshResponseProfileBrowser | 456-470 |
+| setResponseProfileSelection | 472-476 |
+| applyResponseProfileById | 478-489 |
+| applyResponseProfileSelection | 491-494 |
+| saveCurrentResponseProfile | 496-518 |
+| promptSaveCurrentResponseProfile | 520-524 |
+| discardManualProfileChanges | 526-538 |
+| resetAdsrTrim | 540-542 |
+| resolveInstrumentSwitchProfileAction | 544-571 |
+| applyInstrumentPresetSelection | 573-579 |
+| setVolume | 581-591 |
+| setPianoTone | 593-646 |
+| setNoteLength | 648-657 |
+| setAdsrTrim | 659-666 |
+| playPianoPreview | 668-691 |
+| setKeyCount | 693-708 |
+| setStartMidi | 710-719 |
+| setKeyCountVisual | 721-725 |
+| refreshOptionsModeVisibility | 734-756 |
+| setPracticeMode | 758-833 |
+| applyUiFromState | 835-896 |
+| commitCriticalChange | 903-908 |
+| commitNoteCountChange | 910-919 |
+| handleCriticalSettingChange | 921-935 |
+| openSettings | 937-942 |
+| closeSettings | 944-963 |
+| positionFloatingPanel | 965-991 |
+| positionOptionsPanel | 993-996 |
+| openOptionsPanel | 998-1007 |
+| closeOptionsPanel | 1009-1014 |
+| openAdvanced | 1016-1024 |
+| closeAdvanced | 1026-1029 |
+| positionPianoPanel | 1031-1034 |
+| openPianoPanel | 1036-1046 |
+| closePianoPanel | 1048-1053 |
+| positionInstrumentBrowserPanel | 1055-1058 |
+| openInstrumentBrowser | 1060-1070 |
+| closeInstrumentBrowser | 1072-1077 |
 
 ## Maintenance Notes
 - js/app.*.js is an older branch snapshot. Keep it for reference unless explicitly retired.

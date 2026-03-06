@@ -1061,11 +1061,23 @@ if (chordTutorialQualityList) {
     });
 }
 
+const MODE_POLICY = App.modePolicy || {};
+const ACTION_COPY = App.uiCopy?.actions || {};
+const isTypingEnabled = () => MODE_POLICY.isTypingEnabledFromState
+    ? MODE_POLICY.isTypingEnabledFromState(state)
+    : (state.trainingMode === "type" || state.trainingMode === "both");
+const isTypingOnlyMode = () => MODE_POLICY.isTypingOnlyModeFromState
+    ? MODE_POLICY.isTypingOnlyModeFromState(state)
+    : state.trainingMode === "type";
+const getIsChordRound = () => MODE_POLICY.getIsChordRoundFromState
+    ? MODE_POLICY.getIsChordRoundFromState(state)
+    : (isTypingEnabled() || state.chordMode);
+
 const isChordTypingCaptureActive = () => {
     if (!state.active || state.submitted) return false;
     if (!typingZone || typingZone.hidden) return false;
     if (!getIsChordRound()) return false;
-    return state.trainingMode === "type" || state.trainingMode === "both";
+    return isTypingEnabled();
 };
 
 const insertTypedCharacter = (character) => {
@@ -1335,7 +1347,7 @@ keyboardEl.addEventListener("pointerdown", (event) => {
         toggleSelection(noteId);
         return;
     }
-    const isTypingOnly = state.trainingMode === "type";
+    const isTypingOnly = isTypingOnlyMode();
     const playSound = state.submitted || (!(state.blindMode || isTypingOnly) && !willDeselect);
     if (state.submitted && revealPlaying) {
         abortPlayback([noteId]);
@@ -1410,7 +1422,7 @@ document.addEventListener("keydown", (event) => {
         event.preventDefault();
         triggerReplayAction(event);
         if (!holdState.active) {
-            resultEl.textContent = "Type a valid chord or select notes first.";
+            resultEl.textContent = ACTION_COPY.typeOrSelectFirst || "Type a valid chord or select notes first.";
         }
         return;
     }

@@ -112,6 +112,7 @@ const recentChordTargets = [];
 let typingAutoNextTimer = null;
 let roundStartInProgress = false;
 let roundStartToken = 0;
+const MODE_POLICY = App.modePolicy || {};
 const UI_COPY = App.uiCopy || {};
 const CHORD_READOUT_COPY = UI_COPY.chordReadout || {};
 const PROMPT_COPY = UI_COPY.prompts || {};
@@ -157,10 +158,18 @@ CHORD_QUALITIES.forEach((quality) => {
     }
 });
 
-const isTypingEnabled = () => state.trainingMode === "type" || state.trainingMode === "both";
-const isTypingOnlyMode = () => state.trainingMode === "type";
-const getIsChordRound = () => isTypingEnabled() || state.chordMode;
-const getEffectiveBlindMode = () => state.blindMode;
+const isTypingEnabled = () => MODE_POLICY.isTypingEnabledFromState
+    ? MODE_POLICY.isTypingEnabledFromState(state)
+    : (state.trainingMode === "type" || state.trainingMode === "both");
+const isTypingOnlyMode = () => MODE_POLICY.isTypingOnlyModeFromState
+    ? MODE_POLICY.isTypingOnlyModeFromState(state)
+    : state.trainingMode === "type";
+const getIsChordRound = () => MODE_POLICY.getIsChordRoundFromState
+    ? MODE_POLICY.getIsChordRoundFromState(state)
+    : (isTypingEnabled() || state.chordMode);
+const getEffectiveBlindMode = () => MODE_POLICY.getEffectiveBlindModeFromState
+    ? MODE_POLICY.getEffectiveBlindModeFromState(state)
+    : state.blindMode;
 const getKeyboardZoneEl = () => document.querySelector(".keyboard-zone");
 const normalizePitchClass = (value) => ((Math.round(value) % 12) + 12) % 12;
 const getRootName = (pitchClass) => CHORD_ROOT_NAMES[normalizePitchClass(pitchClass)];
@@ -1399,6 +1408,53 @@ const renderNoteComparisonCells = (targetNotes, answerNotes) => {
     return [correctCell, wrongCell, missedCell];
 };
 
+const buildAnswerNoteCell = (answerNotes, targetNotes, { emptyTone = "bad" } = {}) => {
+    const targetSet = new Set(targetNotes);
+    return renderRevealCell(
+        REVEAL_COPY.yourNotes || "Your notes",
+        answerNotes.length
+            ? renderTonePills(answerNotes, (note) => (targetSet.has(note) ? "good" : "bad"))
+            : `<span class="note-pill ${emptyTone}">None</span>`
+    );
+};
+
+const buildChordRevealEntries = ({
+    targetChordLabel = "",
+    targetNotes = [],
+    answerChordLabel = "",
+    answerChordTone = "bad",
+    answerNotes = [],
+    includeAnswerNotes = true,
+    includeNoteComparison = true
+} = {}) => {
+    const entries = [];
+    if (targetChordLabel) {
+        entries.push(renderRevealCell(
+            REVEAL_COPY.targetChord || "Target chord",
+            renderTonePills([targetChordLabel], "good")
+        ));
+    }
+    if (targetNotes.length) {
+        entries.push(renderRevealCell(
+            REVEAL_COPY.targetNotes || "Target notes",
+            renderTonePills(targetNotes, "good")
+        ));
+    }
+    if (answerChordLabel) {
+        entries.push(renderRevealCell(
+            REVEAL_COPY.yourChord || "Your chord",
+            renderTonePills([answerChordLabel], answerChordTone)
+        ));
+    }
+    if (includeAnswerNotes) {
+        entries.push(buildAnswerNoteCell(answerNotes, targetNotes));
+    }
+    if (includeNoteComparison) {
+        entries.push(...renderNoteComparisonCells(targetNotes, answerNotes));
+    }
+    return entries;
+};
+
 const playRevealSequence = (options = {}) => {
     if (!state.active || !state.targetNotes.length) {
         return;
@@ -1606,15 +1662,15 @@ const submitTypedAnswer = () => {
     setSubmitted(true);
     if (isCorrect) {
         resultEl.textContent = ACTION_COPY.correctChord?.(target.label) ?? `Correct: ${target.label}`;
-        const targetChordCell = renderRevealCell(
-            REVEAL_COPY.targetChord || "Target chord",
-            renderTonePills([target.label], "good")
-        );
-        const targetNotesCell = renderRevealCell(
-            REVEAL_COPY.targetNotes || "Target notes",
-            renderTonePills(state.targetNotes, "good")
-        );
-        revealEl.innerHTML = renderChordRevealGrid([targetChordCell, targetNotesCell]);
+        revealEl.innerHTML = renderChordRevealGrid(buildChordRevealEntries({
+            targetChordLabel: target.label,
+            targetNotes: state.targetNotes,
+            answerChordLabel: answerNotes.length ? parsed.label : "",
+            answerChordTone: "good",
+            answerNotes: answerNotes.length ? answerNotes : state.targetNotes,
+            includeAnswerNotes: false,
+            includeNoteComparison: false
+        }));
         lastReveal = {
             target: [...state.targetNotes],
             selected: answerNotes.length ? [...answerNotes] : [...state.targetNotes]
@@ -1632,20 +1688,16 @@ const submitTypedAnswer = () => {
     }
 
     const answerLabel = parsed?.label || (state.typedAnswer?.trim() || "No answer");
-    const targetChordCell = renderRevealCell(
-        REVEAL_COPY.targetChord || "Target chord",
-        renderTonePills([target.label], "good")
-    );
-    const targetNotesCell = renderRevealCell(
-        REVEAL_COPY.targetNotes || "Target notes",
-        renderTonePills(state.targetNotes, "good")
-    );
-    const answerChordCell = renderRevealCell(
-        REVEAL_COPY.yourChord || "Your chord",
-        renderTonePills([answerLabel], "bad")
-    );
     const detail = buildTypingRevealDetail(parsed);
-    revealEl.innerHTML = `${renderChordRevealGrid([targetChordCell, targetNotesCell, answerChordCell])}${detail}`;
+    revealEl.innerHTML = `${renderChordRevealGrid(buildChordRevealEntries({
+        targetChordLabel: target.label,
+        targetNotes: state.targetNotes,
+        answerChordLabel: answerLabel,
+        answerChordTone: "bad",
+        answerNotes,
+        includeAnswerNotes: false,
+        includeNoteComparison: true
+    }))}${detail}`;
     resultEl.textContent = FEEDBACK_COPY.wrongChordName || "Not quite. Compare the chord name and quality.";
     lastReveal = {
         target: [...state.targetNotes],
@@ -1685,27 +1737,15 @@ const submitAnswer = () => {
         resultEl.textContent = isCorrect
             ? (FEEDBACK_COPY.correctChord || "Correct chord. Great ear.")
             : (FEEDBACK_COPY.wrongChordQuality || "Not quite. Compare the chord quality.");
-        const targetSet = new Set(state.targetNotes);
-        const targetChordCell = renderRevealCell(
-            REVEAL_COPY.targetChord || "Target chord",
-            renderTonePills([targetLabel], "good")
-        );
-        const targetNotesCell = renderRevealCell(
-            REVEAL_COPY.targetNotes || "Target notes",
-            renderTonePills(state.targetNotes, "good")
-        );
-        const selectedChordCell = renderRevealCell(
-            REVEAL_COPY.yourChord || "Your chord",
-            renderTonePills([selectedLabel], isCorrect ? "good" : "bad")
-        );
-        const selectedNotesCell = renderRevealCell(
-            REVEAL_COPY.yourNotes || "Your notes",
-            state.selectedNotes.length
-                ? renderTonePills(state.selectedNotes, (note) => (targetSet.has(note) ? "good" : "bad"))
-                : '<span class="note-pill bad">None</span>'
-        );
-        const noteComparisonCells = renderNoteComparisonCells(state.targetNotes, state.selectedNotes);
-        revealEl.innerHTML = renderChordRevealGrid([targetChordCell, targetNotesCell, selectedChordCell, selectedNotesCell, ...noteComparisonCells]);
+        revealEl.innerHTML = renderChordRevealGrid(buildChordRevealEntries({
+            targetChordLabel: targetLabel,
+            targetNotes: state.targetNotes,
+            answerChordLabel: selectedLabel,
+            answerChordTone: isCorrect ? "good" : "bad",
+            answerNotes: state.selectedNotes,
+            includeAnswerNotes: true,
+            includeNoteComparison: true
+        }));
     } else {
         resultEl.textContent = isCorrect
             ? (FEEDBACK_COPY.correctNotes || "Correct. Great ear.")
