@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-06 09:34:21 +01:00
+Generated: 2026-03-06 09:38:32 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -33,13 +33,13 @@ Generated: 2026-03-06 09:34:21 +01:00
 | File | Kind | Runtime Role | Active | Lines |
 |---|---|---|---|---:|
 | index.html | HTML | Loaded directly | Yes | 491 |
-| styles.css | CSS | Loaded directly | Yes | 2780 |
+| styles.css | CSS | Loaded directly | Yes | 2786 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1526 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1003 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 1596 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 1825 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 1615 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 1839 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1142 |
-| README.md | Markdown | Human + AI onboarding | Yes | 111 |
+| README.md | Markdown | Human + AI onboarding | Yes | 112 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
 | PROJECT_MAP.md | Markdown | Generated reference map | Yes | 993 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 500 |
@@ -160,16 +160,16 @@ File: index.html (1-491)
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306093345 | 482 |
-| 2 | vendor/js-synthesizer.min.js?v=20260306093345 | 483 |
-| 3 | js/core.js?v=20260306093345 | 484 |
-| 4 | js/audio.js?v=20260306093345 | 485 |
-| 5 | js/game.js?v=20260306093345 | 486 |
-| 6 | js/settings.js?v=20260306093345 | 487 |
-| 7 | js/events.js?v=20260306093345 | 488 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306093823 | 482 |
+| 2 | vendor/js-synthesizer.min.js?v=20260306093823 | 483 |
+| 3 | js/core.js?v=20260306093823 | 484 |
+| 4 | js/audio.js?v=20260306093823 | 485 |
+| 5 | js/game.js?v=20260306093823 | 486 |
+| 6 | js/settings.js?v=20260306093823 | 487 |
+| 7 | js/events.js?v=20260306093823 | 488 |
 
 ## styles.css Map
-File: styles.css (1-2780)
+File: styles.css (1-2786)
 
 ### Top-Level CSS Blocks
 | Selector | Lines |
@@ -337,188 +337,189 @@ File: styles.css (1-2780)
 | .helper-item::after | 1310-1318 |
 | .helper-item:last-child::after | 1320-1322 |
 | .helper-item:hover, .helper-item:focus-within | 1325-1327 |
-| .helper-label | 1329-1335 |
-| .helper-item .helper-value | 1337-1345 |
-| .helper-item .helper-mask | 1347-1354 |
-| .helper-item .helper-real | 1356-1368 |
-| .helper-item:hover .helper-mask, .helper-item:focus-within .helper-mask | 1371-1374 |
-| .helper-item:hover .helper-real, .helper-item:focus-within .helper-real | 1377-1380 |
-| .typing-zone[hidden] | 1382-1384 |
-| .status | 1386-1397 |
-| .status[hidden] | 1399-1401 |
-| .helper-slot[hidden] | 1403-1405 |
-| .status-actions | 1407-1413 |
-| .hint-flag | 1415-1428 |
-| .hint-flag[hidden] | 1430-1432 |
-| .hint-button | 1434-1436 |
-| :is(.settings-toggle, .theme-toggle, .home-toggle) | 1438-1452 |
-| .settings-toggle | 1454-1456 |
-| .theme-toggle | 1458-1460 |
-| .home-toggle | 1462-1464 |
-| :is(.settings-toggle, .theme-toggle, .home-toggle):hover | 1466-1468 |
-| :is(.settings-toggle, .theme-toggle, .home-toggle) svg | 1470-1474 |
-| .settings-toggle svg | 1476-1479 |
-| .settings-panel | 1481-1500 |
-| .settings-panel.open | 1502-1506 |
-| .settings-panel h2 | 1508-1513 |
-| .settings-body | 1515-1519 |
-| .settings-grid | 1521-1524 |
-| .advanced-trigger | 1526-1534 |
-| .dropdown-trigger | 1536-1550 |
-| .dropdown-trigger svg | 1552-1556 |
-| .dropdown-trigger:focus-visible | 1558-1561 |
-| .panel-trigger | 1563-1575 |
-| .panel-trigger:hover | 1577-1580 |
-| .panel-trigger[aria-expanded="true"] | 1582-1585 |
-| .panel-trigger:focus-visible | 1587-1590 |
-| .control select | 1592-1601 |
-| .options-panel | 1603-1619 |
-| .options-panel.open | 1621-1625 |
-| .options-panel h3 | 1627-1634 |
-| .options-grid | 1636-1639 |
-| .options-panel .control | 1641-1647 |
-| .options-panel .control.compact | 1649-1651 |
-| .options-panel .control label | 1653-1655 |
-| .options-section-title | 1657-1666 |
-| .options-panel .options-section-title:first-child | 1668-1672 |
-| .advanced-panel | 1674-1693 |
-| .advanced-panel.open | 1695-1699 |
-| .advanced-panel h3 | 1701-1706 |
-| .advanced-grid | 1708-1717 |
-| .advanced-grid::-webkit-scrollbar | 1719-1721 |
-| .advanced-grid::-webkit-scrollbar-track | 1723-1726 |
-| .advanced-grid::-webkit-scrollbar-thumb | 1728-1732 |
-| .inline-value | 1734-1741 |
-| .slider-stack | 1743-1746 |
-| .slider-stack input[type="range"] | 1748-1752 |
-| .slider-ghost | 1754-1768 |
-| .slider-ghost.visible | 1770-1772 |
-| .sf2-browser | 1774-1777 |
-| .sf2-browser input[type="text"] | 1779-1788 |
-| .sf2-preset-list | 1790-1803 |
-| .sf2-browser .piano-desc | 1805-1808 |
-| .sf2-browser .piano-desc.pending, .profile-browser .piano-desc.pending | 1811-1813 |
-| .sf2-group | 1815-1820 |
-| .sf2-group-title | 1822-1831 |
-| .sf2-row | 1833-1841 |
-| .sf2-row:first-child | 1843-1845 |
-| .sf2-row:hover | 1847-1849 |
-| .sf2-row.active | 1851-1854 |
-| .sf2-row-name | 1856-1862 |
-| .sf2-row-program, .sf2-row-bank | 1865-1869 |
-| .sf2-empty | 1871-1875 |
-| .profile-browser | 1877-1880 |
-| .profile-browser input[type="text"] | 1882-1891 |
-| .profile-list | 1893-1906 |
-| .profile-row | 1908-1918 |
-| .profile-row:hover | 1920-1922 |
-| .profile-row.active | 1924-1927 |
-| .profile-row.applied | 1929-1931 |
-| .profile-row-name | 1933-1939 |
-| .profile-row-kind | 1941-1946 |
-| .advanced-footer | 1948-1954 |
-| .piano-preview.wide | 1956-1968 |
-| .piano-preview.wide::before | 1970-1972 |
-| .piano-preview.wide .play-icon | 1974-1980 |
-| .piano-preview.wide .play-label | 1982-1984 |
-| .instrument-browser-panel | 1986-2001 |
-| .instrument-browser-panel.open | 2003-2007 |
-| .instrument-browser-panel h3 | 2009-2014 |
-| .piano-panel | 2016-2031 |
-| .piano-panel.open | 2033-2037 |
-| .piano-panel h3 | 2039-2044 |
-| .piano-options | 2046-2049 |
-| .piano-option | 2051-2063 |
-| .piano-option.active | 2065-2068 |
-| .piano-option:focus-visible | 2070-2072 |
-| .piano-info | 2074-2077 |
-| .piano-name | 2079-2082 |
-| .piano-desc | 2084-2087 |
-| .piano-option.simple .piano-name | 2089-2093 |
-| .piano-option.simple .piano-desc | 2095-2099 |
-| .piano-preview | 2101-2116 |
-| .piano-preview::before | 2118-2126 |
-| .piano-preview:active | 2128-2131 |
-| .piano-preview.main | 2133-2137 |
-| .settings-grid input[type="range"], .advanced-panel input[type="range"], .options-... | 2141-2145 |
-| .settings-grid input[type="range"]::-webkit-slider-runnable-track, .advanced-panel... | 2149-2154 |
-| .settings-grid input[type="range"]::-webkit-slider-thumb, .advanced-panel input[ty... | 2158-2167 |
-| .settings-grid input[type="range"]:focus-visible::-webkit-slider-thumb, .advanced-... | 2171-2174 |
-| .settings-grid input[type="range"]::-moz-range-track, .advanced-panel input[type="... | 2178-2183 |
-| .settings-grid input[type="range"]::-moz-range-thumb, .advanced-panel input[type="... | 2187-2194 |
-| .settings-grid input[type="range"]:focus-visible::-moz-range-thumb, .advanced-pane... | 2198-2201 |
-| .volume-value | 2203-2206 |
-| .status-row | 2208-2213 |
-| .switch | 2215-2219 |
-| .switch input | 2221-2226 |
-| .switch-track | 2228-2234 |
-| .switch-thumb | 2236-2246 |
-| .switch input:checked + .switch-track | 2248-2250 |
-| .switch input:checked + .switch-track .switch-thumb | 2252-2254 |
-| .control.compact .switch | 2256-2259 |
-| .control.compact .switch-thumb | 2261-2266 |
-| .control.compact .switch input:checked + .switch-track .switch-thumb | 2268-2270 |
-| .control.compact .unit | 2272-2274 |
-| .test-tone | 2276-2288 |
-| .test-tone:hover | 2290-2293 |
-| .test-tone:active | 2295-2297 |
-| .test-tone-icon | 2299-2306 |
-| .test-tone-label | 2308-2312 |
-| .result | 2314-2318 |
-| .reveal | 2320-2329 |
-| .reveal strong | 2331-2333 |
-| .reveal-label | 2335-2342 |
-| .reveal-grid.compact | 2344-2348 |
-| .reveal-cell | 2350-2352 |
-| .keyboard-zone | 2354-2364 |
-| .keyboard-stack | 2366-2376 |
-| .keyboard-wrapper | 2378-2387 |
-| .keyboard | 2389-2396 |
-| .keyboard-wrapper.ends-black | 2398-2400 |
-| .white-keys | 2402-2405 |
-| .black-keys | 2407-2414 |
-| .key | 2416-2427 |
-| .key.white | 2429-2436 |
-| .key.white.has-black | 2438-2440 |
-| .key.black | 2442-2451 |
-| .key span | 2453-2457 |
-| .key.black span | 2459-2463 |
-| .key.active | 2465-2468 |
-| .key.black.active | 2470-2473 |
-| .key.selected | 2475-2479 |
-| .key.typed-preview | 2481-2483 |
-| .key.correct | 2485-2489 |
-| .key.wrong | 2491-2495 |
-| .key.missed | 2497-2503 |
-| .key.black.selected, .key.black.correct, .key.black.wrong | 2507-2509 |
-| .key.black.missed | 2511-2517 |
-| .keyboard.disabled | 2519-2525 |
-| body.tutorial-open .keyboard | 2527-2529 |
-| body.tutorial-open .keyboard.disabled | 2531-2534 |
-| .keyboard.disabled::before | 2536-2548 |
-| body.tutorial-open .keyboard.disabled::before | 2550-2552 |
-| .keyboard.disabled::after | 2554-2588 |
-| body.tutorial-open .keyboard.disabled::after | 2590-2592 |
-| .tips | 2594-2603 |
-| #pedal-tip[hidden] | 2605-2607 |
-| .pedal-box | 2609-2623 |
-| body.landing .pedal-box | 2625-2627 |
-| .pedal-label | 2629-2639 |
-| .pedal-icon | 2641-2648 |
-| .pedal-icon.active | 2650-2653 |
-| .note-pills | 2655-2661 |
-| .note-pill | 2663-2669 |
-| .note-pill.good | 2671-2675 |
-| .note-pill.bad | 2677-2681 |
-| .note-pill.missed | 2683-2687 |
-| .note-pill.neutral | 2689-2693 |
-| @media (max-width: 700px) | 2695-2750 |
-| @media (max-height: 820px) | 2752-2773 |
-| @media (max-height: 700px) | 2775-2780 |
+| .helper-item:hover, .helper-item:hover * | 1330-1332 |
+| .helper-label | 1334-1340 |
+| .helper-item .helper-value | 1342-1350 |
+| .helper-item .helper-mask | 1352-1360 |
+| .helper-item .helper-real | 1362-1374 |
+| .helper-item:hover .helper-mask, .helper-item:focus-within .helper-mask | 1377-1380 |
+| .helper-item:hover .helper-real, .helper-item:focus-within .helper-real | 1383-1386 |
+| .typing-zone[hidden] | 1388-1390 |
+| .status | 1392-1403 |
+| .status[hidden] | 1405-1407 |
+| .helper-slot[hidden] | 1409-1411 |
+| .status-actions | 1413-1419 |
+| .hint-flag | 1421-1434 |
+| .hint-flag[hidden] | 1436-1438 |
+| .hint-button | 1440-1442 |
+| :is(.settings-toggle, .theme-toggle, .home-toggle) | 1444-1458 |
+| .settings-toggle | 1460-1462 |
+| .theme-toggle | 1464-1466 |
+| .home-toggle | 1468-1470 |
+| :is(.settings-toggle, .theme-toggle, .home-toggle):hover | 1472-1474 |
+| :is(.settings-toggle, .theme-toggle, .home-toggle) svg | 1476-1480 |
+| .settings-toggle svg | 1482-1485 |
+| .settings-panel | 1487-1506 |
+| .settings-panel.open | 1508-1512 |
+| .settings-panel h2 | 1514-1519 |
+| .settings-body | 1521-1525 |
+| .settings-grid | 1527-1530 |
+| .advanced-trigger | 1532-1540 |
+| .dropdown-trigger | 1542-1556 |
+| .dropdown-trigger svg | 1558-1562 |
+| .dropdown-trigger:focus-visible | 1564-1567 |
+| .panel-trigger | 1569-1581 |
+| .panel-trigger:hover | 1583-1586 |
+| .panel-trigger[aria-expanded="true"] | 1588-1591 |
+| .panel-trigger:focus-visible | 1593-1596 |
+| .control select | 1598-1607 |
+| .options-panel | 1609-1625 |
+| .options-panel.open | 1627-1631 |
+| .options-panel h3 | 1633-1640 |
+| .options-grid | 1642-1645 |
+| .options-panel .control | 1647-1653 |
+| .options-panel .control.compact | 1655-1657 |
+| .options-panel .control label | 1659-1661 |
+| .options-section-title | 1663-1672 |
+| .options-panel .options-section-title:first-child | 1674-1678 |
+| .advanced-panel | 1680-1699 |
+| .advanced-panel.open | 1701-1705 |
+| .advanced-panel h3 | 1707-1712 |
+| .advanced-grid | 1714-1723 |
+| .advanced-grid::-webkit-scrollbar | 1725-1727 |
+| .advanced-grid::-webkit-scrollbar-track | 1729-1732 |
+| .advanced-grid::-webkit-scrollbar-thumb | 1734-1738 |
+| .inline-value | 1740-1747 |
+| .slider-stack | 1749-1752 |
+| .slider-stack input[type="range"] | 1754-1758 |
+| .slider-ghost | 1760-1774 |
+| .slider-ghost.visible | 1776-1778 |
+| .sf2-browser | 1780-1783 |
+| .sf2-browser input[type="text"] | 1785-1794 |
+| .sf2-preset-list | 1796-1809 |
+| .sf2-browser .piano-desc | 1811-1814 |
+| .sf2-browser .piano-desc.pending, .profile-browser .piano-desc.pending | 1817-1819 |
+| .sf2-group | 1821-1826 |
+| .sf2-group-title | 1828-1837 |
+| .sf2-row | 1839-1847 |
+| .sf2-row:first-child | 1849-1851 |
+| .sf2-row:hover | 1853-1855 |
+| .sf2-row.active | 1857-1860 |
+| .sf2-row-name | 1862-1868 |
+| .sf2-row-program, .sf2-row-bank | 1871-1875 |
+| .sf2-empty | 1877-1881 |
+| .profile-browser | 1883-1886 |
+| .profile-browser input[type="text"] | 1888-1897 |
+| .profile-list | 1899-1912 |
+| .profile-row | 1914-1924 |
+| .profile-row:hover | 1926-1928 |
+| .profile-row.active | 1930-1933 |
+| .profile-row.applied | 1935-1937 |
+| .profile-row-name | 1939-1945 |
+| .profile-row-kind | 1947-1952 |
+| .advanced-footer | 1954-1960 |
+| .piano-preview.wide | 1962-1974 |
+| .piano-preview.wide::before | 1976-1978 |
+| .piano-preview.wide .play-icon | 1980-1986 |
+| .piano-preview.wide .play-label | 1988-1990 |
+| .instrument-browser-panel | 1992-2007 |
+| .instrument-browser-panel.open | 2009-2013 |
+| .instrument-browser-panel h3 | 2015-2020 |
+| .piano-panel | 2022-2037 |
+| .piano-panel.open | 2039-2043 |
+| .piano-panel h3 | 2045-2050 |
+| .piano-options | 2052-2055 |
+| .piano-option | 2057-2069 |
+| .piano-option.active | 2071-2074 |
+| .piano-option:focus-visible | 2076-2078 |
+| .piano-info | 2080-2083 |
+| .piano-name | 2085-2088 |
+| .piano-desc | 2090-2093 |
+| .piano-option.simple .piano-name | 2095-2099 |
+| .piano-option.simple .piano-desc | 2101-2105 |
+| .piano-preview | 2107-2122 |
+| .piano-preview::before | 2124-2132 |
+| .piano-preview:active | 2134-2137 |
+| .piano-preview.main | 2139-2143 |
+| .settings-grid input[type="range"], .advanced-panel input[type="range"], .options-... | 2147-2151 |
+| .settings-grid input[type="range"]::-webkit-slider-runnable-track, .advanced-panel... | 2155-2160 |
+| .settings-grid input[type="range"]::-webkit-slider-thumb, .advanced-panel input[ty... | 2164-2173 |
+| .settings-grid input[type="range"]:focus-visible::-webkit-slider-thumb, .advanced-... | 2177-2180 |
+| .settings-grid input[type="range"]::-moz-range-track, .advanced-panel input[type="... | 2184-2189 |
+| .settings-grid input[type="range"]::-moz-range-thumb, .advanced-panel input[type="... | 2193-2200 |
+| .settings-grid input[type="range"]:focus-visible::-moz-range-thumb, .advanced-pane... | 2204-2207 |
+| .volume-value | 2209-2212 |
+| .status-row | 2214-2219 |
+| .switch | 2221-2225 |
+| .switch input | 2227-2232 |
+| .switch-track | 2234-2240 |
+| .switch-thumb | 2242-2252 |
+| .switch input:checked + .switch-track | 2254-2256 |
+| .switch input:checked + .switch-track .switch-thumb | 2258-2260 |
+| .control.compact .switch | 2262-2265 |
+| .control.compact .switch-thumb | 2267-2272 |
+| .control.compact .switch input:checked + .switch-track .switch-thumb | 2274-2276 |
+| .control.compact .unit | 2278-2280 |
+| .test-tone | 2282-2294 |
+| .test-tone:hover | 2296-2299 |
+| .test-tone:active | 2301-2303 |
+| .test-tone-icon | 2305-2312 |
+| .test-tone-label | 2314-2318 |
+| .result | 2320-2324 |
+| .reveal | 2326-2335 |
+| .reveal strong | 2337-2339 |
+| .reveal-label | 2341-2348 |
+| .reveal-grid.compact | 2350-2354 |
+| .reveal-cell | 2356-2358 |
+| .keyboard-zone | 2360-2370 |
+| .keyboard-stack | 2372-2382 |
+| .keyboard-wrapper | 2384-2393 |
+| .keyboard | 2395-2402 |
+| .keyboard-wrapper.ends-black | 2404-2406 |
+| .white-keys | 2408-2411 |
+| .black-keys | 2413-2420 |
+| .key | 2422-2433 |
+| .key.white | 2435-2442 |
+| .key.white.has-black | 2444-2446 |
+| .key.black | 2448-2457 |
+| .key span | 2459-2463 |
+| .key.black span | 2465-2469 |
+| .key.active | 2471-2474 |
+| .key.black.active | 2476-2479 |
+| .key.selected | 2481-2485 |
+| .key.typed-preview | 2487-2489 |
+| .key.correct | 2491-2495 |
+| .key.wrong | 2497-2501 |
+| .key.missed | 2503-2509 |
+| .key.black.selected, .key.black.correct, .key.black.wrong | 2513-2515 |
+| .key.black.missed | 2517-2523 |
+| .keyboard.disabled | 2525-2531 |
+| body.tutorial-open .keyboard | 2533-2535 |
+| body.tutorial-open .keyboard.disabled | 2537-2540 |
+| .keyboard.disabled::before | 2542-2554 |
+| body.tutorial-open .keyboard.disabled::before | 2556-2558 |
+| .keyboard.disabled::after | 2560-2594 |
+| body.tutorial-open .keyboard.disabled::after | 2596-2598 |
+| .tips | 2600-2609 |
+| #pedal-tip[hidden] | 2611-2613 |
+| .pedal-box | 2615-2629 |
+| body.landing .pedal-box | 2631-2633 |
+| .pedal-label | 2635-2645 |
+| .pedal-icon | 2647-2654 |
+| .pedal-icon.active | 2656-2659 |
+| .note-pills | 2661-2667 |
+| .note-pill | 2669-2675 |
+| .note-pill.good | 2677-2681 |
+| .note-pill.bad | 2683-2687 |
+| .note-pill.missed | 2689-2693 |
+| .note-pill.neutral | 2695-2699 |
+| @media (max-width: 700px) | 2701-2756 |
+| @media (max-height: 820px) | 2758-2779 |
+| @media (max-height: 700px) | 2781-2786 |
 
 ## Documentation + Tooling Maps
 ### README.md
-File: README.md (1-111)
+File: README.md (1-112)
 | Heading | Line |
 |---|---:|
 | TheEarLab | 1 |
@@ -527,8 +528,8 @@ File: README.md (1-111)
 | Run Locally | 32 |
 | SF2 Behavior | 46 |
 | Chord Training Modes | 65 |
-| Maintenance Rules | 102 |
-| Verification | 109 |
+| Maintenance Rules | 103 |
+| Verification | 110 |
 
 ### AGENTS.md
 File: AGENTS.md (1-34)
@@ -679,7 +680,7 @@ File lines: 1-1003
 | rebuildKeyboard | 995-1002 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-1596
+File lines: 1-1615
 
 | Symbol | Lines |
 |---|---|
@@ -716,11 +717,13 @@ File lines: 1-1596
 | isChordTypingCaptureActive | 1100-1105 |
 | insertTypedCharacter | 1107-1114 |
 | triggerPrimaryAction | 1117-1126 |
-| triggerReplayAction | 1128-1134 |
-| bindPianoOptionEvents | 1309-1334 |
-| setRandomBackgroundAngle | 1549-1552 |
-| init | 1554-1590 |
-| runDeferredCatalogLoad | 1574-1583 |
+| getButtonLikeTarget | 1129-1129 |
+| blurPointerActivatedControl | 1130-1137 |
+| triggerReplayAction | 1139-1145 |
+| bindPianoOptionEvents | 1320-1345 |
+| setRandomBackgroundAngle | 1568-1571 |
+| init | 1573-1609 |
+| runDeferredCatalogLoad | 1593-1602 |
 
 Event bindings:
 | Target | Event | Line |
@@ -785,52 +788,54 @@ Event bindings:
 | chordTutorialQualityList | focusin | 1064 |
 | chordTutorialQualityList | focusout | 1071 |
 | chordTutorialQualityList | click | 1074 |
-| volumeSlider | dblclick | 1136 |
-| lengthSlider | dblclick | 1140 |
-| keyCountSlider | dblclick | 1144 |
-| startNoteDownButton | click | 1150 |
-| startNoteUpButton | click | 1153 |
-| startNoteDownOctButton | click | 1159 |
-| startNoteUpOctButton | click | 1162 |
-| noteCountInput | dblclick | 1167 |
-| attackSlider | dblclick | 1175 |
-| decaySlider | dblclick | 1179 |
-| releaseSlider | dblclick | 1183 |
-| sustainSlider | dblclick | 1187 |
-| profileSearch | input | 1192 |
-| profileList | click | 1198 |
-| profileList | dblclick | 1203 |
-| profileList | keydown | 1206 |
-| profileApply | click | 1217 |
-| profileSave | click | 1223 |
-| instrumentPresetSearch | input | 1229 |
-| instrumentPresetList | click | 1235 |
-| instrumentPresetList | dblclick | 1240 |
-| instrumentPresetList | keydown | 1243 |
-| instrumentPresetApply | click | 1254 |
-| advancedTrigger | click | 1259 |
-| advancedPanel | click | 1268 |
-| pianoTrigger | click | 1273 |
-| pianoPanel | click | 1285 |
-| instrumentBrowserTrigger | click | 1291 |
-| instrumentBrowserPanel | click | 1304 |
-| pianoOptionsContainer | click | 1312 |
-| pianoOptionsContainer | keydown | 1326 |
-| pianoPreviewMain | click | 1337 |
-| testEnvelopeButton | click | 1344 |
-| keyboardEl | pointerdown | 1349 |
-| document | pointerup | 1385 |
-| document | pointercancel | 1392 |
-| keyboardEl | click | 1399 |
-| document | keydown | 1403 |
-| document | keyup | 1497 |
-| pedalBox | pointerdown | 1516 |
-| pedalBox | pointerup | 1525 |
-| pedalBox | pointercancel | 1534 |
-| pedalBox | pointerleave | 1542 |
+| volumeSlider | dblclick | 1147 |
+| lengthSlider | dblclick | 1151 |
+| keyCountSlider | dblclick | 1155 |
+| startNoteDownButton | click | 1161 |
+| startNoteUpButton | click | 1164 |
+| startNoteDownOctButton | click | 1170 |
+| startNoteUpOctButton | click | 1173 |
+| noteCountInput | dblclick | 1178 |
+| attackSlider | dblclick | 1186 |
+| decaySlider | dblclick | 1190 |
+| releaseSlider | dblclick | 1194 |
+| sustainSlider | dblclick | 1198 |
+| profileSearch | input | 1203 |
+| profileList | click | 1209 |
+| profileList | dblclick | 1214 |
+| profileList | keydown | 1217 |
+| profileApply | click | 1228 |
+| profileSave | click | 1234 |
+| instrumentPresetSearch | input | 1240 |
+| instrumentPresetList | click | 1246 |
+| instrumentPresetList | dblclick | 1251 |
+| instrumentPresetList | keydown | 1254 |
+| instrumentPresetApply | click | 1265 |
+| advancedTrigger | click | 1270 |
+| advancedPanel | click | 1279 |
+| pianoTrigger | click | 1284 |
+| pianoPanel | click | 1296 |
+| instrumentBrowserTrigger | click | 1302 |
+| instrumentBrowserPanel | click | 1315 |
+| pianoOptionsContainer | click | 1323 |
+| pianoOptionsContainer | keydown | 1337 |
+| pianoPreviewMain | click | 1348 |
+| testEnvelopeButton | click | 1355 |
+| keyboardEl | pointerdown | 1360 |
+| document | pointerup | 1396 |
+| document | pointercancel | 1403 |
+| document | pointerdown | 1410 |
+| document | click | 1414 |
+| keyboardEl | click | 1418 |
+| document | keydown | 1422 |
+| document | keyup | 1516 |
+| pedalBox | pointerdown | 1535 |
+| pedalBox | pointerup | 1544 |
+| pedalBox | pointercancel | 1553 |
+| pedalBox | pointerleave | 1561 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-1825
+File lines: 1-1839
 
 | Symbol | Lines |
 |---|---|
@@ -871,47 +876,47 @@ File lines: 1-1825
 | updatePrimaryAction | 798-803 |
 | updateReplayAvailability | 805-814 |
 | getChordHelperHints | 816-833 |
-| createDeterministicHelperMask | 843-865 |
-| renderChordHelperBox | 867-885 |
-| updateStatus | 887-992 |
-| updateKeyStates | 994-1033 |
-| setKeyboardEnabled | 1035-1038 |
-| updateKeyboardScale | 1040-1051 |
-| lockKeyboardForPlayback | 1053-1066 |
-| setSubmitted | 1068-1075 |
-| goHome | 1077-1126 |
-| refreshTarget | 1128-1149 |
-| startRound | 1151-1212 |
-| ensureRound | 1214-1223 |
-| playTarget | 1225-1239 |
-| startManualNote | 1241-1259 |
-| releaseManualNote | 1261-1269 |
-| releasePedalNotes | 1271-1281 |
-| startPedalHold | 1283-1289 |
-| stopPedalHold | 1291-1298 |
-| toggleSelection | 1300-1331 |
-| isSelectionCorrect | 1333-1350 |
-| getPlaybackSpan | 1352-1357 |
-| renderNotePills | 1359-1365 |
-| renderChordPill | 1367-1370 |
-| renderTonePills | 1372-1380 |
-| renderRevealCell | 1382-1385 |
-| renderChordRevealGrid | 1387-1390 |
-| renderChordDetectionMeta | 1392-1396 |
-| renderPressedPills | 1398-1403 |
-| buildNoteComparison | 1405-1412 |
-| renderNoteComparisonCells | 1414-1429 |
-| buildAnswerNoteCell | 1431-1439 |
-| getSubmittedReplaySnapshot | 1478-1492 |
-| playSubmittedReplaySequence | 1494-1507 |
-| playRevealSequence | 1509-1559 |
-| playSelectedChord | 1561-1584 |
-| playTypedInputChord | 1586-1599 |
-| startHeldPlayback | 1601-1627 |
-| releaseHeldPlayback | 1629-1643 |
-| buildTypingRevealDetail | 1645-1663 |
-| submitTypedAnswer | 1665-1738 |
-| submitAnswer | 1740-1801 |
+| createDeterministicHelperMask | 851-879 |
+| renderChordHelperBox | 881-899 |
+| updateStatus | 901-1006 |
+| updateKeyStates | 1008-1047 |
+| setKeyboardEnabled | 1049-1052 |
+| updateKeyboardScale | 1054-1065 |
+| lockKeyboardForPlayback | 1067-1080 |
+| setSubmitted | 1082-1089 |
+| goHome | 1091-1140 |
+| refreshTarget | 1142-1163 |
+| startRound | 1165-1226 |
+| ensureRound | 1228-1237 |
+| playTarget | 1239-1253 |
+| startManualNote | 1255-1273 |
+| releaseManualNote | 1275-1283 |
+| releasePedalNotes | 1285-1295 |
+| startPedalHold | 1297-1303 |
+| stopPedalHold | 1305-1312 |
+| toggleSelection | 1314-1345 |
+| isSelectionCorrect | 1347-1364 |
+| getPlaybackSpan | 1366-1371 |
+| renderNotePills | 1373-1379 |
+| renderChordPill | 1381-1384 |
+| renderTonePills | 1386-1394 |
+| renderRevealCell | 1396-1399 |
+| renderChordRevealGrid | 1401-1404 |
+| renderChordDetectionMeta | 1406-1410 |
+| renderPressedPills | 1412-1417 |
+| buildNoteComparison | 1419-1426 |
+| renderNoteComparisonCells | 1428-1443 |
+| buildAnswerNoteCell | 1445-1453 |
+| getSubmittedReplaySnapshot | 1492-1506 |
+| playSubmittedReplaySequence | 1508-1521 |
+| playRevealSequence | 1523-1573 |
+| playSelectedChord | 1575-1598 |
+| playTypedInputChord | 1600-1613 |
+| startHeldPlayback | 1615-1641 |
+| releaseHeldPlayback | 1643-1657 |
+| buildTypingRevealDetail | 1659-1677 |
+| submitTypedAnswer | 1679-1752 |
+| submitAnswer | 1754-1815 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1142

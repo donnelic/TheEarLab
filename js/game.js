@@ -840,8 +840,18 @@ const HELPER_MASK_LENGTHS = {
     [HELPER_LABELS.pitchSpan]: 14
 };
 
+const HELPER_MASK_PROFILES = {
+    [HELPER_LABELS.rootNote]: { length: 5, spacesAt: [] },
+    [HELPER_LABELS.chordSize]: { length: 11, spacesAt: [5] },
+    [HELPER_LABELS.chordType]: { length: 13, spacesAt: [6] },
+    [HELPER_LABELS.voicing]: { length: 14, spacesAt: [5, 10] },
+    [HELPER_LABELS.pitchSpan]: { length: 16, spacesAt: [7] }
+};
+
 const createDeterministicHelperMask = (label) => {
-    const baseLength = HELPER_MASK_LENGTHS[label] ?? 12;
+    const profile = HELPER_MASK_PROFILES[label] ?? null;
+    const baseLength = profile?.length ?? HELPER_MASK_LENGTHS[label] ?? 12;
+    const spacesAt = new Set((profile?.spacesAt ?? []).filter((value) => value > 0 && value < baseLength));
     const rootPc = Number.isFinite(state.targetChord?.rootPc) ? state.targetChord.rootPc : 0;
     const span = Number.isFinite(state.targetChord?.intervalSpan) ? state.targetChord.intervalSpan : 0;
     const seedSource = `${label}|${state.round}|${rootPc}|${span}|${state.targetChord?.qualityHint ?? ""}`;
@@ -855,6 +865,10 @@ const createDeterministicHelperMask = (label) => {
     const chars = "abcdefghijklmnopqrstuvwxyz";
     let out = "";
     for (let i = 0; i < baseLength; i += 1) {
+        if (spacesAt.has(i)) {
+            out += " ";
+            continue;
+        }
         seed ^= seed << 13;
         seed ^= seed >>> 17;
         seed ^= seed << 5;

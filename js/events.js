@@ -1125,6 +1125,17 @@ const triggerPrimaryAction = () => {
     }
 };
 
+let pointerActivatedControl = null;
+const getButtonLikeTarget = (target) => target?.closest?.("button,[role=\"button\"],a[href]") ?? null;
+const blurPointerActivatedControl = () => {
+    if (!pointerActivatedControl) return;
+    const control = pointerActivatedControl;
+    pointerActivatedControl = null;
+    if (document.activeElement === control && typeof control.blur === "function") {
+        control.blur();
+    }
+};
+
 const triggerReplayAction = (event) => {
     if (updateReplayAvailability()) {
         if (!event.repeat && !holdState.active) {
@@ -1395,6 +1406,14 @@ document.addEventListener("pointercancel", (event) => {
     releaseManualNote(noteId);
     pointerActiveNotes.delete(event.pointerId);
 });
+
+document.addEventListener("pointerdown", (event) => {
+    pointerActivatedControl = getButtonLikeTarget(event.target);
+}, true);
+
+document.addEventListener("click", () => {
+    requestAnimationFrame(blurPointerActivatedControl);
+}, true);
 
 keyboardEl.addEventListener("click", (event) => {
     event.preventDefault();
