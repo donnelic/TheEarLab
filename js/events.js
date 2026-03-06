@@ -1061,16 +1061,16 @@ if (chordTutorialQualityList) {
     });
 }
 
-const MODE_POLICY = App.modePolicy || {};
-const ACTION_COPY = App.uiCopy?.actions || {};
-const isTypingEnabled = () => MODE_POLICY.isTypingEnabledFromState
-    ? MODE_POLICY.isTypingEnabledFromState(state)
+const EVENTS_MODE_POLICY = App.modePolicy || {};
+const EVENTS_ACTION_COPY = App.uiCopy?.actions || {};
+const isTypingEnabled = () => EVENTS_MODE_POLICY.isTypingEnabledFromState
+    ? EVENTS_MODE_POLICY.isTypingEnabledFromState(state)
     : (state.trainingMode === "type" || state.trainingMode === "both");
-const isTypingOnlyMode = () => MODE_POLICY.isTypingOnlyModeFromState
-    ? MODE_POLICY.isTypingOnlyModeFromState(state)
+const isTypingOnlyMode = () => EVENTS_MODE_POLICY.isTypingOnlyModeFromState
+    ? EVENTS_MODE_POLICY.isTypingOnlyModeFromState(state)
     : state.trainingMode === "type";
-const getIsChordRound = () => MODE_POLICY.getIsChordRoundFromState
-    ? MODE_POLICY.getIsChordRoundFromState(state)
+const getIsChordRound = () => EVENTS_MODE_POLICY.getIsChordRoundFromState
+    ? EVENTS_MODE_POLICY.getIsChordRoundFromState(state)
     : (isTypingEnabled() || state.chordMode);
 
 const isChordTypingCaptureActive = () => {
@@ -1422,7 +1422,7 @@ document.addEventListener("keydown", (event) => {
         event.preventDefault();
         triggerReplayAction(event);
         if (!holdState.active) {
-            resultEl.textContent = ACTION_COPY.typeOrSelectFirst || "Type a valid chord or select notes first.";
+            resultEl.textContent = EVENTS_ACTION_COPY.typeOrSelectFirst || "Type a valid chord or select notes first.";
         }
         return;
     }

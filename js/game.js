@@ -112,15 +112,15 @@ const recentChordTargets = [];
 let typingAutoNextTimer = null;
 let roundStartInProgress = false;
 let roundStartToken = 0;
-const MODE_POLICY = App.modePolicy || {};
-const UI_COPY = App.uiCopy || {};
-const CHORD_READOUT_COPY = UI_COPY.chordReadout || {};
-const PROMPT_COPY = UI_COPY.prompts || {};
-const MODE_COPY = UI_COPY.modes || {};
-const ACTION_COPY = UI_COPY.actions || {};
-const FEEDBACK_COPY = UI_COPY.feedback || {};
-const REVEAL_COPY = UI_COPY.reveal || {};
-const HELPER_COPY = UI_COPY.helpers || {};
+const GAME_MODE_POLICY = App.modePolicy || {};
+const GAME_UI_COPY = App.uiCopy || {};
+const CHORD_READOUT_COPY = GAME_UI_COPY.chordReadout || {};
+const PROMPT_COPY = GAME_UI_COPY.prompts || {};
+const MODE_COPY = GAME_UI_COPY.modes || {};
+const ACTION_COPY = GAME_UI_COPY.actions || {};
+const FEEDBACK_COPY = GAME_UI_COPY.feedback || {};
+const REVEAL_COPY = GAME_UI_COPY.reveal || {};
+const HELPER_COPY = GAME_UI_COPY.helpers || {};
 const HELPER_LABELS = {
     chordSize: HELPER_COPY.chordSize || "Chord size",
     chordType: HELPER_COPY.chordType || "Chord type",
@@ -158,17 +158,17 @@ CHORD_QUALITIES.forEach((quality) => {
     }
 });
 
-const isTypingEnabled = () => MODE_POLICY.isTypingEnabledFromState
-    ? MODE_POLICY.isTypingEnabledFromState(state)
+const isTypingEnabled = () => GAME_MODE_POLICY.isTypingEnabledFromState
+    ? GAME_MODE_POLICY.isTypingEnabledFromState(state)
     : (state.trainingMode === "type" || state.trainingMode === "both");
-const isTypingOnlyMode = () => MODE_POLICY.isTypingOnlyModeFromState
-    ? MODE_POLICY.isTypingOnlyModeFromState(state)
+const isTypingOnlyMode = () => GAME_MODE_POLICY.isTypingOnlyModeFromState
+    ? GAME_MODE_POLICY.isTypingOnlyModeFromState(state)
     : state.trainingMode === "type";
-const getIsChordRound = () => MODE_POLICY.getIsChordRoundFromState
-    ? MODE_POLICY.getIsChordRoundFromState(state)
+const getIsChordRound = () => GAME_MODE_POLICY.getIsChordRoundFromState
+    ? GAME_MODE_POLICY.getIsChordRoundFromState(state)
     : (isTypingEnabled() || state.chordMode);
-const getEffectiveBlindMode = () => MODE_POLICY.getEffectiveBlindModeFromState
-    ? MODE_POLICY.getEffectiveBlindModeFromState(state)
+const getEffectiveBlindMode = () => GAME_MODE_POLICY.getEffectiveBlindModeFromState
+    ? GAME_MODE_POLICY.getEffectiveBlindModeFromState(state)
     : state.blindMode;
 const getKeyboardZoneEl = () => document.querySelector(".keyboard-zone");
 const normalizePitchClass = (value) => ((Math.round(value) % 12) + 12) % 12;

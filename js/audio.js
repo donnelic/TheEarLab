@@ -3,20 +3,20 @@ App.audio = App.audio || {};
 
 const ABORT_RELEASE_RATE = 28;
 const MIN_ENVELOPE_GAIN = 0.0001;
-const ENVELOPE_API = App.envelope || {};
-const DEFAULT_SOUNDFONT_ENVELOPE = ENVELOPE_API.DEFAULT_SOUNDFONT_ENVELOPE || {
+const AUDIO_ENVELOPE_API = App.envelope || {};
+const AUDIO_DEFAULT_SOUNDFONT_ENVELOPE = AUDIO_ENVELOPE_API.DEFAULT_SOUNDFONT_ENVELOPE || {
     attack: 0.016,
     decay: 0.95,
     sustain: 0.75,
     release: 1.2
 };
-const ADSR_TRIM_STRENGTH = ENVELOPE_API.ADSR_TRIM_STRENGTH || {
+const AUDIO_ADSR_TRIM_STRENGTH = AUDIO_ENVELOPE_API.ADSR_TRIM_STRENGTH || {
     attack: 0.55,
     decay: 0.55,
     release: 0.6,
     length: 0.6
 };
-const DEFAULT_VELOCITY_CURVE = ENVELOPE_API.DEFAULT_VELOCITY_CURVE || 1.6;
+const AUDIO_DEFAULT_VELOCITY_CURVE = AUDIO_ENVELOPE_API.DEFAULT_VELOCITY_CURVE || 1.6;
 const SF2_CHANNEL = 0;
 const SF2_ATTACK_GEN = 34;
 const SF2_DECAY_GEN = 36;
@@ -64,7 +64,7 @@ const releaseRateToSeconds = (releaseRate) => Math.max(0.03, 0.8 / Math.max(1, r
 const getBaseAdsrForProgram = (program = 0) => {
     const normalized = clampValue(Math.round(program), 0, 127);
     const matched = GM_PROGRAM_ENVELOPES.find((entry) => normalized >= entry.min && normalized <= entry.max);
-    if (!matched) return { ...DEFAULT_SOUNDFONT_ENVELOPE };
+    if (!matched) return { ...AUDIO_DEFAULT_SOUNDFONT_ENVELOPE };
     return { ...matched.adsr };
 };
 const slugify = (value) =>
@@ -236,12 +236,12 @@ const normalizeSoundfontConfig = (config, configPath) => {
         description: String(config.description ?? config.desc ?? ""),
         source: "external",
         baseAdsr: {
-            attack: Number.isFinite(config.baseAdsr?.attack) ? config.baseAdsr.attack : DEFAULT_SOUNDFONT_ENVELOPE.attack,
-            decay: Number.isFinite(config.baseAdsr?.decay) ? config.baseAdsr.decay : DEFAULT_SOUNDFONT_ENVELOPE.decay,
-            sustain: Number.isFinite(config.baseAdsr?.sustain) ? config.baseAdsr.sustain : DEFAULT_SOUNDFONT_ENVELOPE.sustain,
-            release: Number.isFinite(config.baseAdsr?.release) ? config.baseAdsr.release : DEFAULT_SOUNDFONT_ENVELOPE.release
+            attack: Number.isFinite(config.baseAdsr?.attack) ? config.baseAdsr.attack : AUDIO_DEFAULT_SOUNDFONT_ENVELOPE.attack,
+            decay: Number.isFinite(config.baseAdsr?.decay) ? config.baseAdsr.decay : AUDIO_DEFAULT_SOUNDFONT_ENVELOPE.decay,
+            sustain: Number.isFinite(config.baseAdsr?.sustain) ? config.baseAdsr.sustain : AUDIO_DEFAULT_SOUNDFONT_ENVELOPE.sustain,
+            release: Number.isFinite(config.baseAdsr?.release) ? config.baseAdsr.release : AUDIO_DEFAULT_SOUNDFONT_ENVELOPE.release
         },
-        velocityCurve: Number.isFinite(config.velocityCurve) ? config.velocityCurve : DEFAULT_VELOCITY_CURVE,
+        velocityCurve: Number.isFinite(config.velocityCurve) ? config.velocityCurve : AUDIO_DEFAULT_VELOCITY_CURVE,
         volume: Number.isFinite(config.volume) ? config.volume : 1,
         samples
     };
@@ -843,10 +843,10 @@ const abortPlayback = (excludeIds = []) => {
 };
 
 const getSoundfontEnvelope = (soundfont, requestedDuration) => {
-    const base = soundfont.baseAdsr ?? DEFAULT_SOUNDFONT_ENVELOPE;
+    const base = soundfont.baseAdsr ?? AUDIO_DEFAULT_SOUNDFONT_ENVELOPE;
     const trim = state.adsrTrim ?? DEFAULTS.adsrTrim;
-    if (typeof ENVELOPE_API.resolveEnvelopeMetrics === "function") {
-        return ENVELOPE_API.resolveEnvelopeMetrics({
+    if (typeof AUDIO_ENVELOPE_API.resolveEnvelopeMetrics === "function") {
+        return AUDIO_ENVELOPE_API.resolveEnvelopeMetrics({
             baseEnvelope: base,
             trim,
             requestedDuration
@@ -980,14 +980,14 @@ const applySf2TrimGenerators = (synth) => {
 };
 
 const getSf2NoteDuration = (requestedDuration) => {
-    if (typeof ENVELOPE_API.resolveEnvelopeMetrics === "function") {
-        return ENVELOPE_API.resolveEnvelopeMetrics({
+    if (typeof AUDIO_ENVELOPE_API.resolveEnvelopeMetrics === "function") {
+        return AUDIO_ENVELOPE_API.resolveEnvelopeMetrics({
             trim: state.adsrTrim ?? DEFAULTS.adsrTrim,
             requestedDuration
         }).holdDuration;
     }
     const trim = state.adsrTrim ?? DEFAULTS.adsrTrim;
-    const lengthMul = 1 + trim.length * ADSR_TRIM_STRENGTH.length;
+    const lengthMul = 1 + trim.length * AUDIO_ADSR_TRIM_STRENGTH.length;
     return clampValue(requestedDuration * lengthMul, 0.06, 8);
 };
 
@@ -1108,7 +1108,7 @@ const scheduleSf2Note = (cacheEntry, soundfont, midi, startTime, duration, volum
     synth.midiProgramSelect(SF2_CHANNEL, cacheEntry.sfontId, cacheEntry.bank, cacheEntry.program);
     applySf2TrimGenerators(synth);
 
-    const velocityCurve = Number.isFinite(soundfont.velocityCurve) ? soundfont.velocityCurve : DEFAULT_VELOCITY_CURVE;
+    const velocityCurve = Number.isFinite(soundfont.velocityCurve) ? soundfont.velocityCurve : AUDIO_DEFAULT_VELOCITY_CURVE;
     const volumeScale = Number.isFinite(soundfont.volume) ? soundfont.volume : 1;
     const velocity = clampValue(
         Math.round(Math.pow(clampValue(volume, 0, 1), velocityCurve) * volumeScale * 127),
@@ -1190,7 +1190,7 @@ const playPianoNote = (
         source.playbackRate.value = Math.pow(2, (targetMidi - sample.midi) / 12);
 
         const gainNode = ctx.createGain();
-        const velocityCurve = Number.isFinite(soundfont.velocityCurve) ? soundfont.velocityCurve : DEFAULT_VELOCITY_CURVE;
+        const velocityCurve = Number.isFinite(soundfont.velocityCurve) ? soundfont.velocityCurve : AUDIO_DEFAULT_VELOCITY_CURVE;
         const volumeScale = Number.isFinite(soundfont.volume) ? soundfont.volume : 1;
         const peakLevel = Math.max(MIN_ENVELOPE_GAIN, Math.pow(clampValue(volume, 0, 1), velocityCurve) * volumeScale);
 

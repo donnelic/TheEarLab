@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-06 08:53:19 +01:00
+Generated: 2026-03-06 09:01:07 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -159,13 +159,13 @@ File: index.html (1-478)
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306084111 | 469 |
-| 2 | vendor/js-synthesizer.min.js?v=20260306084111 | 470 |
-| 3 | js/core.js?v=20260306084111 | 471 |
-| 4 | js/audio.js?v=20260306084111 | 472 |
-| 5 | js/game.js?v=20260306084111 | 473 |
-| 6 | js/settings.js?v=20260306084111 | 474 |
-| 7 | js/events.js?v=20260306084111 | 475 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306085320 | 469 |
+| 2 | vendor/js-synthesizer.min.js?v=20260306085320 | 470 |
+| 3 | js/core.js?v=20260306085320 | 471 |
+| 4 | js/audio.js?v=20260306085320 | 472 |
+| 5 | js/game.js?v=20260306085320 | 473 |
+| 6 | js/settings.js?v=20260306085320 | 474 |
+| 7 | js/events.js?v=20260306085320 | 475 |
 
 ## styles.css Map
 File: styles.css (1-2780)

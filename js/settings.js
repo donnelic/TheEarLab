@@ -1,11 +1,11 @@
 var App = window.App || (window.App = {});
 App.settings = App.settings || {};
 
-const MODE_POLICY = App.modePolicy || {};
-const ENVELOPE_API = App.envelope || {};
-const UI_COPY = App.uiCopy || {};
-const BROWSER_COPY = UI_COPY.browsers || {};
-const ENVELOPE_DEFAULTS = ENVELOPE_API.DEFAULT_SOUNDFONT_ENVELOPE || { attack: 0.016, decay: 0.95, sustain: 0.75, release: 1.2 };
+const SETTINGS_MODE_POLICY = App.modePolicy || {};
+const SETTINGS_ENVELOPE_API = App.envelope || {};
+const SETTINGS_UI_COPY = App.uiCopy || {};
+const BROWSER_COPY = SETTINGS_UI_COPY.browsers || {};
+const ENVELOPE_DEFAULTS = SETTINGS_ENVELOPE_API.DEFAULT_SOUNDFONT_ENVELOPE || { attack: 0.016, decay: 0.95, sustain: 0.75, release: 1.2 };
 const PROFILE_EPSILON = 0.0001;
 
 const GM_FAMILY_RANGES = [
@@ -110,8 +110,8 @@ const getTonePreset = (toneId = state.pianoTone) =>
 
 const getBaseEnvelope = (toneId = state.pianoTone) => {
     const preset = getTonePreset(toneId);
-    if (typeof ENVELOPE_API.normalizeEnvelopeBase === "function") {
-        return ENVELOPE_API.normalizeEnvelopeBase(preset?.baseAdsr ?? ENVELOPE_DEFAULTS);
+    if (typeof SETTINGS_ENVELOPE_API.normalizeEnvelopeBase === "function") {
+        return SETTINGS_ENVELOPE_API.normalizeEnvelopeBase(preset?.baseAdsr ?? ENVELOPE_DEFAULTS);
     }
     const base = preset?.baseAdsr ?? ENVELOPE_DEFAULTS;
     return {
@@ -125,8 +125,8 @@ const getBaseEnvelope = (toneId = state.pianoTone) => {
 const resolveEnvelopeMetrics = (trim, toneId = state.pianoTone, requestedDuration = state.noteDuration) => {
     const normalized = cloneTrim(trim);
     const base = getBaseEnvelope(toneId);
-    if (typeof ENVELOPE_API.resolveEnvelopeMetrics === "function") {
-        return ENVELOPE_API.resolveEnvelopeMetrics({
+    if (typeof SETTINGS_ENVELOPE_API.resolveEnvelopeMetrics === "function") {
+        return SETTINGS_ENVELOPE_API.resolveEnvelopeMetrics({
             baseEnvelope: base,
             trim: normalized,
             requestedDuration
@@ -724,11 +724,11 @@ const setKeyCountVisual = (value) => {
     keyCountSlider.value = String(clamped);
 };
 
-const getEffectivePracticeMode = () => MODE_POLICY.getEffectivePracticeModeFromState
-    ? MODE_POLICY.getEffectivePracticeModeFromState(state)
+const getEffectivePracticeMode = () => SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState
+    ? SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState(state)
     : "random";
-const isTypingEnabled = () => MODE_POLICY.isTypingEnabledFromState
-    ? MODE_POLICY.isTypingEnabledFromState(state)
+const isTypingEnabled = () => SETTINGS_MODE_POLICY.isTypingEnabledFromState
+    ? SETTINGS_MODE_POLICY.isTypingEnabledFromState(state)
     : (state.trainingMode === "type" || state.trainingMode === "both");
 
 const refreshOptionsModeVisibility = () => {
