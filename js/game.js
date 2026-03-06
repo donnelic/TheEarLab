@@ -1455,6 +1455,36 @@ const buildChordRevealEntries = ({
     return entries;
 };
 
+const getSubmittedReplaySnapshot = () => {
+    const snapshot = lastReveal ?? {
+        target: [...state.targetNotes],
+        selected: [...(state.submittedComparisonNotes?.length ? state.submittedComparisonNotes : state.selectedNotes)]
+    };
+    const targetNotes = snapshot.target ?? [];
+    const answerNotes = snapshot.selected ?? [];
+    const comparison = buildNoteComparison(targetNotes, answerNotes);
+    return {
+        target: [...targetNotes],
+        selected: [...comparison.wrong],
+        isCorrect: comparison.wrong.length === 0
+    };
+};
+
+const playSubmittedReplaySequence = (delay = 0) => {
+    const snapshot = getSubmittedReplaySnapshot();
+    if (!snapshot.target.length) {
+        resultEl.textContent = ACTION_COPY.noReplayNotes || "No notes available to replay.";
+        return;
+    }
+    abortPlayback();
+    playRevealSequence({
+        delay,
+        snapshot,
+        isCorrect: snapshot.isCorrect,
+        alwaysPlaySelected: snapshot.selected.length > 0
+    });
+};
+
 const playRevealSequence = (options = {}) => {
     if (!state.active || !state.targetNotes.length) {
         return;
@@ -1519,8 +1549,7 @@ const playSelectedChord = () => {
         return;
     }
     if (state.submitted) {
-        abortPlayback();
-        playRevealSequence({ delay: 0, snapshot: lastReveal });
+        playSubmittedReplaySequence(0);
         return;
     }
     if (!state.selectedNotes.length) {
@@ -1552,28 +1581,7 @@ const startHeldPlayback = () => {
     if (!state.active) return;
     if (getEffectiveBlindMode() && !state.submitted) return;
     if (state.submitted) {
-        const replayNotes = (lastReveal?.selected?.length
-            ? [...lastReveal.selected]
-            : (state.selectedNotes.length ? [...state.selectedNotes] : [...state.targetNotes]));
-        if (!replayNotes.length) {
-            resultEl.textContent = ACTION_COPY.noReplayNotes || "No notes available to replay.";
-            return;
-        }
-        if (revealPlaying) {
-            abortPlayback();
-        }
-        const session = beginInteractivePressSession({
-            noteIds: replayNotes,
-            mode: state.mode,
-            behavior: PRESS_BEHAVIOR.MIN_LENGTH_OR_HELD
-        });
-        if (!session) return;
-        holdState.active = true;
-        holdState.holding = session.holding;
-        holdState.pressAt = session.pressAt;
-        holdState.stopAt = session.stopAt;
-        holdState.holdTimer = session.holdTimer;
-        holdState.noteIds = session.noteIds;
+        playSubmittedReplaySequence(0);
         return;
     }
     const replay = getReplayNoteIds();

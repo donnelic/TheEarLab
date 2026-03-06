@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-06 09:08:42 +01:00
+Generated: 2026-03-06 09:13:56 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -37,11 +37,11 @@ Generated: 2026-03-06 09:08:42 +01:00
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1526 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 991 |
 | js/events.js | JavaScript | Browser runtime module | Yes | 1588 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 1796 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 1804 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1125 |
 | README.md | Markdown | Human + AI onboarding | Yes | 109 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 34 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 984 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 988 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 500 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
 | soundfonts/index.json | JSON | Soundfont asset | Yes | 3 |
@@ -159,13 +159,13 @@ File: index.html (1-478)
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306090553 | 469 |
-| 2 | vendor/js-synthesizer.min.js?v=20260306090553 | 470 |
-| 3 | js/core.js?v=20260306090553 | 471 |
-| 4 | js/audio.js?v=20260306090553 | 472 |
-| 5 | js/game.js?v=20260306090553 | 473 |
-| 6 | js/settings.js?v=20260306090553 | 474 |
-| 7 | js/events.js?v=20260306090553 | 475 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260306090844 | 469 |
+| 2 | vendor/js-synthesizer.min.js?v=20260306090844 | 470 |
+| 3 | js/core.js?v=20260306090844 | 471 |
+| 4 | js/audio.js?v=20260306090844 | 472 |
+| 5 | js/game.js?v=20260306090844 | 473 |
+| 6 | js/settings.js?v=20260306090844 | 474 |
+| 7 | js/events.js?v=20260306090844 | 475 |
 
 ## styles.css Map
 File: styles.css (1-2780)
@@ -828,7 +828,7 @@ Event bindings:
 | pedalBox | pointerleave | 1534 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-1796
+File lines: 1-1804
 
 | Symbol | Lines |
 |---|---|
@@ -900,14 +900,16 @@ File lines: 1-1796
 | buildNoteComparison | 1385-1392 |
 | renderNoteComparisonCells | 1394-1409 |
 | buildAnswerNoteCell | 1411-1419 |
-| playRevealSequence | 1458-1508 |
-| playSelectedChord | 1510-1534 |
-| playTypedInputChord | 1536-1549 |
-| startHeldPlayback | 1551-1598 |
-| releaseHeldPlayback | 1600-1614 |
-| buildTypingRevealDetail | 1616-1634 |
-| submitTypedAnswer | 1636-1709 |
-| submitAnswer | 1711-1772 |
+| getSubmittedReplaySnapshot | 1458-1471 |
+| playSubmittedReplaySequence | 1473-1486 |
+| playRevealSequence | 1488-1538 |
+| playSelectedChord | 1540-1563 |
+| playTypedInputChord | 1565-1578 |
+| startHeldPlayback | 1580-1606 |
+| releaseHeldPlayback | 1608-1622 |
+| buildTypingRevealDetail | 1624-1642 |
+| submitTypedAnswer | 1644-1717 |
+| submitAnswer | 1719-1780 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1125
