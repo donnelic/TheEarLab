@@ -126,6 +126,10 @@ const HELPER_LABELS = {
     voicing: HELPER_COPY.voicing || "Voicing",
     pitchSpan: HELPER_COPY.pitchSpan || "Pitch span"
 };
+const PRESS_BEHAVIOR = {
+    MIN_LENGTH_OR_HELD: "min-length-or-held",
+    HOLD_WHILE_PRESSED: "hold-while-pressed"
+};
 
 const normalizeQualityToken = (value) => {
     return String(value ?? "")
@@ -195,6 +199,131 @@ const getAllowedChordQualities = (difficulty = state.chordDifficulty) => {
 const getChordQualityHint = (qualityId) => {
     if (!qualityId) return "unknown quality";
     return CHORD_QUALITY_HINTS[qualityId] ?? qualityId;
+};
+
+const getInteractivePressBehavior = () => (
+    state.active
+        ? PRESS_BEHAVIOR.MIN_LENGTH_OR_HELD
+        : PRESS_BEHAVIOR.HOLD_WHILE_PRESSED
+);
+
+const getConsistentPreviewDuration = (minimumDuration = 0) => {
+    const safeMinimum = Number.isFinite(minimumDuration) ? minimumDuration : 0;
+    return Math.max(safeMinimum, state.noteDuration);
+};
+
+const getConsistentAnimationHoldMs = (durationSeconds = state.noteDuration) => (
+    Math.max(MIN_KEY_ANIM_MS, durationSeconds * 1000)
+);
+
+const playConsistentPreview = (noteIds, mode = "simultaneous", options = {}) => {
+    if (!noteIds?.length) return 0;
+    const {
+        minimumDuration = 0,
+        animate = true,
+        animationHoldMs,
+        startTime,
+        ...passThrough
+    } = options;
+    const durationOverride = Number.isFinite(passThrough.durationOverride)
+        ? Math.max(minimumDuration, passThrough.durationOverride)
+        : getConsistentPreviewDuration(minimumDuration);
+    return playNotes(noteIds, mode, startTime, {
+        ...passThrough,
+        animate,
+        durationOverride,
+        ...(animate ? { animationHoldMs: animationHoldMs ?? getConsistentAnimationHoldMs(durationOverride) } : {})
+    });
+};
+
+const beginInteractivePressSession = ({
+    noteIds,
+    mode = "simultaneous",
+    playSound = true,
+    behavior = getInteractivePressBehavior(),
+    preset,
+    startDelaySeconds = KEY_PRESS_DELAY
+} = {}) => {
+    const ids = Array.isArray(noteIds) ? [...noteIds] : [];
+    if (!ids.length) return null;
+    const now = performance.now();
+    if (playSound) {
+        const ctx = ensureAudio();
+        playNotes(ids, mode, ctx.currentTime + startDelaySeconds, {
+            animate: false,
+            durationOverride: state.noteDuration + HOLD_MAX_EXTRA,
+            preset
+        });
+    }
+    ids.forEach((noteId) => activateKey(noteId));
+    const entry = {
+        noteIds: ids,
+        pressAt: now,
+        stopAt: now + state.noteDuration * 1000,
+        playSound,
+        behavior,
+        holdTimer: null,
+        holding: false
+    };
+    entry.holdTimer = setTimeout(() => {
+        entry.holding = true;
+    }, HOLD_THRESHOLD * 1000);
+    return entry;
+};
+
+const releaseInteractivePressSession = (entry, options = {}) => {
+    if (!entry) return;
+    const { pedalAware = false, pedalNoteId = null } = options;
+    if (entry.holdTimer) {
+        clearTimeout(entry.holdTimer);
+        entry.holdTimer = null;
+    }
+    const now = performance.now();
+    const remainingMs = entry.behavior === PRESS_BEHAVIOR.HOLD_WHILE_PRESSED
+        ? 0
+        : Math.max(0, entry.stopAt - now);
+    const elapsedMs = Math.max(0, now - entry.pressAt);
+    const animDelayMs = state.active ? Math.max(0, MIN_KEY_ANIM_MS - elapsedMs) : SHORT_PRESS_ANIM_MS;
+
+    if (pedalAware && pedalState.active && pedalNoteId) {
+        pedalState.pending.add(pedalNoteId);
+        scheduleKeyRelease(pedalNoteId, animDelayMs);
+        return;
+    }
+
+    entry.noteIds.forEach((noteId) => {
+        scheduleKeyRelease(noteId, animDelayMs);
+    });
+    if (entry.playSound && audioContext && entry.noteIds.length) {
+        setTimeout(() => {
+            stopNotesById(entry.noteIds);
+        }, remainingMs);
+    }
+};
+
+const getReplayNoteIds = () => {
+    if (isTypingEnabled()) {
+        const parsed = updateTypedPreviewFromInput();
+        if (parsed) {
+            const typedNoteIds = getTypedPreviewNoteIds(parsed);
+            if (typedNoteIds.length) {
+                return {
+                    noteIds: typedNoteIds,
+                    mode: "simultaneous",
+                    source: "typed",
+                    label: parsed.label
+                };
+            }
+        }
+    }
+    if (state.selectedNotes.length) {
+        return {
+            noteIds: [...state.selectedNotes],
+            mode: state.mode,
+            source: "selected"
+        };
+    }
+    return null;
 };
 
 const getVoicingHintLabel = (voicing) => {
@@ -1041,7 +1170,10 @@ const startRound = async (shouldPlay = false) => {
         if (!isTypingOnlyMode()) {
             lockKeyboardForPlayback(state.targetNotes, state.mode);
         }
-        playNotes(state.targetNotes, state.mode, ctx.currentTime + ROUND_START_DELAY, { animate: false });
+        playConsistentPreview(state.targetNotes, state.mode, {
+            startTime: ctx.currentTime + ROUND_START_DELAY,
+            animate: false
+        });
         if (token === roundStartToken) {
             roundStartInProgress = false;
         }
@@ -1071,9 +1203,9 @@ const playTarget = () => {
     if (!isTypingOnlyMode()) {
         lockKeyboardForPlayback(state.targetNotes, state.mode);
     }
-    playNotes(state.targetNotes, state.mode, undefined, {
+    playConsistentPreview(state.targetNotes, state.mode, {
         animate: state.submitted,
-        animationHoldMs: ROUND_ANIM_HOLD_MS
+        animationHoldMs: state.submitted ? getConsistentAnimationHoldMs() : undefined
     });
 };
 
@@ -1083,59 +1215,27 @@ const startManualNote = (noteId, options = {}) => {
     if (!key) return;
     if (manualNoteState.has(noteId)) return;
 
-    activateKey(noteId);
-
-    const now = performance.now();
-    const durationMs = state.noteDuration * 1000;
-    if (playSound) {
-        const ctx = ensureAudio();
-        const durationOverride = state.noteDuration + HOLD_MAX_EXTRA;
-        playNotes([noteId], "simultaneous", ctx.currentTime, {
-            animate: false,
-            durationOverride
-        });
-    } else if (getEffectiveBlindMode() && state.active && !state.submitted) {
+    if (!playSound && getEffectiveBlindMode() && state.active && !state.submitted) {
         resultEl.textContent = "Blind mode: notes are muted while selecting.";
     }
-    const entry = {
-        pressAt: now,
-        stopAt: now + durationMs,
+    const entry = beginInteractivePressSession({
+        noteIds: [noteId],
+        mode: "simultaneous",
         playSound,
-        holdTimer: null
-    };
-    entry.holdTimer = setTimeout(() => {
-        entry.held = true;
-    }, HOLD_THRESHOLD * 1000);
+        behavior: getInteractivePressBehavior(),
+        startDelaySeconds: 0
+    });
+    if (!entry) return;
     manualNoteState.set(noteId, entry);
 };
 
 const releaseManualNote = (noteId) => {
     const entry = manualNoteState.get(noteId);
     if (!entry) return;
-    if (entry.holdTimer) {
-        clearTimeout(entry.holdTimer);
-        entry.holdTimer = null;
-    }
-    const now = performance.now();
-    const remainingMs = Math.max(0, entry.stopAt - now);
-    const elapsedMs = Math.max(0, now - entry.pressAt);
-    const animDelayMs = state.active ? Math.max(0, MIN_KEY_ANIM_MS - elapsedMs) : SHORT_PRESS_ANIM_MS;
-
-    const key = keyMap.get(noteId);
-    if (pedalState.active) {
-        pedalState.pending.add(noteId);
-        scheduleKeyRelease(noteId, animDelayMs);
-        manualNoteState.delete(noteId);
-        return;
-    }
-    const releaseDelayMs = remainingMs > 0 ? remainingMs : 0;
-    scheduleKeyRelease(noteId, animDelayMs);
-    if (entry.playSound && audioContext) {
-        setTimeout(() => {
-            stopNotesById([noteId]);
-        }, releaseDelayMs);
-    }
-
+    releaseInteractivePressSession(entry, {
+        pedalAware: true,
+        pedalNoteId: noteId
+    });
     manualNoteState.delete(noteId);
 };
 
@@ -1325,10 +1425,9 @@ const playRevealSequence = (options = {}) => {
 
     const playTargetTimer = setTimeout(() => {
         if (seqId !== revealSequenceId) return;
-        playNotes(targetNotes, state.mode, undefined, {
+        playConsistentPreview(targetNotes, state.mode, {
             animate: true,
-            animationDelay: 0,
-            animationHoldMs: ROUND_ANIM_HOLD_MS
+            animationDelay: 0
         });
     }, revealDelayMs);
     revealTimers.push(playTargetTimer);
@@ -1336,10 +1435,9 @@ const playRevealSequence = (options = {}) => {
     if (playSelectedAfterTarget && selectedNotes.length) {
         const playSelectedTimer = setTimeout(() => {
             if (seqId !== revealSequenceId) return;
-            playNotes(selectedNotes, state.mode, undefined, {
+            playConsistentPreview(selectedNotes, state.mode, {
                 animate: true,
-                animationDelay: 0,
-                animationHoldMs: ROUND_ANIM_HOLD_MS
+                animationDelay: 0
             });
         }, revealDelayMs + targetSpanMs);
         revealTimers.push(playSelectedTimer);
@@ -1373,10 +1471,9 @@ const playSelectedChord = () => {
         resultEl.textContent = ACTION_COPY.selectNotesFirst || "Select some notes first.";
         return;
     }
-    playNotes(state.selectedNotes, state.mode, undefined, {
+    playConsistentPreview(state.selectedNotes, state.mode, {
         animate: true,
-        animationDelay: 0,
-        animationHoldMs: ROUND_ANIM_HOLD_MS
+        animationDelay: 0
     });
 };
 
@@ -1387,10 +1484,9 @@ const playTypedInputChord = () => {
     if (!parsed) return false;
     const noteIds = getTypedPreviewNoteIds(parsed);
     if (!noteIds.length) return false;
-    playNotes(noteIds, "simultaneous", undefined, {
+    playConsistentPreview(noteIds, "simultaneous", {
         animate: true,
-        animationDelay: 0,
-        animationHoldMs: ROUND_ANIM_HOLD_MS
+        animationDelay: 0
     });
     resultEl.textContent = ACTION_COPY.previewChord?.(parsed.label) ?? `Preview: ${parsed.label}`;
     return true;
@@ -1399,12 +1495,6 @@ const playTypedInputChord = () => {
 const startHeldPlayback = () => {
     if (!state.active) return;
     if (getEffectiveBlindMode() && !state.submitted) return;
-    if (isTypingOnlyMode()) {
-        if (!playTypedInputChord()) {
-            resultEl.textContent = ACTION_COPY.typeValidChordFirst || "Type a valid chord first.";
-        }
-        return;
-    }
     if (state.submitted) {
         const replayNotes = (lastReveal?.selected?.length
             ? [...lastReveal.selected]
@@ -1416,80 +1506,54 @@ const startHeldPlayback = () => {
         if (revealPlaying) {
             abortPlayback();
         }
-        const ctx = ensureAudio();
-        const durationOverride = state.noteDuration + HOLD_MAX_EXTRA;
-        playNotes(replayNotes, state.mode, ctx.currentTime + KEY_PRESS_DELAY, {
-            animate: false,
-            durationOverride
+        const session = beginInteractivePressSession({
+            noteIds: replayNotes,
+            mode: state.mode,
+            behavior: PRESS_BEHAVIOR.MIN_LENGTH_OR_HELD
         });
-        replayNotes.forEach((noteId) => {
-            activateKey(noteId);
-        });
+        if (!session) return;
         holdState.active = true;
-        holdState.holding = false;
-        holdState.pressAt = performance.now();
-        holdState.noteIds = replayNotes;
-        holdState.stopAt = holdState.pressAt + state.noteDuration * 1000;
-        if (holdState.holdTimer) clearTimeout(holdState.holdTimer);
-        holdState.holdTimer = setTimeout(() => {
-            holdState.holding = true;
-        }, HOLD_THRESHOLD * 1000);
+        holdState.holding = session.holding;
+        holdState.pressAt = session.pressAt;
+        holdState.stopAt = session.stopAt;
+        holdState.holdTimer = session.holdTimer;
+        holdState.noteIds = session.noteIds;
         return;
     }
-    if (!state.selectedNotes.length) {
-        resultEl.textContent = ACTION_COPY.selectNotesFirst || "Select some notes first.";
+    const replay = getReplayNoteIds();
+    if (!replay?.noteIds?.length) {
+        resultEl.textContent = isTypingEnabled()
+            ? (ACTION_COPY.typeValidChordFirst || "Type a valid chord first.")
+            : (ACTION_COPY.selectNotesFirst || "Select some notes first.");
         return;
     }
-
-    const ctx = ensureAudio();
-    const durationOverride = state.noteDuration + HOLD_MAX_EXTRA;
-    playNotes(state.selectedNotes, state.mode, ctx.currentTime + KEY_PRESS_DELAY, {
-        animate: false,
-        durationOverride
+    const session = beginInteractivePressSession({
+        noteIds: replay.noteIds,
+        mode: replay.mode,
+        behavior: PRESS_BEHAVIOR.MIN_LENGTH_OR_HELD
     });
-    state.selectedNotes.forEach((noteId) => {
-        activateKey(noteId);
-    });
-
+    if (!session) return;
     holdState.active = true;
-    holdState.holding = false;
-    holdState.pressAt = performance.now();
-    holdState.noteIds = [...state.selectedNotes];
-    holdState.stopAt = holdState.pressAt + state.noteDuration * 1000;
-
-    if (holdState.holdTimer) clearTimeout(holdState.holdTimer);
-
-    holdState.holdTimer = setTimeout(() => {
-        holdState.holding = true;
-    }, HOLD_THRESHOLD * 1000);
+    holdState.holding = session.holding;
+    holdState.pressAt = session.pressAt;
+    holdState.noteIds = session.noteIds;
+    holdState.stopAt = session.stopAt;
+    holdState.holdTimer = session.holdTimer;
 };
 
 const releaseHeldPlayback = () => {
-    if (isTypingOnlyMode()) {
-        return;
-    }
     if (!holdState.active) return;
-    if (holdState.holdTimer) {
-        clearTimeout(holdState.holdTimer);
-        holdState.holdTimer = null;
-    }
-
-    const now = performance.now();
-    const remainingMs = Math.max(0, holdState.stopAt - now);
-    const elapsedMs = Math.max(0, now - holdState.pressAt);
-    const animDelayMs = Math.max(0, MIN_KEY_ANIM_MS - elapsedMs);
-
-    holdState.noteIds.forEach((noteId) => {
-        scheduleKeyRelease(noteId, animDelayMs);
+    releaseInteractivePressSession({
+        noteIds: [...holdState.noteIds],
+        pressAt: holdState.pressAt,
+        stopAt: holdState.stopAt,
+        playSound: true,
+        behavior: PRESS_BEHAVIOR.MIN_LENGTH_OR_HELD,
+        holdTimer: holdState.holdTimer
     });
-    if (holdState.noteIds.length) {
-        setTimeout(() => {
-            stopNotesById(holdState.noteIds);
-        }, remainingMs);
-    }
-
     holdState.active = false;
     holdState.holding = false;
+    holdState.holdTimer = null;
     holdState.noteIds = [];
 };
 
@@ -1671,6 +1735,8 @@ Object.assign(App.game, {
     createTarget,
     startRound,
     goHome,
+    getConsistentPreviewDuration,
+    playConsistentPreview,
     playTarget,
     playSelectedChord,
     playTypedInputChord,

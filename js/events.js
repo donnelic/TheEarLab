@@ -834,20 +834,22 @@ const playTutorialChordSpec = (spec = getTutorialActiveSpec()) => {
     if (typeof App.audio?.stopAllNotes === "function") {
         App.audio.stopAllNotes();
     }
+    const consistentDuration = typeof App.game?.getConsistentPreviewDuration === "function"
+        ? App.game.getConsistentPreviewDuration(0.8)
+        : Math.max(0.8, state.noteDuration);
     if (typeof App.audio?.playPianoNote === "function" && typeof App.audio?.ensureAudio === "function") {
         const ctx = App.audio.ensureAudio();
         const start = ctx.currentTime + (SCHEDULE_LEAD || 0.02);
-        const duration = Math.max(0.8, state.noteDuration);
         rendered.midis.forEach((midi, index) => {
             const frequency = 440 * Math.pow(2, (midi - 69) / 12);
-            App.audio.playPianoNote(frequency, start, duration, 1, `tutorial-preview-${previewToken}-${index}`);
+            App.audio.playPianoNote(frequency, start, consistentDuration, 1, `tutorial-preview-${previewToken}-${index}`);
         });
         return;
     }
-    if (typeof App.audio?.playNotes === "function" && rendered.noteIds.length) {
-        App.audio.playNotes(rendered.noteIds, "simultaneous", undefined, {
+    if (typeof App.game?.playConsistentPreview === "function" && rendered.noteIds.length) {
+        App.game.playConsistentPreview(rendered.noteIds, "simultaneous", {
             animate: false,
-            durationOverride: Math.max(0.8, state.noteDuration)
+            minimumDuration: 0.8
         });
     }
 };
@@ -1073,11 +1075,6 @@ const insertTypedCharacter = (character) => {
     const end = Number.isFinite(chordAnswerInput.selectionEnd) ? chordAnswerInput.selectionEnd : chordAnswerInput.value.length;
     chordAnswerInput.setRangeText(character, start, end, "end");
     chordAnswerInput.dispatchEvent(new Event("input", { bubbles: true }));
-};
-
-const tryPlayTypedChordPreview = () => {
-    if (typeof App.game?.playTypedInputChord !== "function") return false;
-    return App.game.playTypedInputChord();
 };
 
 let lastPrimaryActionAt = 0;
@@ -1411,13 +1408,9 @@ document.addEventListener("keydown", (event) => {
 
     if (chordInputFocused && event.code === "Space") {
         event.preventDefault();
-        if (!tryPlayTypedChordPreview()) {
-            const canReplaySelection = state.trainingMode === "both" && state.selectedNotes.length > 0;
-            if (canReplaySelection) {
-                triggerReplayAction(event);
-            } else {
-                resultEl.textContent = "Type a valid chord or select notes first.";
-            }
+        triggerReplayAction(event);
+        if (!holdState.active) {
+            resultEl.textContent = "Type a valid chord or select notes first.";
         }
         return;
     }
