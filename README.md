@@ -17,9 +17,9 @@ Browser-based piano ear-training app for note and chord recognition.
 
 ## Project Layout
 - `index.html`: app structure and script loading.
-- `styles.css`: all visual styling, variables, responsive rules.
+- `styles.css`: all visual styling, shared layout/unit tokens in `:root`, responsive rules.
 - `vendor/`: bundled SF2 runtime dependencies (`libfluidsynth` + `js-synthesizer`).
-- `js/core.js`: DOM references, constants, soundfont catalog state, shared app state, note/key builders.
+- `js/core.js`: DOM references, shared runtime constants/copy, soundfont catalog state, shared app state, note/key builders.
 - `js/audio.js`: SF2 playback engine + sample-pack compatibility, discovery/loading, preview sequencing.
 - `js/game.js`: round lifecycle, validation, reveal playback, keyboard state behavior.
 - `js/settings.js`: settings mutations, persistence hooks, panel positioning logic.

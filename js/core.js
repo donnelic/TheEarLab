@@ -1,6 +1,6 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260306000059";
+const BUILD_ID = "20260306083127";
 App.buildId = BUILD_ID;
 
 const dom = {
@@ -274,6 +274,64 @@ const CONSTANTS = {
     SHORT_PRESS_ANIM_MS
 };
 App.constants = CONSTANTS;
+const UI_COPY = {
+    chordReadout: {
+        typedNone: "Typed chord: none",
+        typedUnrecognized: "Typed chord: unrecognized",
+        typedPreview: (label) => `Typed chord: ${label} (preview)`,
+        selectedNone: "Selected chord: none",
+        selectedUnknown: "Selected chord: unknown",
+        selected: (label) => `Selected chord: ${label}`,
+        typed: (label) => `Typed chord: ${label}`,
+        selectedAndTyped: (selectedLabel, typedLabel) => `Selected chord: ${selectedLabel} | Typed chord: ${typedLabel}`
+    },
+    prompts: {
+        landingTyping: "Press New Round to hear a chord, then type your answer.",
+        landingBoth: "Press New Round to hear a chord, then play it, type it, or both.",
+        landingDefault: "Press New Round to begin."
+    },
+    modes: {
+        typingOnly: "Type Chord",
+        chordBoth: "Chord + Both",
+        chordBlind: "Chord + Blind",
+        chord: "Chord",
+        blind: "Blind",
+        normal: "Normal"
+    },
+    actions: {
+        typeValidChordFirst: "Type a valid chord first.",
+        selectNotesFirst: "Select some notes first.",
+        noReplayNotes: "No notes available to replay.",
+        noTargetChord: "No target chord available. Start a new round.",
+        previewChord: (label) => `Preview: ${label}`,
+        correctChord: (label) => `Correct: ${label}`
+    },
+    feedback: {
+        correctChord: "Correct chord. Great ear.",
+        wrongChordName: "Not quite. Compare the chord name and quality.",
+        wrongChordQuality: "Not quite. Compare the chord quality.",
+        correctNotes: "Correct. Great ear.",
+        wrongNotes: "Not quite. Listen closely."
+    },
+    reveal: {
+        targetChord: "Target chord",
+        targetNotes: "Target notes",
+        yourChord: "Your chord",
+        yourNotes: "Your notes",
+        correctNotes: "Correct notes",
+        wrongNotes: "Wrong notes",
+        missedNotes: "Missed notes",
+        differencePrefix: "Difference"
+    },
+    helpers: {
+        title: "Chord helper",
+        chordSize: "Chord size",
+        chordType: "Chord type",
+        voicing: "Voicing",
+        pitchSpan: "Pitch span"
+    }
+};
+App.uiCopy = UI_COPY;
 const SOUNDFONT_DIR = "soundfonts";
 const SOUNDFONT_MANIFEST = `${SOUNDFONT_DIR}/index.json`;
 

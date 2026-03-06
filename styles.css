@@ -49,6 +49,30 @@
             /* Settings */
             --settings-shadow: rgba(15, 23, 42, 0.2);
             --panel-bottom-gap: 24px;
+            /* Shared layout units */
+            --section-width: 820px;
+            --app-radius: 28px;
+            --panel-radius: 18px;
+            --control-radius: 16px;
+            --surface-radius: 14px;
+            --field-radius: 12px;
+            --pill-radius: 999px;
+            --app-pad-x: 20px;
+            --app-pad-top: 16px;
+            --app-pad-bottom: 18px;
+            --panel-width: min(320px, 90vw);
+            --panel-padding: 16px;
+            --panel-shadow: 0 18px 40px var(--settings-shadow);
+            --surface-pad-x: 12px;
+            --surface-pad-y: 10px;
+            --surface-shadow-soft: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 20px rgba(15, 23, 42, 0.08);
+            --floating-right: 18px;
+            --floating-top: 18px;
+            --floating-size: 44px;
+            --floating-radius: 14px;
+            --floating-stack-gap: 6px;
+            --floating-shadow: 0 12px 24px var(--settings-shadow);
+            --floating-icon-size: 20px;
             /* Inputs */
             --input-bg: rgba(255, 255, 255, 0.9);
             --input-border: rgba(148, 163, 184, 0.35);
@@ -213,9 +237,9 @@
         .app {
             width: min(100%, calc(var(--keyboard-width) + 140px + var(--layout-extra)));
             background: var(--card);
-            border-radius: 28px;
+            border-radius: var(--app-radius);
             box-shadow: 0 30px 70px var(--shadow);
-            padding: 16px 20px 18px;
+            padding: var(--app-pad-top) var(--app-pad-x) var(--app-pad-bottom);
             backdrop-filter: blur(10px);
             border: 1px solid var(--control-border);
             height: 100%;
@@ -245,7 +269,7 @@
             align-items: center;
             justify-content: center;
             padding: 6px 14px;
-            border-radius: 999px;
+            border-radius: var(--pill-radius);
             background: var(--badge-bg);
             color: var(--badge-text);
             font-weight: 700;
@@ -285,7 +309,7 @@ h1 {
         .typing-zone,
         .status,
         .tips {
-            width: min(100%, 820px);
+            width: min(100%, var(--section-width));
             margin-inline: auto;
         }
 
@@ -297,7 +321,7 @@ h1 {
 
         .control {
             background: var(--control-bg);
-            border-radius: 16px;
+            border-radius: var(--control-radius);
             padding: 14px 16px;
             border: 1px solid var(--control-border);
             box-shadow: inset 0 1px 0 var(--control-inset);
@@ -453,7 +477,7 @@ h1 {
         color-mix(in oklab, var(--panel) 88%, transparent),
         color-mix(in oklab, var(--status-bg) 74%, transparent)
     );
-    border-radius: 14px;
+    border-radius: var(--surface-radius);
     padding: 7px 10px;
     text-align: left;
     display: grid;
@@ -489,10 +513,10 @@ body:not(.landing) .quick-start {
     display: none;
 }
 
-        .btn {
+.btn {
             border: none;
             padding: 12px 18px;
-            border-radius: 12px;
+            border-radius: var(--field-radius);
             font-weight: 700;
             cursor: pointer;
             transition: transform 0.15s ease, box-shadow 0.2s ease;
@@ -538,8 +562,8 @@ body:not(.landing) .quick-start {
     min-height: 1.4em;
     border: 1px solid var(--control-border);
     background: linear-gradient(180deg, var(--panel), var(--status-bg));
-    border-radius: 12px;
-    padding: 8px 12px;
+    border-radius: var(--field-radius);
+    padding: 8px var(--surface-pad-x);
     grid-row: 5;
 }
 
@@ -551,11 +575,11 @@ body:not(.landing) .quick-start {
     background:
         linear-gradient(160deg, color-mix(in oklab, var(--panel) 86%, transparent), color-mix(in oklab, var(--status-bg) 92%, transparent));
     border: 1px solid color-mix(in oklab, var(--control-border) 85%, var(--accent));
-    border-radius: 14px;
-    padding: 10px 12px 11px;
+    border-radius: var(--surface-radius);
+    padding: var(--surface-pad-y) var(--surface-pad-x) 11px;
     display: grid;
     gap: 7px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 20px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--surface-shadow-soft);
     grid-row: 6;
 }
 
@@ -573,7 +597,7 @@ body:not(.landing) .quick-start {
     border: 1px solid color-mix(in oklab, var(--input-border) 82%, var(--accent));
     background: color-mix(in oklab, var(--input-bg) 86%, white);
     color: var(--ink);
-    border-radius: 12px;
+    border-radius: var(--field-radius);
     padding: 11px 40px 11px 13px;
     font: inherit;
     font-weight: 700;
@@ -1393,7 +1417,7 @@ body:not(.landing) .quick-start {
             align-items: center;
             gap: 6px;
             padding: 4px 10px;
-            border-radius: 999px;
+            border-radius: var(--pill-radius);
             background: var(--hint-bg);
             color: var(--hint-text);
             border: 1px solid var(--hint-border);
@@ -1411,16 +1435,15 @@ body:not(.landing) .quick-start {
             margin-left: auto;
         }
 
-        .settings-toggle {
+        :is(.settings-toggle, .theme-toggle, .home-toggle) {
             position: fixed;
-            top: 18px;
-            right: 18px;
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
+            right: var(--floating-right);
+            width: var(--floating-size);
+            height: var(--floating-size);
+            border-radius: var(--floating-radius);
             border: none;
             background: var(--panel);
-            box-shadow: 0 12px 24px var(--settings-shadow);
+            box-shadow: var(--floating-shadow);
             cursor: pointer;
             display: grid;
             place-items: center;
@@ -1428,80 +1451,43 @@ body:not(.landing) .quick-start {
             z-index: 20;
         }
 
-        .settings-toggle:hover {
+        .settings-toggle {
+            top: var(--floating-top);
+        }
+
+        .theme-toggle {
+            top: calc(var(--floating-top) + var(--floating-size) + var(--floating-stack-gap));
+        }
+
+        .home-toggle {
+            top: calc(var(--floating-top) + ((var(--floating-size) + var(--floating-stack-gap)) * 2));
+        }
+
+        :is(.settings-toggle, .theme-toggle, .home-toggle):hover {
             transform: translateY(-2px);
+        }
+
+        :is(.settings-toggle, .theme-toggle, .home-toggle) svg {
+            width: var(--floating-icon-size);
+            height: var(--floating-icon-size);
+            fill: var(--ink);
         }
 
         .settings-toggle svg {
             width: 22px;
             height: 22px;
-            fill: var(--ink);
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 68px;
-            right: 18px;
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            border: none;
-            background: var(--panel);
-            box-shadow: 0 12px 24px var(--settings-shadow);
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            transition: transform 0.2s ease;
-            z-index: 20;
-        }
-
-        .theme-toggle:hover {
-            transform: translateY(-2px);
-        }
-
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--ink);
-        }
-
-        .home-toggle {
-            position: fixed;
-            top: 118px;
-            right: 18px;
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            border: none;
-            background: var(--panel);
-            box-shadow: 0 12px 24px var(--settings-shadow);
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            transition: transform 0.2s ease;
-            z-index: 20;
-        }
-
-        .home-toggle:hover {
-            transform: translateY(-2px);
-        }
-
-        .home-toggle svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--ink);
         }
 
         .settings-panel {
             position: fixed;
             top: 8vh;
-            right: 18px;
-            width: min(320px, 90vw);
+            right: var(--floating-right);
+            width: var(--panel-width);
             background: var(--panel);
-            border-radius: 18px;
-            padding: 16px;
+            border-radius: var(--panel-radius);
+            padding: var(--panel-padding);
             border: 1px solid var(--control-border);
-            box-shadow: 0 18px 40px var(--settings-shadow);
+            box-shadow: var(--panel-shadow);
             opacity: 0;
             transform: translateY(-8px) scale(0.98);
             pointer-events: none;
