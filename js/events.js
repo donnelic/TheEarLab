@@ -1,6 +1,22 @@
 var App = window.App || (window.App = {});
 App.events = App.events || {};
 
+let audioPrimedFromGesture = false;
+const primeAudioFromGesture = () => {
+    if (audioPrimedFromGesture) return;
+    audioPrimedFromGesture = true;
+    if (typeof App.audio?.ensureAudio === "function") {
+        App.audio.ensureAudio({ resume: true });
+    }
+    document.removeEventListener("pointerdown", primeAudioFromGesture, true);
+    document.removeEventListener("keydown", primeAudioFromGesture, true);
+    document.removeEventListener("touchstart", primeAudioFromGesture, true);
+};
+
+document.addEventListener("pointerdown", primeAudioFromGesture, true);
+document.addEventListener("keydown", primeAudioFromGesture, true);
+document.addEventListener("touchstart", primeAudioFromGesture, true);
+
 noteCountInput.addEventListener("input", (event) => {
     const next = clampNoteCount(event.target.value);
     pendingNoteCount = next;

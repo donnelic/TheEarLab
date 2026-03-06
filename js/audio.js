@@ -422,7 +422,7 @@ const ensureSf2SynthReady = async () => {
             throw new Error("SF2 engine not loaded. Missing JSSynth runtime scripts.");
         }
         await window.JSSynth.waitForReady();
-        const ctx = ensureAudio();
+        const ctx = ensureAudio({ resume: false });
         const synth = new window.JSSynth.Synthesizer();
         synth.init(ctx.sampleRate);
         const node = synth.createAudioNode(ctx, 2048);
@@ -613,7 +613,8 @@ const refreshSoundfontCatalog = async (options = {}) => {
     return catalog;
 };
 
-const ensureAudio = () => {
+const ensureAudio = (options = {}) => {
+    const { resume = true } = options;
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: "interactive"
@@ -644,7 +645,7 @@ const ensureAudio = () => {
         masterCompressor.connect(masterOutputGain);
         masterOutputGain.connect(audioContext.destination);
     }
-    if (audioContext.state === "suspended") {
+    if (resume && audioContext.state === "suspended") {
         void audioContext.resume().catch(() => {
             /* autoplay gate */
         });
