@@ -103,7 +103,7 @@ if (chordDifficultySelect) {
             : (["easy", "medium", "voiced", "hard"].includes(value)
                 ? value
                 : DEFAULTS.chordDifficulty);
-        if (getIsChordRound()) {
+        if (getEventsChordRound()) {
             handleCriticalSettingChange(200);
         }
         updateStatus();
@@ -114,7 +114,7 @@ if (chordDifficultySelect) {
 if (chordExtraHelpersToggle) {
     chordExtraHelpersToggle.addEventListener("change", (event) => {
         state.chordExtraHelpers = Boolean(event.target.checked);
-        if (getIsChordRound()) {
+        if (getEventsChordRound()) {
             handleCriticalSettingChange(200);
         }
         updateStatus();
@@ -1063,21 +1063,21 @@ if (chordTutorialQualityList) {
 
 const EVENTS_MODE_POLICY = App.modePolicy || {};
 const EVENTS_ACTION_COPY = App.uiCopy?.actions || {};
-const isTypingEnabled = () => EVENTS_MODE_POLICY.isTypingEnabledFromState
+const isEventsTypingEnabled = () => EVENTS_MODE_POLICY.isTypingEnabledFromState
     ? EVENTS_MODE_POLICY.isTypingEnabledFromState(state)
     : (state.trainingMode === "type" || state.trainingMode === "both");
-const isTypingOnlyMode = () => EVENTS_MODE_POLICY.isTypingOnlyModeFromState
+const isEventsTypingOnlyMode = () => EVENTS_MODE_POLICY.isTypingOnlyModeFromState
     ? EVENTS_MODE_POLICY.isTypingOnlyModeFromState(state)
     : state.trainingMode === "type";
-const getIsChordRound = () => EVENTS_MODE_POLICY.getIsChordRoundFromState
+const getEventsChordRound = () => EVENTS_MODE_POLICY.getIsChordRoundFromState
     ? EVENTS_MODE_POLICY.getIsChordRoundFromState(state)
-    : (isTypingEnabled() || state.chordMode);
+    : (isEventsTypingEnabled() || state.chordMode);
 
 const isChordTypingCaptureActive = () => {
     if (!state.active || state.submitted) return false;
     if (!typingZone || typingZone.hidden) return false;
-    if (!getIsChordRound()) return false;
-    return isTypingEnabled();
+    if (!getEventsChordRound()) return false;
+    return isEventsTypingEnabled();
 };
 
 const insertTypedCharacter = (character) => {
@@ -1347,7 +1347,7 @@ keyboardEl.addEventListener("pointerdown", (event) => {
         toggleSelection(noteId);
         return;
     }
-    const isTypingOnly = isTypingOnlyMode();
+    const isTypingOnly = isEventsTypingOnlyMode();
     const playSound = state.submitted || (!(state.blindMode || isTypingOnly) && !willDeselect);
     if (state.submitted && revealPlaying) {
         abortPlayback([noteId]);

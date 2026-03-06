@@ -727,14 +727,14 @@ const setKeyCountVisual = (value) => {
 const getEffectivePracticeMode = () => SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState
     ? SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState(state)
     : "random";
-const isTypingEnabled = () => SETTINGS_MODE_POLICY.isTypingEnabledFromState
+const isSettingsTypingEnabled = () => SETTINGS_MODE_POLICY.isTypingEnabledFromState
     ? SETTINGS_MODE_POLICY.isTypingEnabledFromState(state)
     : (state.trainingMode === "type" || state.trainingMode === "both");
 
 const refreshOptionsModeVisibility = () => {
     const mode = getEffectivePracticeMode();
     const showChord = mode === "chord";
-    const showTyping = showChord && isTypingEnabled();
+    const showTyping = showChord && isSettingsTypingEnabled();
     const showNoteCount = mode !== "chord";
 
     document.querySelectorAll('[data-option-group="legacy"]').forEach((el) => {
