@@ -1135,74 +1135,84 @@ const blurPointerActivatedControl = () => {
         control.blur();
     }
 };
-const HELPER_CURSOR_SYNC_DELAY_MS = 340;
-const HELPER_CURSOR_FADE_MS = 180;
-let helperCursorEl = null;
-let helperCursorShowTimer = null;
-let helperCursorHideTimer = null;
-let helperCursorActiveItem = null;
-let helperCursorHoveredItem = null;
-const ensureHelperCursorEl = () => {
-    if (helperCursorEl?.isConnected) return helperCursorEl;
-    helperCursorEl = document.createElement("div");
-    helperCursorEl.className = "helper-cursor";
-    helperCursorEl.setAttribute("aria-hidden", "true");
-    document.body.appendChild(helperCursorEl);
-    return helperCursorEl;
+const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
+let customCursorEnabled = false;
+let customCursorEl = null;
+let customCursorX = -100;
+let customCursorY = -100;
+let customCursorVisible = false;
+let customCursorPressed = false;
+let customCursorMode = "default";
+let customCursorFrame = null;
+const ensureCustomCursorEl = () => {
+    if (customCursorEl?.isConnected) return customCursorEl;
+    const cursor = document.createElement("div");
+    cursor.className = "app-cursor";
+    cursor.setAttribute("aria-hidden", "true");
+
+    const ring = document.createElement("div");
+    ring.className = "app-cursor-ring";
+    cursor.appendChild(ring);
+
+    const dot = document.createElement("div");
+    dot.className = "app-cursor-dot";
+    cursor.appendChild(dot);
+
+    document.body.appendChild(cursor);
+    customCursorEl = cursor;
+    return cursor;
 };
-const setHelperCursorPosition = (x, y) => {
-    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-    const cursor = ensureHelperCursorEl();
-    cursor.style.setProperty("--cursor-x", `${x}px`);
-    cursor.style.setProperty("--cursor-y", `${y}px`);
-};
-const clearHelperCursorShowTimer = () => {
-    if (!helperCursorShowTimer) return;
-    clearTimeout(helperCursorShowTimer);
-    helperCursorShowTimer = null;
-};
-const clearHelperCursorHideTimer = () => {
-    if (!helperCursorHideTimer) return;
-    clearTimeout(helperCursorHideTimer);
-    helperCursorHideTimer = null;
-};
-const scheduleHelperCursorHide = (item) => {
-    if (!item) return;
-    helperCursorHoveredItem = item;
-    clearHelperCursorShowTimer();
-    clearHelperCursorHideTimer();
-    item.classList.remove("helper-cursor-hidden");
-    const cursor = ensureHelperCursorEl();
-    cursor.classList.remove("visible");
-    helperCursorShowTimer = setTimeout(() => {
-        helperCursorShowTimer = null;
-        if (helperCursorHoveredItem !== item || !item.matches(":hover")) return;
-        helperCursorActiveItem = item;
-        item.classList.add("helper-cursor-hidden");
-        cursor.classList.add("visible");
-    }, HELPER_CURSOR_SYNC_DELAY_MS);
-};
-const resetHelperCursorState = (item) => {
-    if (!item) return;
-    if (helperCursorHoveredItem === item) {
-        helperCursorHoveredItem = null;
+const getCustomCursorMode = (target) => {
+    if (!(target instanceof Element)) return "default";
+    if (target.closest("input[type=\"text\"], input[type=\"search\"], input[type=\"email\"], input[type=\"password\"], textarea, [contenteditable=\"true\"]")) {
+        return "text";
     }
-    clearHelperCursorShowTimer();
-    const wasActive = helperCursorActiveItem === item;
-    const cursor = helperCursorEl;
-    if (wasActive) {
-        helperCursorActiveItem = null;
-        if (cursor) {
-            cursor.classList.remove("visible");
+    if (target.closest("button, [role=\"button\"], a[href], input, select, label.switch, .key, .helper-item, .piano-option, .sf2-row, .profile-row, .tutorial-chip, [tabindex]:not([tabindex=\"-1\"])")) {
+        return "interactive";
+    }
+    return "default";
+};
+const syncCustomCursorState = (target = document.elementFromPoint(customCursorX, customCursorY)) => {
+    customCursorMode = getCustomCursorMode(target);
+    if (!customCursorEnabled || !customCursorEl) return;
+    customCursorEl.classList.toggle("is-interactive", customCursorMode === "interactive");
+    customCursorEl.classList.toggle("is-text", customCursorMode === "text");
+    customCursorEl.classList.toggle("is-pressed", customCursorPressed);
+};
+const renderCustomCursor = () => {
+    customCursorFrame = null;
+    if (!customCursorEnabled) return;
+    const cursor = ensureCustomCursorEl();
+    cursor.style.setProperty("--cursor-x", `${customCursorX}px`);
+    cursor.style.setProperty("--cursor-y", `${customCursorY}px`);
+    cursor.classList.toggle("visible", customCursorVisible);
+    syncCustomCursorState();
+};
+const scheduleCustomCursorRender = () => {
+    if (customCursorFrame !== null) return;
+    customCursorFrame = requestAnimationFrame(renderCustomCursor);
+};
+const setCustomCursorEnabled = (enabled) => {
+    customCursorEnabled = Boolean(enabled);
+    document.body.classList.toggle("custom-cursor-enabled", customCursorEnabled);
+    if (!customCursorEnabled) {
+        customCursorVisible = false;
+        customCursorPressed = false;
+        if (customCursorEl) {
+            customCursorEl.classList.remove("visible", "is-interactive", "is-text", "is-pressed");
         }
-        clearHelperCursorHideTimer();
-        helperCursorHideTimer = setTimeout(() => {
-            helperCursorHideTimer = null;
-            item.classList.remove("helper-cursor-hidden");
-        }, HELPER_CURSOR_FADE_MS);
         return;
     }
-    item.classList.remove("helper-cursor-hidden");
+    ensureCustomCursorEl();
+    scheduleCustomCursorRender();
+};
+const updateCustomCursorPosition = (event) => {
+    if (!customCursorEnabled) return;
+    customCursorX = event.clientX;
+    customCursorY = event.clientY;
+    customCursorVisible = true;
+    customCursorMode = getCustomCursorMode(event.target);
+    scheduleCustomCursorRender();
 };
 
 const triggerReplayAction = (event) => {
@@ -1478,39 +1488,66 @@ document.addEventListener("pointercancel", (event) => {
 
 document.addEventListener("pointerdown", (event) => {
     pointerActivatedControl = getButtonLikeTarget(event.target);
+    customCursorPressed = true;
+    updateCustomCursorPosition(event);
 }, true);
 
 document.addEventListener("click", () => {
     requestAnimationFrame(blurPointerActivatedControl);
 }, true);
 
-if (helperSlotEl) {
-    helperSlotEl.addEventListener("pointerover", (event) => {
-        const item = event.target.closest(".helper-item");
-        if (!item || !helperSlotEl.contains(item)) return;
-        const fromItem = event.relatedTarget?.closest?.(".helper-item") ?? null;
-        if (fromItem === item) return;
-        scheduleHelperCursorHide(item);
-    });
+document.addEventListener("pointermove", (event) => {
+    updateCustomCursorPosition(event);
+}, { passive: true, capture: true });
 
-    helperSlotEl.addEventListener("pointermove", (event) => {
-        const item = event.target.closest(".helper-item");
-        if (!item || !helperSlotEl.contains(item)) return;
-        setHelperCursorPosition(event.clientX, event.clientY);
-        if (helperCursorHoveredItem && helperCursorHoveredItem !== item) {
-            resetHelperCursorState(helperCursorHoveredItem);
-            scheduleHelperCursorHide(item);
-        }
-    });
+document.addEventListener("pointerup", (event) => {
+    customCursorPressed = false;
+    updateCustomCursorPosition(event);
+}, true);
 
-    helperSlotEl.addEventListener("pointerout", (event) => {
-        const item = event.target.closest(".helper-item");
-        if (!item || !helperSlotEl.contains(item)) return;
-        const toItem = event.relatedTarget?.closest?.(".helper-item") ?? null;
-        if (toItem === item) return;
-        resetHelperCursorState(item);
-    });
+document.addEventListener("pointercancel", () => {
+    customCursorPressed = false;
+    scheduleCustomCursorRender();
+}, true);
+
+document.addEventListener("pointerover", (event) => {
+    if (!customCursorEnabled) return;
+    customCursorMode = getCustomCursorMode(event.target);
+    scheduleCustomCursorRender();
+}, true);
+
+document.addEventListener("pointerout", (event) => {
+    if (!customCursorEnabled) return;
+    if (!event.relatedTarget) {
+        customCursorVisible = false;
+        customCursorPressed = false;
+        scheduleCustomCursorRender();
+    }
+}, true);
+
+window.addEventListener("blur", () => {
+    customCursorVisible = false;
+    customCursorPressed = false;
+    scheduleCustomCursorRender();
+});
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        customCursorVisible = false;
+        customCursorPressed = false;
+        scheduleCustomCursorRender();
+    }
+});
+
+const applyCustomCursorMediaState = () => {
+    setCustomCursorEnabled(CUSTOM_CURSOR_QUERY.matches);
+};
+if (typeof CUSTOM_CURSOR_QUERY.addEventListener === "function") {
+    CUSTOM_CURSOR_QUERY.addEventListener("change", applyCustomCursorMediaState);
+} else if (typeof CUSTOM_CURSOR_QUERY.addListener === "function") {
+    CUSTOM_CURSOR_QUERY.addListener(applyCustomCursorMediaState);
 }
+applyCustomCursorMediaState();
 
 keyboardEl.addEventListener("click", (event) => {
     event.preventDefault();
