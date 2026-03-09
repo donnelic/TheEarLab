@@ -133,20 +133,45 @@ const PRESS_BEHAVIOR = {
     HOLD_WHILE_PRESSED: "hold-while-pressed"
 };
 
+const applyRoundStatePatch = (patch, mutation = "round/patch") => {
+    if (typeof App.features?.round?.applyRoundPatch === "function") {
+        App.features.round.applyRoundPatch(patch, {
+            mutation,
+            source: "game.js"
+        });
+        return;
+    }
+    Object.assign(state, patch || {});
+};
+
+const applySubmissionStatePatch = (patch, mutation = "submission/patch") => {
+    if (typeof App.features?.round?.applySubmissionPatch === "function") {
+        App.features.round.applySubmissionPatch(patch, {
+            mutation,
+            source: "game.js"
+        });
+        return;
+    }
+    Object.assign(state, patch || {});
+};
+
 const normalizeQualityToken = (value) => {
-    return String(value ?? "")
+    let normalized = String(value ?? "")
         .replace(/\u266f/g, "#")
         .replace(/\u266d/g, "b")
-        .replace(/[♯]/g, "#")
-        .replace(/[♭]/g, "b")
+        .replace(/♯/g, "#")
+        .replace(/♭/g, "b")
+        .replace(/\u266F/g, "#")
+        .replace(/\u266D/g, "b")
+        .replace(/^\s*M(?=\d|aj)/, "maj")
         .replace(/major/gi, "maj")
         .replace(/minor/gi, "min")
         .replace(/dominant/gi, "dom")
         .replace(/\s+/g, "")
         .replace(/_/g, "")
-        .replace(/-/g, "")
-        .replace(/[^a-zA-Z0-9#b+/]/g, "")
+        .replace(/[^a-zA-Z0-9#b+/\-]/g, "")
         .toLowerCase();
+    return normalized;
 };
 
 const escapeHtml = (value) => String(value ?? "")
@@ -160,10 +185,12 @@ CHORD_QUALITIES.forEach((quality) => {
     quality.aliases.forEach((alias) => {
         const normalizedAlias = normalizeQualityToken(alias);
         if (!normalizedAlias) return;
-        CHORD_QUALITY_ALIASES.set(normalizedAlias, quality.id);
+        if (!CHORD_QUALITY_ALIASES.has(normalizedAlias)) {
+            CHORD_QUALITY_ALIASES.set(normalizedAlias, quality.id);
+        }
     });
     const normalizedSuffix = normalizeQualityToken(quality.suffix);
-    if (normalizedSuffix) {
+    if (normalizedSuffix && !CHORD_QUALITY_ALIASES.has(normalizedSuffix)) {
         CHORD_QUALITY_ALIASES.set(normalizedSuffix, quality.id);
     }
 });
@@ -194,6 +221,41 @@ const getPitchClassSetFromNoteIds = (noteIds) => {
         set.add(normalizePitchClass(midi));
     });
     return set;
+};
+
+const sanitizeKnownNoteIds = (noteIds) => Array.from(new Set(
+    (Array.isArray(noteIds) ? noteIds : []).filter((noteId) => noteMap.has(noteId))
+));
+
+const getRootGuideNoteId = () => {
+    if (!state.active || state.submitted || !getIsChordRound() || !state.chordRootHint || !state.targetChord) {
+        return null;
+    }
+    if (Number.isFinite(state.targetChord.rootMidi)) {
+        const rooted = getNoteIdByMidi(state.targetChord.rootMidi);
+        if (rooted && noteMap.has(rooted)) {
+            return rooted;
+        }
+    }
+    const fallback = (state.targetNotes ?? []).find((noteId) => {
+        const midi = getMidiFromNoteId(noteId);
+        return Number.isFinite(midi) && normalizePitchClass(midi) === state.targetChord.rootPc;
+    });
+    return fallback ?? null;
+};
+
+const getEffectiveKeyboardSelection = (noteIds = state.selectedNotes, options = {}) => {
+    const { includeRootGuide = true } = options;
+    const ids = sanitizeKnownNoteIds(noteIds);
+    if (!includeRootGuide) return ids;
+    const rootNoteId = getRootGuideNoteId();
+    if (!rootNoteId || state.rootHintSuppressed) {
+        return ids;
+    }
+    if (ids.includes(rootNoteId)) {
+        return ids;
+    }
+    return [...ids, rootNoteId];
 };
 
 const getChordDifficultyId = (value = state.chordDifficulty) => {
@@ -335,9 +397,10 @@ const getReplayNoteIds = () => {
             }
         }
     }
-    if (state.selectedNotes.length) {
+    const keyboardSelection = getEffectiveKeyboardSelection(state.selectedNotes);
+    if (keyboardSelection.length) {
         return {
-            noteIds: [...state.selectedNotes],
+            noteIds: keyboardSelection,
             mode: state.mode,
             source: "selected"
         };
@@ -410,7 +473,13 @@ const getQualityPitchClassSet = (rootPc, quality) => {
 const parseChordInput = (raw, options = {}) => {
     const input = String(raw ?? "").trim();
     if (!input) return null;
-    const normalizedInput = input.replace(/♯/g, "#").replace(/♭/g, "b");
+    const normalizedInput = input
+        .replace(/♯/g, "#")
+        .replace(/♭/g, "b")
+        .replace(/\u266f/g, "#")
+        .replace(/\u266d/g, "b")
+        .replace(/\u266F/g, "#")
+        .replace(/\u266D/g, "b");
     const match = normalizedInput.match(/^(-?\d+)?\s*([A-Ga-g])\s*([#b]?)\s*(.*)$/);
     if (!match) return null;
 
@@ -581,8 +650,10 @@ const createChordTarget = () => {
     const difficultyId = getChordDifficultyId(state.chordDifficulty);
     const qualities = getAllowedChordQualities(difficultyId);
     if (!qualities.length || !notes.length) {
-        state.targetChord = null;
-        state.targetNotes = [];
+        applyRoundStatePatch({
+            targetChord: null,
+            targetNotes: []
+        }, "round/create-chord-target-empty");
         return;
     }
 
@@ -609,8 +680,10 @@ const createChordTarget = () => {
     }
 
     if (!picked) {
-        state.targetChord = null;
-        state.targetNotes = [];
+        applyRoundStatePatch({
+            targetChord: null,
+            targetNotes: []
+        }, "round/create-chord-target-fallback-empty");
         return;
     }
 
@@ -619,8 +692,10 @@ const createChordTarget = () => {
         recentChordTargets.pop();
     }
 
-    state.targetChord = picked;
-    state.targetNotes = [...picked.noteIds];
+    applyRoundStatePatch({
+        targetChord: picked,
+        targetNotes: [...picked.noteIds]
+    }, "round/create-chord-target");
 };
 
 const createNoteTarget = () => {
@@ -654,11 +729,14 @@ const createNoteTarget = () => {
         recentTargets.pop();
     }
 
-    state.targetNotes = next;
-    state.targetChord = null;
+    applyRoundStatePatch({
+        targetNotes: next,
+        targetChord: null
+    }, "round/create-note-target");
 };
 
 const createTarget = () => {
+    applyRoundStatePatch({ rootHintSuppressed: false }, "round/reset-root-hint-suppressed");
     if (getIsChordRound()) {
         createChordTarget();
         return;
@@ -685,23 +763,24 @@ const getTypedPreviewNoteIds = (parsed) => {
     );
     if (!roots.length) return [];
 
-    let preferredRootMidi = centerMidi;
-    if (Number.isFinite(parsed.rootMidi)) {
-        preferredRootMidi = parsed.rootMidi;
-    }
+    let preferredRootMidi = Number.isFinite(parsed.rootMidi) ? parsed.rootMidi : centerMidi;
     if (
         !Number.isFinite(parsed.rootMidi) &&
         state.active &&
         getIsChordRound() &&
         state.targetChord &&
-        parsed.rootPc === state.targetChord.rootPc &&
         Number.isFinite(state.targetChord.rootMidi)
     ) {
         preferredRootMidi = state.targetChord.rootMidi;
     }
 
-    roots.sort((a, b) => Math.abs(a.midi - preferredRootMidi) - Math.abs(b.midi - preferredRootMidi));
+    roots.sort((a, b) => {
+        const distanceDelta = Math.abs(a.midi - preferredRootMidi) - Math.abs(b.midi - preferredRootMidi);
+        if (distanceDelta !== 0) return distanceDelta;
+        return b.midi - a.midi;
+    });
     const root = roots[0];
+
     return parsed.quality.intervals
         .map((interval) => getNoteIdByMidi(root.midi + interval))
         .filter(Boolean);
@@ -709,19 +788,23 @@ const getTypedPreviewNoteIds = (parsed) => {
 
 const updateTypedPreviewFromInput = () => {
     if (!isTypingEnabled()) {
-        state.typedPreviewNotes = [];
+        applySubmissionStatePatch({ typedPreviewNotes: [] }, "submission/typed-preview-disabled");
         return null;
     }
     const raw = chordAnswerInput?.value ?? "";
-    state.typedAnswer = raw;
     const parsed = parseChordInput(raw);
-    state.typedPreviewNotes = (state.typingShowTyped && parsed) ? getTypedPreviewNoteIds(parsed) : [];
+    const nextTypedPreview = (state.typingShowTyped && parsed) ? getTypedPreviewNoteIds(parsed) : [];
+    applySubmissionStatePatch({
+        typedAnswer: raw,
+        typedPreviewNotes: nextTypedPreview
+    }, "submission/update-typed-preview");
     return parsed;
 };
 
 const updateChordReadout = () => {
     if (!chordReadout) return;
-    const hasKeyboardSelection = state.selectedNotes.length >= 2;
+    const keyboardSelection = getEffectiveKeyboardSelection(state.selectedNotes);
+    const hasKeyboardSelection = keyboardSelection.length >= 2;
     const hasTypedInput = Boolean(state.typedAnswer?.trim());
     const hideLivePreview = Boolean(state.hideLivePreview) && !state.submitted;
     const shouldShow = state.active && getIsChordRound() && !hideLivePreview
@@ -742,7 +825,7 @@ const updateChordReadout = () => {
         return;
     }
 
-    const selectedDetected = state.selectedNotes.length ? detectChordFromNoteIds(state.selectedNotes) : null;
+    const selectedDetected = keyboardSelection.length ? detectChordFromNoteIds(keyboardSelection) : null;
     state.selectedChordLabel = selectedDetected?.label ?? "";
 
     if (state.trainingMode === "both") {
@@ -761,13 +844,13 @@ const updateChordReadout = () => {
             chordReadout.textContent = CHORD_READOUT_COPY.selected?.(state.selectedChordLabel) ?? `Selected chord: ${state.selectedChordLabel}`;
             return;
         }
-        chordReadout.textContent = state.selectedNotes.length
+        chordReadout.textContent = keyboardSelection.length
             ? (CHORD_READOUT_COPY.selectedUnknown || "Selected chord: unknown")
             : (CHORD_READOUT_COPY.selectedNone || "Selected chord: none");
         return;
     }
 
-    if (!state.selectedNotes.length) {
+    if (!keyboardSelection.length) {
         chordReadout.textContent = CHORD_READOUT_COPY.selectedNone || "Selected chord: none";
         return;
     }
@@ -803,9 +886,7 @@ const updatePrimaryAction = () => {
 };
 
 const updateReplayAvailability = () => {
-    const allowReplay = isTypingOnlyMode()
-        ? state.active
-        : state.active && (!getEffectiveBlindMode() || state.submitted);
+    const allowReplay = state.active && (!getEffectiveBlindMode() || state.submitted);
     playSelectedButton.hidden = !allowReplay;
     playSelectedButton.textContent = isTypingOnlyMode()
         ? "Replay Chord (Space)"
@@ -814,20 +895,21 @@ const updateReplayAvailability = () => {
 };
 
 const getChordHelperHints = () => {
-    if (!state.targetChord) return [];
+    if (!state.targetChord || !state.chordExtraHelpers) return [];
     const hints = [];
-    if (state.chordRootHint) {
-        hints.push({ label: HELPER_LABELS.rootNote, value: state.targetChord.rootName });
-    }
-    if (state.chordExtraHelpers) {
-        hints.push(
-            { label: HELPER_LABELS.chordSize, value: `${state.targetChord.noteCount} notes` },
-            { label: HELPER_LABELS.chordType, value: state.targetChord.qualityHint },
-            { label: HELPER_LABELS.voicing, value: getVoicingHintLabel(state.targetChord.voicing) }
-        );
-        if (Number.isFinite(state.targetChord.intervalSpan)) {
-            hints.push({ label: HELPER_LABELS.pitchSpan, value: `${state.targetChord.intervalSpan} semitones` });
-        }
+    hints.push({
+        label: HELPER_LABELS.rootNote,
+        value: state.chordRootHint
+            ? state.targetChord.rootName
+            : (HELPER_COPY.rootHidden || "Hidden")
+    });
+    hints.push(
+        { label: HELPER_LABELS.chordSize, value: `${state.targetChord.noteCount} notes` },
+        { label: HELPER_LABELS.chordType, value: state.targetChord.qualityHint },
+        { label: HELPER_LABELS.voicing, value: getVoicingHintLabel(state.targetChord.voicing) }
+    );
+    if (Number.isFinite(state.targetChord.intervalSpan)) {
+        hints.push({ label: HELPER_LABELS.pitchSpan, value: `${state.targetChord.intervalSpan} semitones` });
     }
     return hints;
 };
@@ -900,6 +982,9 @@ const renderChordHelperBox = () => {
 
 const updateStatus = () => {
     const chordRound = getIsChordRound();
+    if (!chordRound || !state.chordRootHint) {
+        state.rootHintSuppressed = false;
+    }
     const hideLivePreview = Boolean(state.hideLivePreview) && !state.submitted;
     goalCountEl.textContent = chordRound ? "1" : String(state.noteCount);
     if (goalLabelEl) {
@@ -956,6 +1041,7 @@ const updateStatus = () => {
     }
 
     roundCountEl.textContent = String(state.round);
+    const keyboardSelection = getEffectiveKeyboardSelection(state.selectedNotes);
     const typedSubmissionFinal = state.submitted && chordRound && state.submissionSource === "typing";
     if (hideLivePreview) {
         selectedListEl.textContent = "Hidden";
@@ -966,7 +1052,7 @@ const updateStatus = () => {
         const parsed = parseChordInput(state.typedAnswer);
         selectedListEl.textContent = parsed?.label || state.typedAnswer?.trim() || "None";
     } else if (state.trainingMode === "both" && chordRound) {
-        const selectedChord = detectChordFromNoteIds(state.selectedNotes);
+        const selectedChord = detectChordFromNoteIds(keyboardSelection);
         state.selectedChordLabel = selectedChord?.label ?? "";
         const parsed = state.typedAnswer?.trim() ? parseChordInput(state.typedAnswer) : null;
         const typedLabel = state.typedAnswer?.trim() ? (parsed?.label || state.typedAnswer.trim()) : "";
@@ -977,12 +1063,12 @@ const updateStatus = () => {
         } else if (state.selectedChordLabel) {
             selectedListEl.textContent = state.selectedChordLabel;
         } else {
-            selectedListEl.textContent = state.selectedNotes.length ? state.selectedNotes.join(", ") : "None";
+            selectedListEl.textContent = keyboardSelection.length ? keyboardSelection.join(", ") : "None";
         }
     } else if (chordRound) {
-        const selectedChord = detectChordFromNoteIds(state.selectedNotes);
+        const selectedChord = detectChordFromNoteIds(keyboardSelection);
         state.selectedChordLabel = selectedChord?.label ?? "";
-        selectedListEl.textContent = state.selectedChordLabel || (state.selectedNotes.length ? state.selectedNotes.join(", ") : "None");
+        selectedListEl.textContent = state.selectedChordLabel || (keyboardSelection.length ? keyboardSelection.join(", ") : "None");
     } else {
         selectedListEl.textContent = state.selectedNotes.length ? state.selectedNotes.join(", ") : "None";
     }
@@ -992,7 +1078,7 @@ const updateStatus = () => {
 
     const shouldShowHelpers = !state.submitted
         && getIsChordRound()
-        && Boolean(state.chordExtraHelpers || state.chordRootHint)
+        && Boolean(state.chordExtraHelpers)
         && Boolean(state.targetChord);
     if (helperSlotEl) {
         helperSlotEl.hidden = !shouldShowHelpers;
@@ -1008,10 +1094,21 @@ const updateStatus = () => {
 const updateKeyStates = () => {
     const evaluationNotes = state.submitted
         ? (state.submittedComparisonNotes?.length ? state.submittedComparisonNotes : state.selectedNotes)
-        : state.selectedNotes;
+        : getEffectiveKeyboardSelection(state.selectedNotes);
     const selectedSet = new Set(evaluationNotes);
-    const liveSelectedSet = new Set(state.selectedNotes);
+    const liveSelectedSet = new Set(
+        state.submitted ? state.selectedNotes : getEffectiveKeyboardSelection(state.selectedNotes)
+    );
     const targetSet = new Set(state.targetNotes);
+    const rootGuideNoteId = getRootGuideNoteId();
+    let typingRootMissing = false;
+    if (!state.submitted && rootGuideNoteId && isTypingEnabled() && state.typedAnswer?.trim()) {
+        const parsed = parseChordInput(state.typedAnswer);
+        if (parsed) {
+            const typedNoteIds = getTypedPreviewNoteIds(parsed);
+            typingRootMissing = !typedNoteIds.includes(rootGuideNoteId);
+        }
+    }
     const typedPreviewSet = new Set(
         isTypingEnabled() && state.typingShowTyped ? state.typedPreviewNotes : []
     );
@@ -1035,8 +1132,19 @@ const updateKeyStates = () => {
             } else if (targetSet.has(id) && !selectedSet.has(id)) {
                 key.classList.add("missed");
             }
-        } else if (selectedSet.has(id)) {
-            key.classList.add("selected");
+        } else {
+            if (selectedSet.has(id)) {
+                key.classList.add("selected");
+            }
+            if (rootGuideNoteId && id === rootGuideNoteId) {
+                if (state.rootHintSuppressed || typingRootMissing) {
+                    key.classList.remove("selected");
+                    key.classList.add("missed");
+                } else {
+                    key.classList.remove("selected");
+                    key.classList.add("correct");
+                }
+            }
         }
 
         if (typedPreviewSet.has(id)) {
@@ -1080,7 +1188,7 @@ const lockKeyboardForPlayback = (noteIds, mode) => {
 };
 
 const setSubmitted = (value) => {
-    state.submitted = value;
+    applySubmissionStatePatch({ submitted: Boolean(value) }, "submission/set-submitted");
     if (!value) {
         resultEl.textContent = "";
         revealEl.textContent = "";
@@ -1119,16 +1227,19 @@ const goHome = () => {
         pedalIcon.classList.remove("active");
     }
 
-    state.active = false;
-    state.hintUsed = false;
-    state.selectedNotes = [];
-    state.selectedChordLabel = "";
-    state.submissionSource = null;
-    state.submittedComparisonNotes = [];
-    state.targetNotes = [];
-    state.targetChord = null;
-    state.typedAnswer = "";
-    state.typedPreviewNotes = [];
+    applyRoundStatePatch({
+        active: false,
+        hintUsed: false,
+        selectedNotes: [],
+        selectedChordLabel: "",
+        submissionSource: null,
+        submittedComparisonNotes: [],
+        targetNotes: [],
+        targetChord: null,
+        typedAnswer: "",
+        typedPreviewNotes: [],
+        rootHintSuppressed: false
+    }, "round/go-home");
     if (chordAnswerInput) {
         chordAnswerInput.value = "";
     }
@@ -1145,15 +1256,20 @@ const refreshTarget = () => {
         updateKeyStates();
         return;
     }
-    state.selectedNotes = [];
-    state.selectedChordLabel = "";
-    state.submissionSource = null;
-    state.submittedComparisonNotes = [];
+    applyRoundStatePatch({
+        selectedNotes: [],
+        selectedChordLabel: "",
+        submissionSource: null,
+        submittedComparisonNotes: [],
+        rootHintSuppressed: false
+    }, "round/refresh-target");
     setSubmitted(false);
     createTarget();
     if (isTypingEnabled()) {
-        state.typedAnswer = "";
-        state.typedPreviewNotes = [];
+        applySubmissionStatePatch({
+            typedAnswer: "",
+            typedPreviewNotes: []
+        }, "submission/refresh-target-reset-typed");
         if (chordAnswerInput) {
             chordAnswerInput.value = "";
         }
@@ -1172,18 +1288,23 @@ const startRound = async (shouldPlay = false) => {
     }
     abortPlayback();
     clearTypingAutoNext();
-    state.round = state.active ? state.round + 1 : 1;
-    state.active = true;
-    state.hintUsed = false;
-    state.selectedNotes = [];
-    state.selectedChordLabel = "";
-    state.submissionSource = null;
-    state.submittedComparisonNotes = [];
+    applyRoundStatePatch({
+        round: state.active ? state.round + 1 : 1,
+        active: true,
+        hintUsed: false,
+        selectedNotes: [],
+        selectedChordLabel: "",
+        submissionSource: null,
+        submittedComparisonNotes: [],
+        rootHintSuppressed: false
+    }, "round/start");
     setSubmitted(false);
     createTarget();
     if (isTypingEnabled()) {
-        state.typedAnswer = "";
-        state.typedPreviewNotes = [];
+        applySubmissionStatePatch({
+            typedAnswer: "",
+            typedPreviewNotes: []
+        }, "submission/start-round-reset-typed");
         if (chordAnswerInput) {
             chordAnswerInput.value = "";
             if (state.active) {
@@ -1241,7 +1362,7 @@ const playTarget = () => {
         void startRound(true);
         return;
     }
-    state.hintUsed = true;
+    applyRoundStatePatch({ hintUsed: true }, "round/hint-used");
     updateStatus();
     if (!isTypingOnlyMode()) {
         lockKeyboardForPlayback(state.targetNotes, state.mode);
@@ -1322,6 +1443,17 @@ const toggleSelection = (noteId) => {
     if (state.submitted) {
         return;
     }
+    const rootGuideNoteId = getRootGuideNoteId();
+    if (rootGuideNoteId && noteId === rootGuideNoteId) {
+        state.rootHintSuppressed = !state.rootHintSuppressed;
+        if (state.rootHintSuppressed) {
+            state.selectedNotes = state.selectedNotes.filter((id) => id !== noteId);
+        }
+        setSubmitted(false);
+        updateStatus();
+        updateKeyStates();
+        return;
+    }
     const index = state.selectedNotes.indexOf(noteId);
     if (index !== -1) {
         state.selectedNotes.splice(index, 1);
@@ -1334,7 +1466,9 @@ const toggleSelection = (noteId) => {
     const maxSelection = getIsChordRound()
         ? Math.max(6, state.targetNotes.length || 3)
         : state.noteCount;
-    while (state.selectedNotes.length >= maxSelection) {
+    const guideOffset = rootGuideNoteId && !state.rootHintSuppressed ? 1 : 0;
+    const manualSelectionCap = Math.max(1, maxSelection - guideOffset);
+    while (state.selectedNotes.length >= manualSelectionCap) {
         state.selectedNotes.pop();
     }
 
@@ -1344,10 +1478,10 @@ const toggleSelection = (noteId) => {
     updateKeyStates();
 };
 
-const isSelectionCorrect = () => {
+const isSelectionCorrect = (noteIds = state.selectedNotes) => {
     if (getIsChordRound()) {
         if (!state.targetChord) return false;
-        const selectedPcs = getPitchClassSetFromNoteIds(state.selectedNotes);
+        const selectedPcs = getPitchClassSetFromNoteIds(noteIds);
         const targetPcs = new Set(state.targetChord.pitchClasses);
         if (!selectedPcs.size) return false;
         return (
@@ -1356,9 +1490,9 @@ const isSelectionCorrect = () => {
         );
     }
 
-    const selectedSet = new Set(state.selectedNotes);
+    const selectedSet = new Set(noteIds);
     return (
-        state.selectedNotes.length === state.targetNotes.length &&
+        noteIds.length === state.targetNotes.length &&
         state.targetNotes.every((noteId) => selectedSet.has(noteId))
     );
 };
@@ -1425,23 +1559,6 @@ const buildNoteComparison = (targetNotes, answerNotes) => {
     return { correct, wrong, missed };
 };
 
-const renderNoteComparisonCells = (targetNotes, answerNotes) => {
-    const comparison = buildNoteComparison(targetNotes, answerNotes);
-    const correctCell = renderRevealCell(
-        REVEAL_COPY.correctNotes || "Correct notes",
-        comparison.correct.length ? renderTonePills(comparison.correct, "good") : '<span class="note-pill neutral">None</span>'
-    );
-    const wrongCell = renderRevealCell(
-        REVEAL_COPY.wrongNotes || "Wrong notes",
-        comparison.wrong.length ? renderTonePills(comparison.wrong, "bad") : '<span class="note-pill neutral">None</span>'
-    );
-    const missedCell = renderRevealCell(
-        REVEAL_COPY.missedNotes || "Missed notes",
-        comparison.missed.length ? renderTonePills(comparison.missed, "missed") : '<span class="note-pill neutral">None</span>'
-    );
-    return [correctCell, wrongCell, missedCell];
-};
-
 const buildAnswerNoteCell = (answerNotes, targetNotes, { emptyTone = "bad" } = {}) => {
     const targetSet = new Set(targetNotes);
     return renderRevealCell(
@@ -1452,14 +1569,27 @@ const buildAnswerNoteCell = (answerNotes, targetNotes, { emptyTone = "bad" } = {
     );
 };
 
+const buildTargetNoteCell = (targetNotes, answerNotes) => {
+    if (!targetNotes.length) return "";
+    const answerSet = new Set(answerNotes);
+    return renderRevealCell(
+        REVEAL_COPY.targetNotes || "Target notes",
+        targetNotes.map((note) => {
+            const isMissed = !answerSet.has(note);
+            const toneClass = isMissed ? "missed" : "good";
+            const label = isMissed ? `${note} (missed)` : note;
+            return `<span class="note-pill ${toneClass}">${escapeHtml(label)}</span>`;
+        }).join("")
+    );
+};
+
 const buildChordRevealEntries = ({
     targetChordLabel = "",
     targetNotes = [],
     answerChordLabel = "",
     answerChordTone = "bad",
     answerNotes = [],
-    includeAnswerNotes = true,
-    includeNoteComparison = true
+    includeAnswerNotes = true
 } = {}) => {
     const entries = [];
     if (targetChordLabel) {
@@ -1468,12 +1598,7 @@ const buildChordRevealEntries = ({
             renderTonePills([targetChordLabel], "good")
         ));
     }
-    if (targetNotes.length) {
-        entries.push(renderRevealCell(
-            REVEAL_COPY.targetNotes || "Target notes",
-            renderTonePills(targetNotes, "good")
-        ));
-    }
+    entries.push(buildTargetNoteCell(targetNotes, answerNotes));
     if (answerChordLabel) {
         entries.push(renderRevealCell(
             REVEAL_COPY.yourChord || "Your chord",
@@ -1482,9 +1607,6 @@ const buildChordRevealEntries = ({
     }
     if (includeAnswerNotes) {
         entries.push(buildAnswerNoteCell(answerNotes, targetNotes));
-    }
-    if (includeNoteComparison) {
-        entries.push(...renderNoteComparisonCells(targetNotes, answerNotes));
     }
     return entries;
 };
@@ -1587,11 +1709,12 @@ const playSelectedChord = () => {
         playSubmittedReplaySequence(0);
         return;
     }
-    if (!state.selectedNotes.length) {
+    const keyboardSelection = getEffectiveKeyboardSelection(state.selectedNotes);
+    if (!keyboardSelection.length) {
         resultEl.textContent = ACTION_COPY.selectNotesFirst || "Select some notes first.";
         return;
     }
-    playConsistentPreview(state.selectedNotes, state.mode, {
+    playConsistentPreview(keyboardSelection, state.mode, {
         animate: true,
         animationDelay: 0
     });
@@ -1700,8 +1823,10 @@ const submitTypedAnswer = () => {
         parsed.quality.id === target.quality.id &&
         octaveValid
     );
-    state.submissionSource = "typing";
-    state.submittedComparisonNotes = isCorrect ? [...state.targetNotes] : [...answerNotes];
+    applySubmissionStatePatch({
+        submissionSource: "typing",
+        submittedComparisonNotes: isCorrect ? [...state.targetNotes] : [...answerNotes]
+    }, "submission/typed-answer");
     setSubmitted(true);
     if (isCorrect) {
         resultEl.textContent = ACTION_COPY.correctChord?.(target.label) ?? `Correct: ${target.label}`;
@@ -1711,8 +1836,7 @@ const submitTypedAnswer = () => {
             answerChordLabel: answerNotes.length ? parsed.label : "",
             answerChordTone: "good",
             answerNotes: answerNotes.length ? answerNotes : state.targetNotes,
-            includeAnswerNotes: false,
-            includeNoteComparison: false
+            includeAnswerNotes: false
         }));
         lastReveal = {
             target: [...state.targetNotes],
@@ -1738,8 +1862,7 @@ const submitTypedAnswer = () => {
         answerChordLabel: answerLabel,
         answerChordTone: "bad",
         answerNotes,
-        includeAnswerNotes: false,
-        includeNoteComparison: true
+        includeAnswerNotes: false
     }))}${detail}`;
     resultEl.textContent = FEEDBACK_COPY.wrongChordName || "Not quite. Compare the chord name and quality.";
     lastReveal = {
@@ -1768,13 +1891,16 @@ const submitAnswer = () => {
         return;
     }
     abortPlayback();
-    state.submissionSource = "keyboard";
-    state.submittedComparisonNotes = [...state.selectedNotes];
+    const keyboardSelection = getEffectiveKeyboardSelection(state.selectedNotes);
+    applySubmissionStatePatch({
+        submissionSource: "keyboard",
+        submittedComparisonNotes: [...keyboardSelection]
+    }, "submission/keyboard-answer");
     setSubmitted(true);
-    const isCorrect = isSelectionCorrect();
+    const isCorrect = isSelectionCorrect(keyboardSelection);
 
     if (getIsChordRound()) {
-        const selectedChord = detectChordFromNoteIds(state.selectedNotes);
+        const selectedChord = detectChordFromNoteIds(keyboardSelection);
         const targetLabel = state.targetChord?.label ?? "Unknown";
         const selectedLabel = selectedChord?.label ?? "Unknown";
         resultEl.textContent = isCorrect
@@ -1785,9 +1911,8 @@ const submitAnswer = () => {
             targetNotes: state.targetNotes,
             answerChordLabel: selectedLabel,
             answerChordTone: isCorrect ? "good" : "bad",
-            answerNotes: state.selectedNotes,
-            includeAnswerNotes: true,
-            includeNoteComparison: true
+            answerNotes: keyboardSelection,
+            includeAnswerNotes: true
         }));
     } else {
         resultEl.textContent = isCorrect
@@ -1796,13 +1921,13 @@ const submitAnswer = () => {
         const targetHtml = renderNotePills(REVEAL_COPY.targetNotes || "Target notes", state.targetNotes, "good");
         const pressedHtml = renderPressedPills();
         const targetChordMeta = renderChordDetectionMeta("Detected target chord", state.targetNotes, "good");
-        const selectedChordMeta = renderChordDetectionMeta("Detected your chord", state.selectedNotes, isCorrect ? "good" : "bad");
+        const selectedChordMeta = renderChordDetectionMeta("Detected your chord", keyboardSelection, isCorrect ? "good" : "bad");
         revealEl.innerHTML = `${targetHtml}${pressedHtml}${targetChordMeta}${selectedChordMeta}`;
     }
 
     lastReveal = {
         target: [...state.targetNotes],
-        selected: [...state.selectedNotes]
+        selected: [...keyboardSelection]
     };
     playRevealSequence({
         snapshot: lastReveal,
@@ -1812,6 +1937,48 @@ const submitAnswer = () => {
     updateKeyStates();
     updatePrimaryAction();
     updateStatus();
+};
+
+const sanitizeRoundStateForKeyboardRange = () => {
+    state.selectedNotes = sanitizeKnownNoteIds(state.selectedNotes);
+    state.targetNotes = sanitizeKnownNoteIds(state.targetNotes);
+    state.typedPreviewNotes = sanitizeKnownNoteIds(state.typedPreviewNotes);
+    state.submittedComparisonNotes = sanitizeKnownNoteIds(state.submittedComparisonNotes);
+
+    if (state.targetChord) {
+        const chordNoteIds = sanitizeKnownNoteIds(state.targetChord.noteIds);
+        const hasRootPitchClass = chordNoteIds.some((noteId) => {
+            const midi = getMidiFromNoteId(noteId);
+            return Number.isFinite(midi) && normalizePitchClass(midi) === state.targetChord.rootPc;
+        });
+        if (!chordNoteIds.length || !hasRootPitchClass) {
+            state.targetChord = null;
+            state.targetNotes = [];
+        } else {
+            state.targetChord = {
+                ...state.targetChord,
+                noteIds: chordNoteIds,
+                noteCount: chordNoteIds.length
+            };
+            state.targetNotes = [...chordNoteIds];
+        }
+    }
+
+    if (lastReveal) {
+        lastReveal = {
+            target: sanitizeKnownNoteIds(lastReveal.target),
+            selected: sanitizeKnownNoteIds(lastReveal.selected)
+        };
+    }
+
+    if (state.active && !state.submitted && !state.targetNotes.length) {
+        createTarget();
+    }
+    if (!state.active || !state.chordRootHint || !getIsChordRound()) {
+        state.rootHintSuppressed = false;
+    }
+    updateStatus();
+    updateKeyStates();
 };
 
 Object.assign(App.game, {
@@ -1833,7 +2000,10 @@ Object.assign(App.game, {
     updateStatus,
     updateKeyStates,
     setKeyboardEnabled,
-    clearTypingAutoNext
+    clearTypingAutoNext,
+    sanitizeRoundStateForKeyboardRange
 });
+
+
 
 

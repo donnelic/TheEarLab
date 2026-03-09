@@ -8,6 +8,17 @@ Browser-based piano ear-training app for note and chord recognition.
    - `vendor/libfluidsynth-2.4.6.js`
    - `vendor/js-synthesizer.min.js`
    - `js/core.js`
+   - `js/store/reducers.js`
+   - `js/store/actions.js`
+   - `js/store/selectors.js`
+   - `js/store/store.js`
+   - `js/features/round/state-mutations.js`
+   - `js/features/settings/state-mutations.js`
+   - `js/features/chords/index.js`
+   - `js/features/typing/index.js`
+   - `js/features/tutorial/index.js`
+   - `js/features/audio-preview/index.js`
+   - `js/features/input/index.js`
    - `js/audio.js`
    - `js/game.js`
    - `js/settings.js`
@@ -20,13 +31,17 @@ Browser-based piano ear-training app for note and chord recognition.
 - `styles.css`: all visual styling, shared layout/unit tokens in `:root`, responsive rules.
 - `vendor/`: bundled SF2 runtime dependencies (`libfluidsynth` + `js-synthesizer`).
 - `js/core.js`: DOM references, shared runtime constants/copy, mode policy, envelope policy, soundfont catalog state, shared app state, note/key builders.
+- `js/store/`: centralized state dispatcher (`store.js`), action creators (`actions.js`), reducers (`reducers.js`), and shared selectors/invariant helpers (`selectors.js`).
+- `js/features/`: split feature-layer modules (`round`, `settings`, `chords`, `typing`, `tutorial`, `audio-preview`, `input`) with compatibility wrappers for migrated flows.
 - `js/audio.js`: SF2 playback engine + sample-pack compatibility, discovery/loading, preview sequencing.
 - `js/game.js`: round lifecycle, validation, reveal playback, keyboard state behavior.
 - `js/settings.js`: settings mutations, persistence hooks, panel positioning logic.
 - `js/events.js`: all event wiring and startup initialization.
 - `js/app.*.js`: legacy snapshot modules (not loaded by `index.html`).
 - `soundfonts/`: drop-in `.sf2` files for instrument discovery.
+- `IMPLEMENTATION_CHECKLIST.md`: phased execution checklist for bug fixes, redesign, refactor, and feature rollout.
 - `tools/generate-project-map.ps1`: regenerates `PROJECT_MAP.md` with exact line maps.
+- `tools/smoke-checklist.md`: fast regression pass for critical app flows (target <=10 minutes).
 - `tools/start-local-server.ps1` and `start-server.bat`: quick local static server launcher.
 
 ## Run Locally
@@ -49,6 +64,10 @@ Browser-based piano ear-training app for note and chord recognition.
 - Full SF2 instrument browsing is in a separate `Instrument Browser` panel (grouped by inferred GM families for bank 0).
 - Advanced panel is now dedicated to `Articulation Profile` controls and profile management.
 - Game settings (`Play style`, `Blind mode`, mode-specific chord controls, typing controls) live in the `Game Settings` popup opened from settings.
+- Floating settings popups now run through one shared panel manager (single-open behavior, consistent click-outside/escape close, shared resize repositioning).
+- Round-affecting settings now follow a shared refresh policy: active rounds auto-restart only for changes that require target regeneration/playback context refresh (for example play style, practice/input mode, chord set/root hint, note count, key range/start note).
+- Migrated round/settings/submission state flows now dispatch through `App.store` patch actions (with optional action logging + invariant checks for development diagnostics).
+  - Runtime debug toggles (console): `App.debug.enableActionLog()`, `App.debug.disableActionLog()`, `App.debug.enableInvariantChecks()`, `App.debug.disableInvariantChecks()`.
 - `Notes per round` now lives inside `Game Settings` and is only shown in `Random Notes` / `Harmonic Notes` modes.
 - Advanced sliders show absolute values (seconds + hold multiplier), not percentages.
 - Slider ghost markers show the selected profile target while editing.
@@ -78,10 +97,12 @@ Browser-based piano ear-training app for note and chord recognition.
 - Chord parsing/training now includes broader common types (for example `m6`, `m9`, `maj9`, `7sus4`, `add11`, plus prior advanced variants like `m7b5`, `dim7`, `mMaj7`, `maj7#11`, `7b9`).
 - Live selected chord detection is shown below the keyboard while in chord rounds.
 - Reveal/check output shows chord names (target vs your chord) in chord rounds.
+- Chord reveal now uses a compact note comparison layout: `Target notes` marks misses inline (for example `C5 (missed)`) and `Your notes` marks extra wrong notes, without separate redundant correct/wrong/missed rows.
 - Post-submit replay now follows the target with your submitted answer whenever the answer was incomplete or wrong, not only when extra wrong notes were pressed.
 - In chord rounds, helper hints are shown as delayed hover-reveal rows (all labels visible, each value revealed independently) when `Extra helpers` is enabled, with masked placeholder strings so value length is not leaked before reveal.
 - Helper masks now vary slightly by hint type and may include spacing so the blurred placeholders look less uniform; pointer-fine devices now use one lightweight semi-transparent custom cursor across the app instead of the laggy helper-only cursor experiment.
-- Chord mode also includes `Reveal root note`, which shows the target root in the helper card without giving away the full chord quality.
+- Chord mode also includes `Reveal root note`, which shows the target root in the helper card and highlights it on the keyboard as a green anchor without giving away the full chord quality.
+- Chord helper layout stays stable when toggling `Reveal root note`; the root row remains present and switches between hidden/revealed value so keyboard spacing does not jump between rounds.
 - `Answer input` options in chord practice:
   - `Play on keyboard` (keyboard only),
   - `Type chord name` (typing only),
@@ -96,6 +117,8 @@ Browser-based piano ear-training app for note and chord recognition.
   - pressing `Space` inside the typing field previews the typed chord when parsing succeeds and blind mode is off; it will not auto-replay target notes when nothing is selected/typed.
   - includes a built-in chord tutorial opened directly from the `?` button in typing mode and from `Game Settings -> Chord tutorial`.
 - typed chords can optionally include root octave as a prefix (for example `4Cm`, `3A#maj7`); when octave is included, grading checks it.
+  - when no octave is typed, typed chord preview roots are anchored around the target-root register and choose the nearest valid octave for each root (with range-fit fallback), so trying different roots stays musically close instead of forcing one fixed octave bucket.
+  - quality parsing now keeps `6` as major 6 (for example `B6`) and supports `M7`/`M9` major shorthand without collapsing them into minor aliases.
   - when a typed answer is correct, result key-highlighting uses the target-note mapping so octave placement chosen by typed preview does not produce false "missed notes".
   - tutorial now uses a progressive root/quality matrix: all roots/qualities stay visible, locked items are greyed out until introduced, newly introduced items are highlighted, and each theory step explains specific chord families in plain language.
   - typed chord parsing treats a bare root (for example `F`) as major (`F`), not minor.
