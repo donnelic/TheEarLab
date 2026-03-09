@@ -79,7 +79,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - Game settings include `Hide live answer preview`, which suppresses live selected/typed note/chord labels until submit.
 - Audio output uses headroom + light compression/high-pass filtering.
 - Startup is staged: first paint renders UI quickly, then only the selected/primary SF2 pack is loaded in the background; full multi-pack preset loading is deferred until opening the Instrument Browser.
-- First playback now gates on selected instrument readiness to avoid "short/cut first notes" while SF2 assets are still warming up.
+- New-round playback now uses a short handoff pause after stopping current notes, and round start waits for selected instrument readiness before activating playback (including first round) to avoid silent starts/cut notes while SF2 assets warm up.
 
 ## Chord Training Modes
 - Landing page now includes quick-start cards for `Random Notes`, `Harmonic Notes`, and `Chord Practice`; pressing `Enter` still starts a round with your last-used mode profile.

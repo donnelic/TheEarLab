@@ -108,6 +108,7 @@ const CHORD_QUALITY_HINTS = {
 };
 const TYPE_SUCCESS_FLASH_MS = 700;
 const CHORD_HISTORY_LIMIT = 8;
+const ROUND_TRANSITION_PAUSE_MS = 90;
 const recentChordTargets = [];
 let typingAutoNextTimer = null;
 let roundStartInProgress = false;
@@ -750,6 +751,34 @@ const clearTypingAutoNext = () => {
     typingAutoNextTimer = null;
 };
 
+const waitForMs = (delayMs = 0) => new Promise((resolve) => {
+    const ms = Number.isFinite(delayMs) ? delayMs : 0;
+    if (ms <= 0) {
+        resolve();
+        return;
+    }
+    setTimeout(resolve, ms);
+});
+
+const ensureRoundPlaybackReady = async () => {
+    const ensureReady = App.audio?.ensureSoundfontReady;
+    if (typeof ensureReady !== "function") return true;
+    let entry = await ensureReady(state.pianoTone);
+    if (entry?.ready) return true;
+
+    const refreshCatalog = App.audio?.refreshSoundfontCatalog;
+    if (typeof refreshCatalog === "function") {
+        try {
+            await refreshCatalog({ loadAllPacks: false });
+        } catch (_error) {
+            // Ignore here; readiness check below determines whether playback can proceed.
+        }
+        entry = await ensureReady(state.pianoTone);
+    }
+
+    return Boolean(entry?.ready);
+};
+
 const getTypedPreviewNoteIds = (parsed) => {
     if (!parsed || !notes.length) return [];
     const maxMidi = notes[notes.length - 1].midi;
@@ -1286,63 +1315,73 @@ const startRound = async (shouldPlay = false) => {
     if (shouldPlay) {
         roundStartInProgress = true;
     }
-    abortPlayback();
-    clearTypingAutoNext();
-    applyRoundStatePatch({
-        round: state.active ? state.round + 1 : 1,
-        active: true,
-        hintUsed: false,
-        selectedNotes: [],
-        selectedChordLabel: "",
-        submissionSource: null,
-        submittedComparisonNotes: [],
-        rootHintSuppressed: false
-    }, "round/start");
-    setSubmitted(false);
-    createTarget();
-    if (isTypingEnabled()) {
-        applySubmissionStatePatch({
-            typedAnswer: "",
-            typedPreviewNotes: []
-        }, "submission/start-round-reset-typed");
-        if (chordAnswerInput) {
-            chordAnswerInput.value = "";
-            if (state.active) {
-                chordAnswerInput.focus();
+    try {
+        abortPlayback();
+        clearTypingAutoNext();
+
+        if (shouldPlay) {
+            await waitForMs(ROUND_TRANSITION_PAUSE_MS);
+            if (token !== roundStartToken) {
+                return;
+            }
+            const isReady = await ensureRoundPlaybackReady();
+            if (token !== roundStartToken) {
+                return;
+            }
+            if (!isReady) {
+                resultEl.textContent = ACTION_COPY.instrumentStillLoading
+                    || "Instrument is still loading. Please try again in a moment.";
+                return;
             }
         }
-    }
-    setKeyboardEnabled(!isTypingOnlyMode());
-    updateStatus();
-    updateKeyStates();
-    pendingCriticalRestart = false;
-    if (shouldPlay) {
-        if (typeof ensureSoundfontReady === "function") {
-            try {
-                await ensureSoundfontReady(state.pianoTone);
-            } catch (_error) {
-                // Keep flow moving; playNotes has its own readiness gate too.
+
+        applyRoundStatePatch({
+            round: state.active ? state.round + 1 : 1,
+            active: true,
+            hintUsed: false,
+            selectedNotes: [],
+            selectedChordLabel: "",
+            submissionSource: null,
+            submittedComparisonNotes: [],
+            rootHintSuppressed: false
+        }, "round/start");
+        setSubmitted(false);
+        createTarget();
+        if (isTypingEnabled()) {
+            applySubmissionStatePatch({
+                typedAnswer: "",
+                typedPreviewNotes: []
+            }, "submission/start-round-reset-typed");
+            if (chordAnswerInput) {
+                chordAnswerInput.value = "";
+                if (state.active) {
+                    chordAnswerInput.focus();
+                }
             }
         }
-        if (token !== roundStartToken || !state.active) {
-            if (token === roundStartToken) {
-                roundStartInProgress = false;
+        setKeyboardEnabled(!isTypingOnlyMode());
+        updateStatus();
+        updateKeyStates();
+        pendingCriticalRestart = false;
+        if (shouldPlay) {
+            if (token !== roundStartToken || !state.active) {
+                return;
             }
-            return;
+            const ctx = ensureAudio();
+            if (!isTypingOnlyMode()) {
+                lockKeyboardForPlayback(state.targetNotes, state.mode);
+            }
+            playConsistentPreview(state.targetNotes, state.mode, {
+                startTime: ctx.currentTime + ROUND_START_DELAY,
+                animate: false
+            });
+        } else {
+            setKeyboardEnabled(!isTypingOnlyMode());
         }
-        const ctx = ensureAudio();
-        if (!isTypingOnlyMode()) {
-            lockKeyboardForPlayback(state.targetNotes, state.mode);
-        }
-        playConsistentPreview(state.targetNotes, state.mode, {
-            startTime: ctx.currentTime + ROUND_START_DELAY,
-            animate: false
-        });
-        if (token === roundStartToken) {
+    } finally {
+        if (shouldPlay) {
             roundStartInProgress = false;
         }
-    } else {
-        setKeyboardEnabled(!isTypingOnlyMode());
     }
 };
 
