@@ -327,6 +327,7 @@ window.addEventListener("resize", () => {
     }
     if (isChordTutorialOpen()) {
         fitTutorialLayout({ recompute: false });
+        fitTutorialProgressTabs();
     }
 });
 
@@ -999,6 +1000,25 @@ const renderChordTutorialTabs = () => {
         `;
     }).join("");
     chordTutorialTabs.innerHTML = tabs;
+    fitTutorialProgressTabs();
+};
+
+const fitTutorialProgressTabs = () => {
+    if (!chordTutorialTabs) return;
+    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
+    void chordTutorialTabs.offsetWidth;
+    const available = chordTutorialTabs.clientWidth;
+    if (!available) return;
+    const baseWidth = chordTutorialTabs.scrollWidth;
+    if (!baseWidth || baseWidth <= available) return;
+    const nextScale = Math.max(0.72, Math.min(1, available / baseWidth));
+    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", nextScale.toFixed(3));
+    void chordTutorialTabs.offsetWidth;
+    const adjustedWidth = chordTutorialTabs.scrollWidth;
+    if (adjustedWidth > available + 1 && nextScale > 0.72) {
+        const secondScale = Math.max(0.72, Math.min(nextScale, available / adjustedWidth));
+        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", secondScale.toFixed(3));
+    }
 };
 
 const renderChordTutorialStep = () => {

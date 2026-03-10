@@ -1240,16 +1240,17 @@ body.modal-open {
 }
 
 .tutorial-progress-tabs {
+    --tutorial-tabs-scale: 1;
     position: relative;
     display: flex;
     flex-wrap: nowrap;
-    gap: 8px;
+    gap: calc(8px * var(--tutorial-tabs-scale));
     align-items: center;
     justify-content: center;
-    padding: 6px 10px;
+    padding: calc(6px * var(--tutorial-tabs-scale)) calc(10px * var(--tutorial-tabs-scale));
     min-width: 0;
     max-width: 100%;
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     scrollbar-width: none;
 }
@@ -1261,13 +1262,13 @@ body.modal-open {
 .tutorial-progress-tab {
     position: relative;
     z-index: 1;
-    border: 1px solid color-mix(in oklab, var(--control-border) 80%, var(--muted));
+    border: 2px solid color-mix(in oklab, var(--control-border) 80%, var(--muted));
     background: color-mix(in oklab, var(--panel) 94%, transparent);
     color: var(--muted);
     font: inherit;
-    font-size: 0.72rem;
+    font-size: calc(0.72rem * var(--tutorial-tabs-scale));
     font-weight: 700;
-    padding: 6px 12px;
+    padding: calc(6px * var(--tutorial-tabs-scale)) calc(12px * var(--tutorial-tabs-scale));
     cursor: pointer;
     transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
     white-space: nowrap;
@@ -1279,8 +1280,8 @@ body.modal-open {
     content: "";
     position: absolute;
     top: 50%;
-    left: 16px;
-    right: 16px;
+    left: calc(14px * var(--tutorial-tabs-scale));
+    right: calc(14px * var(--tutorial-tabs-scale));
     border-top: 1px dashed color-mix(in oklab, var(--control-border) 80%, var(--muted));
     transform: translateY(-50%);
     z-index: 0;
@@ -1294,9 +1295,9 @@ body.modal-open {
 
 .tutorial-progress-tab.active {
     color: var(--ink);
-    background: color-mix(in oklab, var(--accent-2) 20%, var(--panel));
-    border-color: color-mix(in oklab, var(--accent-2) 60%, var(--input-border));
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent-2) 40%, transparent);
+    background: color-mix(in oklab, var(--accent-2) 30%, var(--panel));
+    border-color: color-mix(in oklab, var(--accent-2) 75%, var(--input-border));
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-2) 35%, transparent);
     transform: translateY(-1px);
 }
 
