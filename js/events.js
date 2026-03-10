@@ -1006,17 +1006,33 @@ const renderChordTutorialTabs = () => {
 
 const fitTutorialProgressTabs = () => {
     if (!chordTutorialTabs) return;
-    const minScale = 0.5;
+    const minScale = 0.55;
+    const measure = () => {
+        const styles = getComputedStyle(chordTutorialTabs);
+        const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
+        const padRight = Number.parseFloat(styles.paddingRight) || 0;
+        const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
+        const contentWidth = Math.max(0, chordTutorialTabs.scrollWidth - padLeft - padRight);
+        return { available, contentWidth };
+    };
+
+    chordTutorialTabs.classList.remove("compact");
     chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
     void chordTutorialTabs.offsetWidth;
-    const styles = getComputedStyle(chordTutorialTabs);
-    const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
-    const padRight = Number.parseFloat(styles.paddingRight) || 0;
-    const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
-    if (!available) return;
-    const contentWidth = Math.max(0, chordTutorialTabs.scrollWidth - padLeft - padRight);
-    if (!contentWidth) return;
-    const scale = Math.max(minScale, Math.min(1, available / contentWidth));
+    let { available, contentWidth } = measure();
+    if (!available || !contentWidth) return;
+    let scale = Math.min(1, available / contentWidth);
+
+    if (scale < 0.72) {
+        chordTutorialTabs.classList.add("compact");
+        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
+        void chordTutorialTabs.offsetWidth;
+        ({ available, contentWidth } = measure());
+        if (!available || !contentWidth) return;
+        scale = Math.min(1, available / contentWidth);
+    }
+
+    scale = Math.max(minScale, scale);
     chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", scale.toFixed(3));
 };
 

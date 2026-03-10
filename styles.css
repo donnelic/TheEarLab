@@ -599,16 +599,24 @@ body:not(.landing) .quick-start {
     color: inherit;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    padding-top: 26px;
-    margin-top: -26px;
+    text-decoration: none;
+}
+
+.chord-link::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    right: -6px;
+    top: -28px;
+    height: 28px;
 }
 
 
 .chord-link-bubble {
     position: absolute;
-    top: -30px;
+    top: -22px;
     left: 50%;
-    transform: translate(-50%, -4px);
+    transform: translate(-50%, -2px);
     width: 24px;
     height: 24px;
     border-radius: 999px;
@@ -622,7 +630,7 @@ body:not(.landing) .quick-start {
     box-shadow: 0 10px 20px color-mix(in oklab, var(--shadow) 55%, transparent);
     opacity: 0;
     pointer-events: auto;
-    transition: opacity 0.18s ease, transform 0.18s ease;
+    transition: opacity 0.16s ease, transform 0.16s ease;
     z-index: 2;
     cursor: pointer;
 }
@@ -639,11 +647,9 @@ body:not(.landing) .quick-start {
 }
 
 .chord-link:hover .chord-link-bubble,
-.chord-link:focus-visible .chord-link-bubble,
-.chord-link:focus-within .chord-link-bubble,
-.chord-link-bubble:hover {
+.chord-link:focus-visible .chord-link-bubble {
     opacity: 1;
-    transform: translate(-50%, -8px);
+    transform: translate(-50%, -6px);
 }
 
 .chord-link:focus-visible {
@@ -1310,6 +1316,14 @@ body.modal-open {
 
 .tutorial-progress-label {
     letter-spacing: 0.02em;
+}
+
+.tutorial-progress-tabs.compact .tutorial-progress-label {
+    display: none;
+}
+
+.tutorial-progress-tabs.compact .tutorial-progress-tab {
+    padding: calc(6px * var(--tutorial-tabs-scale)) calc(8px * var(--tutorial-tabs-scale));
 }
 
 .tutorial-progress-tabs::before {
@@ -2786,6 +2800,9 @@ body.modal-open {
 .reveal-grid.compact {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+        "target-chord target-notes"
+        "your-chord your-notes";
     gap: 6px 6px;
     overflow: visible;
 }
@@ -2793,6 +2810,22 @@ body.modal-open {
 .reveal-cell {
     min-width: 0;
     overflow: visible;
+}
+
+.reveal-cell.reveal-target-chord {
+    grid-area: target-chord;
+}
+
+.reveal-cell.reveal-target-notes {
+    grid-area: target-notes;
+}
+
+.reveal-cell.reveal-your-chord {
+    grid-area: your-chord;
+}
+
+.reveal-cell.reveal-your-notes {
+    grid-area: your-notes;
 }
 
 .keyboard-zone {
@@ -3105,12 +3138,21 @@ body.landing .pedal-box {
     overflow: visible;
 }
 
+.reveal-grid.compact .note-pills {
+    align-items: flex-start;
+}
+
 .note-pill {
     padding: 3px 9px;
     border-radius: 999px;
     font-weight: 700;
     font-size: 0.8rem;
     border: 2px solid transparent;
+}
+
+.reveal-grid.compact .note-pill {
+    min-width: 56px;
+    text-align: center;
 }
 
 .note-pill.chord-pill {
@@ -3125,7 +3167,7 @@ body.landing .pedal-box {
 
 .note-pill.chord-pill .chord-link-bubble {
     position: absolute;
-    top: -26px;
+    top: -18px;
     left: 50%;
     transform: translate(-50%, -2px);
 }

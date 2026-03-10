@@ -1612,10 +1612,10 @@ const renderNotePills = (label, notes, toneClass) => {
     return `<div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${pills}</div>`;
 };
 
-const renderChordPill = (label, chordLabel, toneClass) => {
+const renderChordPill = (label, chordLabel, toneClass, className = "") => {
     if (!chordLabel) return "";
     const chordMarkup = renderChordLink(chordLabel, { className: `note-pill ${toneClass} chord-pill` });
-    return `<div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${chordMarkup}</div>`;
+    return renderRevealCell(label, chordMarkup, className);
 };
 
 const renderTonePills = (items, toneClassOrResolver = "good") => {
@@ -1628,9 +1628,11 @@ const renderTonePills = (items, toneClassOrResolver = "good") => {
     }).join("");
 };
 
-const renderRevealCell = (label, pillsHtml) => {
+const renderRevealCell = (label, pillsHtml, className = "") => {
     if (!pillsHtml) return "";
-    return `<div class="reveal-cell"><div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${pillsHtml}</div></div>`;
+    const classes = ["reveal-cell"];
+    if (className) classes.push(className);
+    return `<div class="${classes.join(" ")}"><div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${pillsHtml}</div></div>`;
 };
 
 const renderChordRevealGrid = (entries) => {
@@ -1660,17 +1662,18 @@ const buildNoteComparison = (targetNotes, answerNotes) => {
     return { correct, wrong, missed };
 };
 
-const buildAnswerNoteCell = (answerNotes, targetNotes, { emptyTone = "bad" } = {}) => {
+const buildAnswerNoteCell = (answerNotes, targetNotes, { emptyTone = "bad", className = "" } = {}) => {
     const targetSet = new Set(targetNotes);
     return renderRevealCell(
         REVEAL_COPY.yourNotes || "Your notes",
         answerNotes.length
             ? renderTonePills(answerNotes, (note) => (targetSet.has(note) ? "good" : "bad"))
-            : `<span class="note-pill ${emptyTone}">None</span>`
+            : `<span class="note-pill ${emptyTone}">None</span>`,
+        className
     );
 };
 
-const buildTargetNoteCell = (targetNotes, answerNotes) => {
+const buildTargetNoteCell = (targetNotes, answerNotes, className = "") => {
     if (!targetNotes.length) return "";
     const answerSet = new Set(answerNotes);
     return renderRevealCell(
@@ -1680,7 +1683,8 @@ const buildTargetNoteCell = (targetNotes, answerNotes) => {
             const toneClass = isMissed ? "missed" : "good";
             const label = isMissed ? `${note} (missed)` : note;
             return `<span class="note-pill ${toneClass}">${escapeHtml(label)}</span>`;
-        }).join("")
+        }).join(""),
+        className
     );
 };
 
@@ -1694,14 +1698,14 @@ const buildChordRevealEntries = ({
 } = {}) => {
     const entries = [];
     if (targetChordLabel) {
-        entries.push(renderChordPill(REVEAL_COPY.targetChord || "Target chord", targetChordLabel, "good"));
+        entries.push(renderChordPill(REVEAL_COPY.targetChord || "Target chord", targetChordLabel, "good", "reveal-target-chord"));
     }
-    entries.push(buildTargetNoteCell(targetNotes, answerNotes));
+    entries.push(buildTargetNoteCell(targetNotes, answerNotes, "reveal-target-notes"));
     if (answerChordLabel) {
-        entries.push(renderChordPill(REVEAL_COPY.yourChord || "Your chord", answerChordLabel, answerChordTone));
+        entries.push(renderChordPill(REVEAL_COPY.yourChord || "Your chord", answerChordLabel, answerChordTone, "reveal-your-chord"));
     }
     if (includeAnswerNotes) {
-        entries.push(buildAnswerNoteCell(answerNotes, targetNotes));
+        entries.push(buildAnswerNoteCell(answerNotes, targetNotes, { className: "reveal-your-notes" }));
     }
     return entries;
 };
