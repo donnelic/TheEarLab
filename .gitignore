@@ -25,3 +25,6 @@ coverage/
 .env
 .env.*
 !.env.example
+
+# Local tooling state
+tools/.build-version-state.json

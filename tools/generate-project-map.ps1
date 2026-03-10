@@ -8,7 +8,11 @@ $ErrorActionPreference = "Stop"
 
 function Get-LineCount {
     param([string]$Path)
-    return (Get-Content -Path $Path).Count
+    try {
+        return (Get-Content -Path $Path -ErrorAction Stop).Count
+    } catch {
+        return 0
+    }
 }
 
 function Count-Braces {
@@ -229,17 +233,24 @@ $rootPath = (Resolve-Path -Path $Root).Path
 $indexPath = Join-Path $rootPath "index.html"
 $stylesPath = Join-Path $rootPath "styles.css"
 $jsDir = Join-Path $rootPath "js"
+$vendorDir = Join-Path $rootPath "vendor"
 $readmePath = Join-Path $rootPath "README.md"
 $agentsPath = Join-Path $rootPath "AGENTS.md"
+$implementationChecklistPath = Join-Path $rootPath "IMPLEMENTATION_CHECKLIST.md"
+$smokeChecklistPath = Join-Path $rootPath "tools\smoke-checklist.md"
 $mapPath = Join-Path $rootPath "PROJECT_MAP.md"
 $toolPath = Join-Path $rootPath "tools\generate-project-map.ps1"
+$soundfontsDir = Join-Path $rootPath "soundfonts"
 $outputPath = Join-Path $rootPath $Output
 
 $jsFiles = Get-ChildItem -Path $jsDir -File -Filter "*.js" | Sort-Object Name
 $loadedScripts = Get-IndexScripts -Path $indexPath
 $loadedLookup = @{}
 foreach ($script in $loadedScripts) {
-    $loadedLookup[$script.Src.Replace("/", "\")] = $true
+    $normalizedSrc = ($script.Src -split "\?")[0].Trim()
+    if ($normalizedSrc) {
+        $loadedLookup[$normalizedSrc.Replace("/", "\")] = $true
+    }
 }
 
 $inventory = @(
@@ -269,6 +280,15 @@ if (Test-Path $readmePath) {
         Lines = Get-LineCount -Path $readmePath
     }
 }
+if (Test-Path $implementationChecklistPath) {
+    $inventory += [pscustomobject]@{
+        File = "IMPLEMENTATION_CHECKLIST.md"
+        Kind = "Markdown"
+        Runtime = "Implementation roadmap checklist"
+        Active = "Yes"
+        Lines = Get-LineCount -Path $implementationChecklistPath
+    }
+}
 if (Test-Path $agentsPath) {
     $inventory += [pscustomobject]@{
         File = "AGENTS.md"
@@ -296,6 +316,38 @@ if (Test-Path $toolPath) {
         Lines = Get-LineCount -Path $toolPath
     }
 }
+if (Test-Path $smokeChecklistPath) {
+    $inventory += [pscustomobject]@{
+        File = "tools/smoke-checklist.md"
+        Kind = "Markdown"
+        Runtime = "Manual regression checklist"
+        Active = "Yes"
+        Lines = Get-LineCount -Path $smokeChecklistPath
+    }
+}
+if (Test-Path $soundfontsDir) {
+    $soundfontFiles = Get-ChildItem -Path $soundfontsDir -Recurse -File | Sort-Object FullName
+    foreach ($sf in $soundfontFiles) {
+        $relative = $sf.FullName.Replace($rootPath + "\", "") -replace "\\", "/"
+        $kind = switch ($sf.Extension.ToLower()) {
+            ".json" { "JSON" }
+            ".md" { "Markdown" }
+            ".wav" { "Audio" }
+            ".mp3" { "Audio" }
+            ".ogg" { "Audio" }
+            ".flac" { "Audio" }
+            default { "Asset" }
+        }
+        $lineCount = if ($kind -in @("JSON", "Markdown")) { Get-LineCount -Path $sf.FullName } else { 0 }
+        $inventory += [pscustomobject]@{
+            File = $relative
+            Kind = $kind
+            Runtime = "Soundfont asset"
+            Active = "Yes"
+            Lines = $lineCount
+        }
+    }
+}
 
 $doc = New-Object System.Text.StringBuilder
 
@@ -308,25 +360,27 @@ $doc = New-Object System.Text.StringBuilder
 [void]$doc.AppendLine("2. Treat index.html script order as the source of truth for runtime behavior.")
 [void]$doc.AppendLine("3. After any code edit, run powershell -File ./tools/generate-project-map.ps1 to refresh line ranges.")
 [void]$doc.AppendLine("4. If you add/remove/move files, update README.md, this file, and AGENTS.md in the same change.")
-[void]$doc.AppendLine("5. Do not edit legacy js/app.*.js files unless you intentionally want to revive that branch.")
+[void]$doc.AppendLine("5. Commit and push changes when the update is complete (if git remote is configured).")
+[void]$doc.AppendLine("6. Do not edit legacy js/app.*.js files unless you intentionally want to revive that branch.")
 [void]$doc.AppendLine("")
 [void]$doc.AppendLine("## System Flows")
 [void]$doc.AppendLine("### Bootstrap")
-[void]$doc.AppendLine("1. index.html loads CSS and five runtime scripts (core -> audio -> game -> settings -> events).")
+[void]$doc.AppendLine("1. index.html loads CSS, vendor synth dependencies, and runtime scripts (core -> audio -> game -> settings -> events).")
 [void]$doc.AppendLine("2. core.js defines DOM handles, constants, state containers, persistence helpers, note/key builders.")
 [void]$doc.AppendLine("3. events.js:init() hydrates UI from saved settings, binds events, renders keyboard, and sets status.")
 [void]$doc.AppendLine("")
 [void]$doc.AppendLine("### Round Lifecycle")
-[void]$doc.AppendLine("1. startRound(true) creates target notes and optionally plays them.")
-[void]$doc.AppendLine("2. User selects notes on keyboard (toggleSelection).")
-[void]$doc.AppendLine("3. Submit (submitAnswer) compares selection vs target and renders reveal.")
-[void]$doc.AppendLine("4. Reveal playback (playRevealSequence) replays target and selected snapshots.")
+[void]$doc.AppendLine("1. startRound(true) creates either note targets or chord targets and optionally plays them.")
+[void]$doc.AppendLine("2. Keyboard mode: user selects keys (toggleSelection) and submits with submitAnswer().")
+[void]$doc.AppendLine("3. Typing mode: user types chord names (submitTypedAnswer) with quick-fire auto-next on correct.")
+[void]$doc.AppendLine("4. Reveal playback (playRevealSequence) replays target and selected/typed snapshots on review.")
 [void]$doc.AppendLine("")
 [void]$doc.AppendLine("### Audio Lifecycle")
 [void]$doc.AppendLine("1. ensureAudio() lazily creates Web Audio context + master gain.")
-[void]$doc.AppendLine("2. playNotes / playPianoNote schedule oscillators, envelopes, and key animations.")
-[void]$doc.AppendLine("3. stopNotesById / stopAllNotes release voices and clear key timers.")
-[void]$doc.AppendLine("4. Preview system (playPianoPreview) runs timed on/off/pedal events.")
+[void]$doc.AppendLine("2. refreshSoundfontCatalog() discovers local soundfont packs from soundfonts/.")
+[void]$doc.AppendLine("3. playNotes / playPianoNote schedule SF2/sample playback, envelopes, and key animations.")
+[void]$doc.AppendLine("4. stopNotesById / stopAllNotes release active sample voices and clear key timers.")
+[void]$doc.AppendLine("5. Preview system (playPianoPreview) runs timed on/off/pedal events.")
 [void]$doc.AppendLine("")
 [void]$doc.AppendLine("## File Inventory")
 [void]$doc.AppendLine("| File | Kind | Runtime Role | Active | Lines |")
@@ -383,6 +437,16 @@ if (Test-Path $readmePath) {
     }
     [void]$doc.AppendLine("")
 }
+if (Test-Path $implementationChecklistPath) {
+    [void]$doc.AppendLine("### IMPLEMENTATION_CHECKLIST.md")
+    [void]$doc.AppendLine("File: IMPLEMENTATION_CHECKLIST.md (1-$(Get-LineCount -Path $implementationChecklistPath))")
+    [void]$doc.AppendLine("| Heading | Line |")
+    [void]$doc.AppendLine("|---|---:|")
+    foreach ($heading in (Get-MarkdownHeadings -Path $implementationChecklistPath)) {
+        [void]$doc.AppendLine("| $($heading.Title) | $($heading.Line) |")
+    }
+    [void]$doc.AppendLine("")
+}
 if (Test-Path $agentsPath) {
     [void]$doc.AppendLine("### AGENTS.md")
     [void]$doc.AppendLine("File: AGENTS.md (1-$(Get-LineCount -Path $agentsPath))")
@@ -400,6 +464,16 @@ if (Test-Path $toolPath) {
     [void]$doc.AppendLine("|---|---:|")
     foreach ($fn in (Get-PsFunctionStarts -Path $toolPath)) {
         [void]$doc.AppendLine("| $($fn.Name) | $($fn.Line) |")
+    }
+    [void]$doc.AppendLine("")
+}
+if (Test-Path $smokeChecklistPath) {
+    [void]$doc.AppendLine("### tools/smoke-checklist.md")
+    [void]$doc.AppendLine("File: tools/smoke-checklist.md (1-$(Get-LineCount -Path $smokeChecklistPath))")
+    [void]$doc.AppendLine("| Heading | Line |")
+    [void]$doc.AppendLine("|---|---:|")
+    foreach ($heading in (Get-MarkdownHeadings -Path $smokeChecklistPath)) {
+        [void]$doc.AppendLine("| $($heading.Title) | $($heading.Line) |")
     }
     [void]$doc.AppendLine("")
 }
@@ -442,10 +516,25 @@ foreach ($js in $jsFiles) {
     }
 }
 
+if (Test-Path $vendorDir) {
+    $vendorFiles = Get-ChildItem -Path $vendorDir -File -Filter "*.js" | Sort-Object Name
+    foreach ($vendor in $vendorFiles) {
+        $relative = "vendor/$($vendor.Name)"
+        $inventory += [pscustomobject]@{
+            File = $relative
+            Kind = "JavaScript"
+            Runtime = "Vendor runtime dependency"
+            Active = if ($loadedLookup[$relative.Replace("/", "\")]) { "Yes" } else { "No" }
+            Lines = Get-LineCount -Path $vendor.FullName
+        }
+    }
+}
+
 [void]$doc.AppendLine("## Maintenance Notes")
 [void]$doc.AppendLine("- js/app.*.js is an older branch snapshot. Keep it for reference unless explicitly retired.")
 [void]$doc.AppendLine("- Functional edits should target loaded scripts first: core.js, audio.js, game.js, settings.js, events.js.")
 [void]$doc.AppendLine("- If you intentionally switch runtime scripts, update script tags in index.html and regenerate this file.")
+[void]$doc.AppendLine("- After verification, commit and push the updated files when repository remotes are configured.")
 
 $doc.ToString() | Set-Content -Path $outputPath -Encoding UTF8
 Write-Output "Generated $Output"

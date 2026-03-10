@@ -5,12 +5,28 @@ These instructions are mandatory for any AI assistant working in this repository
 ## Priority Order
 1. Read `README.md`.
 2. Read `PROJECT_MAP.md`.
-3. Only then inspect/edit source files.
+3. Read `IMPLEMENTATION_CHECKLIST.md` for roadmap sequencing when the task is backlog/feature planning.
+4. Only then inspect/edit source files.
+5. For runtime-impacting changes, run `tools/smoke-checklist.md` before finalizing.
 
 ## Source of Truth
 - Runtime behavior is defined by the script order in `index.html`.
+- Vendor runtime dependencies loaded before app modules:
+  - `vendor/libfluidsynth-2.4.6.js`
+  - `vendor/js-synthesizer.min.js`
 - Active runtime modules are:
   - `js/core.js`
+  - `js/store/reducers.js`
+  - `js/store/actions.js`
+  - `js/store/selectors.js`
+  - `js/store/store.js`
+  - `js/features/round/state-mutations.js`
+  - `js/features/settings/state-mutations.js`
+  - `js/features/chords/index.js`
+  - `js/features/typing/index.js`
+  - `js/features/tutorial/index.js`
+  - `js/features/audio-preview/index.js`
+  - `js/features/input/index.js`
   - `js/audio.js`
   - `js/game.js`
   - `js/settings.js`
@@ -22,7 +38,8 @@ These instructions are mandatory for any AI assistant working in this repository
 2. Regenerate map:
    - `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\generate-project-map.ps1`
 3. If any file layout/flow changed, ensure `README.md` and `PROJECT_MAP.md` still match.
-4. Do not finish the task if line maps are stale.
+4. Commit and push changes if git is configured for this repo.
+5. Do not finish the task if line maps are stale.
 
 ## Documentation Quality Bar
 - Keep updates compact but information-dense.
