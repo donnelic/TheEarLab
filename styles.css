@@ -602,16 +602,6 @@ body:not(.landing) .quick-start {
     text-decoration: none;
 }
 
-.chord-link::before {
-    content: "";
-    position: absolute;
-    left: -6px;
-    right: -6px;
-    top: -28px;
-    height: 28px;
-}
-
-
 .chord-link-bubble {
     position: absolute;
     top: -22px;
@@ -647,6 +637,11 @@ body:not(.landing) .quick-start {
 }
 
 .chord-link:hover .chord-link-bubble {
+    opacity: 1;
+    transform: translate(-50%, -6px);
+}
+
+.chord-link-bubble:hover {
     opacity: 1;
     transform: translate(-50%, -6px);
 }
@@ -3169,11 +3164,20 @@ body.landing .pedal-box {
     overflow: visible;
 }
 
+.note-pill.chord-pill .chord-link {
+    position: static;
+}
+
 .note-pill.chord-pill .chord-link-bubble {
     position: absolute;
-    top: -26px;
+    top: -22px;
     left: 50%;
-    transform: translate(-50%, -4px);
+    transform: translate(-50%, -2px);
+}
+
+.note-pill.chord-pill:hover .chord-link-bubble {
+    opacity: 1;
+    transform: translate(-50%, -6px);
 }
 
 .note-pill.good {
