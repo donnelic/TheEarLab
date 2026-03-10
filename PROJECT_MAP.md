@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-10 12:11:44 +01:00
+Generated: 2026-03-10 12:17:53 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -36,8 +36,8 @@ Generated: 2026-03-10 12:11:44 +01:00
 | styles.css | CSS | Loaded directly | Yes | 3175 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1529 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1064 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 2071 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 2108 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 2073 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 2110 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1474 |
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
@@ -797,7 +797,7 @@ File lines: 1-1064
 | rebuildKeyboard | 1052-1063 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-2071
+File lines: 1-2073
 
 | Symbol | Lines |
 |---|---|
@@ -806,66 +806,66 @@ File lines: 1-2071
 | patchSettingsState | 32-38 |
 | adjustKeyCount | 409-412 |
 | bindKeyCountStepper | 414-419 |
-| isChordTutorialOpen | 620-620 |
-| fitTutorialLayout | 623-651 |
-| clearFitClasses | 629-632 |
-| applyFitClass | 634-639 |
-| getTutorialStep | 653-658 |
-| getStepUnlockedRootSet | 660-668 |
-| getStepUnlockedQualitySet | 670-676 |
-| isTutorialRootEnabled | 678-678 |
-| isTutorialQualityEnabled | 679-679 |
-| getTutorialRootLabel | 681-684 |
-| midiToTutorialLabel | 686-690 |
-| getClosestNoteIdFromMidi | 692-699 |
-| getTutorialRenderedChord | 701-723 |
-| ensureTutorialKeyboard | 725-763 |
-| getStepAllowedQualityIds | 765-767 |
-| getTutorialActiveSpec | 769-771 |
-| renderTutorialCurrentText | 773-784 |
-| renderTutorialPianoHighlight | 786-820 |
-| renderTutorialRootOptions | 822-840 |
-| renderTutorialQualityOptions | 842-887 |
-| syncTutorialRootChipStates | 889-908 |
-| syncTutorialQualityChipStates | 910-929 |
-| setTutorialHoverSpec | 931-938 |
-| clearTutorialHoverSpec | 940-943 |
-| refreshTutorialVisuals | 945-949 |
-| getTutorialStepIndexForQuality | 979-985 |
-| renderChordTutorialTabs | 987-1002 |
-| renderChordTutorialStep | 1004-1060 |
-| closeChordTutorial | 1062-1075 |
-| openChordTutorial | 1077-1112 |
-| registerTutorialOpenTrigger | 1114-1121 |
-| openChordTutorialForChordLink | 1123-1133 |
-| handleChordLinkActivation | 1135-1142 |
-| isChordTypingCaptureActive | 1280-1285 |
-| insertTypedCharacter | 1287-1294 |
-| triggerPrimaryAction | 1297-1306 |
-| getButtonLikeTarget | 1309-1309 |
-| blurPointerActivatedControl | 1310-1317 |
-| ensureCustomCursorEl | 1327-1344 |
-| getCustomCursorMode | 1345-1354 |
-| renderCustomCursor | 1362-1370 |
-| scheduleCustomCursorRender | 1371-1374 |
-| setCustomCursorEnabled | 1375-1388 |
-| updateCustomCursorPosition | 1389-1396 |
-| triggerReplayAction | 1398-1404 |
-| bindPianoOptionEvents | 1564-1589 |
-| applyCustomCursorMediaState | 1707-1709 |
-| isElementVisible | 1724-1730 |
-| getFocusableElements | 1732-1736 |
-| focusFirstInModal | 1742-1748 |
-| trapModalFocus | 1750-1772 |
-| isTextEditableTarget | 1774-1779 |
-| getActiveModalEl | 1781-1786 |
-| closeGameSettingsModalUi | 1788-1797 |
-| openGameSettingsModalUi | 1799-1805 |
-| closeActiveModal | 1807-1821 |
-| moveFocusInPanel | 1823-1834 |
-| setRandomBackgroundAngle | 2024-2027 |
-| init | 2029-2065 |
-| runDeferredCatalogLoad | 2049-2058 |
+| isChordTutorialOpen | 622-622 |
+| fitTutorialLayout | 625-653 |
+| clearFitClasses | 631-634 |
+| applyFitClass | 636-641 |
+| getTutorialStep | 655-660 |
+| getStepUnlockedRootSet | 662-670 |
+| getStepUnlockedQualitySet | 672-678 |
+| isTutorialRootEnabled | 680-680 |
+| isTutorialQualityEnabled | 681-681 |
+| getTutorialRootLabel | 683-686 |
+| midiToTutorialLabel | 688-692 |
+| getClosestNoteIdFromMidi | 694-701 |
+| getTutorialRenderedChord | 703-725 |
+| ensureTutorialKeyboard | 727-765 |
+| getStepAllowedQualityIds | 767-769 |
+| getTutorialActiveSpec | 771-773 |
+| renderTutorialCurrentText | 775-786 |
+| renderTutorialPianoHighlight | 788-822 |
+| renderTutorialRootOptions | 824-842 |
+| renderTutorialQualityOptions | 844-889 |
+| syncTutorialRootChipStates | 891-910 |
+| syncTutorialQualityChipStates | 912-931 |
+| setTutorialHoverSpec | 933-940 |
+| clearTutorialHoverSpec | 942-945 |
+| refreshTutorialVisuals | 947-951 |
+| getTutorialStepIndexForQuality | 981-987 |
+| renderChordTutorialTabs | 989-1004 |
+| renderChordTutorialStep | 1006-1062 |
+| closeChordTutorial | 1064-1077 |
+| openChordTutorial | 1079-1114 |
+| registerTutorialOpenTrigger | 1116-1123 |
+| openChordTutorialForChordLink | 1125-1135 |
+| handleChordLinkActivation | 1137-1144 |
+| isChordTypingCaptureActive | 1282-1287 |
+| insertTypedCharacter | 1289-1296 |
+| triggerPrimaryAction | 1299-1308 |
+| getButtonLikeTarget | 1311-1311 |
+| blurPointerActivatedControl | 1312-1319 |
+| ensureCustomCursorEl | 1329-1346 |
+| getCustomCursorMode | 1347-1356 |
+| renderCustomCursor | 1364-1372 |
+| scheduleCustomCursorRender | 1373-1376 |
+| setCustomCursorEnabled | 1377-1390 |
+| updateCustomCursorPosition | 1391-1398 |
+| triggerReplayAction | 1400-1406 |
+| bindPianoOptionEvents | 1566-1591 |
+| applyCustomCursorMediaState | 1709-1711 |
+| isElementVisible | 1726-1732 |
+| getFocusableElements | 1734-1738 |
+| focusFirstInModal | 1744-1750 |
+| trapModalFocus | 1752-1774 |
+| isTextEditableTarget | 1776-1781 |
+| getActiveModalEl | 1783-1788 |
+| closeGameSettingsModalUi | 1790-1799 |
+| openGameSettingsModalUi | 1801-1807 |
+| closeActiveModal | 1809-1823 |
+| moveFocusInPanel | 1825-1836 |
+| setRandomBackgroundAngle | 2026-2029 |
+| init | 2031-2067 |
+| runDeferredCatalogLoad | 2051-2060 |
 
 Event bindings:
 | Target | Event | Line |
@@ -917,168 +917,168 @@ Event bindings:
 | hintButton | click | 424 |
 | chordAnswerInput | input | 429 |
 | chordAnswerInput | keydown | 436 |
-| triggerEl | click | 1116 |
-| document | click | 1144 |
-| document | keydown | 1145 |
-| chordTutorialTabs | click | 1151 |
-| chordTutorialClose | click | 1163 |
-| chordTutorialBackdrop | click | 1170 |
-| chordTutorialPrev | click | 1176 |
-| chordTutorialNext | click | 1184 |
-| chordTutorialRootList | mouseover | 1196 |
-| chordTutorialRootList | mouseleave | 1204 |
-| chordTutorialRootList | focusin | 1207 |
-| chordTutorialRootList | focusout | 1215 |
-| chordTutorialRootList | click | 1218 |
-| chordTutorialQualityList | mouseover | 1234 |
-| chordTutorialQualityList | mouseleave | 1241 |
-| chordTutorialQualityList | focusin | 1244 |
-| chordTutorialQualityList | focusout | 1251 |
-| chordTutorialQualityList | click | 1254 |
-| volumeSlider | dblclick | 1406 |
-| lengthSlider | dblclick | 1410 |
-| keyCountSlider | dblclick | 1414 |
-| startNoteDownButton | click | 1420 |
-| startNoteUpButton | click | 1423 |
-| startNoteDownOctButton | click | 1429 |
-| startNoteUpOctButton | click | 1432 |
-| noteCountInput | dblclick | 1437 |
-| attackSlider | dblclick | 1445 |
-| decaySlider | dblclick | 1449 |
-| releaseSlider | dblclick | 1453 |
-| sustainSlider | dblclick | 1457 |
-| profileSearch | input | 1462 |
-| profileList | click | 1468 |
-| profileList | dblclick | 1473 |
-| profileList | keydown | 1476 |
-| profileApply | click | 1487 |
-| profileSave | click | 1493 |
-| instrumentPresetSearch | input | 1499 |
-| instrumentPresetList | click | 1505 |
-| instrumentPresetList | dblclick | 1510 |
-| instrumentPresetList | keydown | 1513 |
-| instrumentPresetApply | click | 1524 |
-| advancedTrigger | click | 1529 |
-| advancedPanel | click | 1534 |
-| pianoTrigger | click | 1539 |
-| pianoPanel | click | 1546 |
-| instrumentBrowserTrigger | click | 1552 |
-| instrumentBrowserPanel | click | 1559 |
-| pianoOptionsContainer | click | 1567 |
-| pianoOptionsContainer | keydown | 1581 |
-| pianoPreviewMain | click | 1592 |
-| testEnvelopeButton | click | 1599 |
-| keyboardEl | pointerdown | 1604 |
-| document | pointerup | 1640 |
-| document | pointercancel | 1647 |
-| document | pointerdown | 1654 |
-| document | click | 1660 |
-| document | pointermove | 1664 |
-| document | pointerup | 1668 |
-| document | pointercancel | 1673 |
-| document | pointerover | 1678 |
-| document | pointerout | 1684 |
-| window | blur | 1693 |
-| document | visibilitychange | 1699 |
-| CUSTOM_CURSOR_QUERY | change | 1711 |
-| keyboardEl | click | 1717 |
-| document | keydown | 1836 |
-| document | keyup | 1972 |
-| pedalBox | pointerdown | 1991 |
-| pedalBox | pointerup | 2000 |
-| pedalBox | pointercancel | 2009 |
-| pedalBox | pointerleave | 2017 |
+| triggerEl | click | 1118 |
+| document | click | 1146 |
+| document | keydown | 1147 |
+| chordTutorialTabs | click | 1153 |
+| chordTutorialClose | click | 1165 |
+| chordTutorialBackdrop | click | 1172 |
+| chordTutorialPrev | click | 1178 |
+| chordTutorialNext | click | 1186 |
+| chordTutorialRootList | mouseover | 1198 |
+| chordTutorialRootList | mouseleave | 1206 |
+| chordTutorialRootList | focusin | 1209 |
+| chordTutorialRootList | focusout | 1217 |
+| chordTutorialRootList | click | 1220 |
+| chordTutorialQualityList | mouseover | 1236 |
+| chordTutorialQualityList | mouseleave | 1243 |
+| chordTutorialQualityList | focusin | 1246 |
+| chordTutorialQualityList | focusout | 1253 |
+| chordTutorialQualityList | click | 1256 |
+| volumeSlider | dblclick | 1408 |
+| lengthSlider | dblclick | 1412 |
+| keyCountSlider | dblclick | 1416 |
+| startNoteDownButton | click | 1422 |
+| startNoteUpButton | click | 1425 |
+| startNoteDownOctButton | click | 1431 |
+| startNoteUpOctButton | click | 1434 |
+| noteCountInput | dblclick | 1439 |
+| attackSlider | dblclick | 1447 |
+| decaySlider | dblclick | 1451 |
+| releaseSlider | dblclick | 1455 |
+| sustainSlider | dblclick | 1459 |
+| profileSearch | input | 1464 |
+| profileList | click | 1470 |
+| profileList | dblclick | 1475 |
+| profileList | keydown | 1478 |
+| profileApply | click | 1489 |
+| profileSave | click | 1495 |
+| instrumentPresetSearch | input | 1501 |
+| instrumentPresetList | click | 1507 |
+| instrumentPresetList | dblclick | 1512 |
+| instrumentPresetList | keydown | 1515 |
+| instrumentPresetApply | click | 1526 |
+| advancedTrigger | click | 1531 |
+| advancedPanel | click | 1536 |
+| pianoTrigger | click | 1541 |
+| pianoPanel | click | 1548 |
+| instrumentBrowserTrigger | click | 1554 |
+| instrumentBrowserPanel | click | 1561 |
+| pianoOptionsContainer | click | 1569 |
+| pianoOptionsContainer | keydown | 1583 |
+| pianoPreviewMain | click | 1594 |
+| testEnvelopeButton | click | 1601 |
+| keyboardEl | pointerdown | 1606 |
+| document | pointerup | 1642 |
+| document | pointercancel | 1649 |
+| document | pointerdown | 1656 |
+| document | click | 1662 |
+| document | pointermove | 1666 |
+| document | pointerup | 1670 |
+| document | pointercancel | 1675 |
+| document | pointerover | 1680 |
+| document | pointerout | 1686 |
+| window | blur | 1695 |
+| document | visibilitychange | 1701 |
+| CUSTOM_CURSOR_QUERY | change | 1713 |
+| keyboardEl | click | 1719 |
+| document | keydown | 1838 |
+| document | keyup | 1974 |
+| pedalBox | pointerdown | 1993 |
+| pedalBox | pointerup | 2002 |
+| pedalBox | pointercancel | 2011 |
+| pedalBox | pointerleave | 2019 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-2108
+File lines: 1-2110
 
 | Symbol | Lines |
 |---|---|
-| applyRoundStatePatch | 137-146 |
-| applySubmissionStatePatch | 148-157 |
-| normalizeQualityToken | 159-176 |
-| renderChordLink | 185-209 |
-| getKeyboardZoneEl | 237-237 |
-| normalizePitchClass | 238-238 |
-| getRootName | 239-239 |
-| getMidiFromNoteId | 240-240 |
-| buildChordLabel | 241-241 |
-| getPitchClassSetFromNoteIds | 243-251 |
-| getRootGuideNoteId | 257-272 |
-| getEffectiveKeyboardSelection | 274-286 |
-| getChordDifficultyId | 288-293 |
-| getChordDifficultyConfig | 295-298 |
-| getAllowedChordQualities | 300-305 |
-| getChordQualityHint | 307-310 |
-| getConsistentPreviewDuration | 318-321 |
-| playConsistentPreview | 327-345 |
-| releaseInteractivePressSession | 382-410 |
-| getReplayNoteIds | 412-436 |
-| getVoicingHintLabel | 438-442 |
-| randomSample | 444-451 |
-| getNiceTarget | 453-490 |
-| getQualityPitchClassSet | 492-498 |
-| parseChordInput | 500-539 |
-| detectChordFromNoteIds | 541-577 |
-| normalizeIntervals | 579-581 |
-| fitIntervalsToAvailableRange | 583-603 |
-| buildVoicedIntervals | 605-633 |
-| chooseRootCandidatesForIntervals | 635-644 |
-| buildChordFromRoot | 646-674 |
-| createChordTarget | 676-726 |
-| createNoteTarget | 728-763 |
-| createTarget | 765-772 |
-| clearTypingAutoNext | 774-778 |
-| ensureRoundPlaybackReady | 789-806 |
-| getTypedPreviewNoteIds | 808-842 |
-| updateTypedPreviewFromInput | 844-857 |
-| updateChordReadout | 859-931 |
-| updateModeVisibility | 933-950 |
-| updatePrimaryAction | 952-957 |
-| updateReplayAvailability | 959-966 |
-| getChordHelperHints | 968-986 |
-| createDeterministicHelperMask | 1004-1032 |
-| renderChordHelperBox | 1034-1052 |
-| updateStatus | 1054-1178 |
-| updateKeyStates | 1180-1241 |
-| setKeyboardEnabled | 1243-1246 |
-| updateKeyboardScale | 1248-1259 |
-| lockKeyboardForPlayback | 1261-1274 |
-| setSubmitted | 1276-1283 |
-| goHome | 1285-1337 |
-| refreshTarget | 1339-1365 |
-| startRound | 1367-1443 |
-| ensureRound | 1445-1454 |
-| playTarget | 1456-1470 |
-| startManualNote | 1472-1490 |
-| releaseManualNote | 1492-1500 |
-| releasePedalNotes | 1502-1512 |
-| startPedalHold | 1514-1520 |
-| stopPedalHold | 1522-1529 |
-| toggleSelection | 1531-1575 |
-| isSelectionCorrect | 1577-1594 |
-| getPlaybackSpan | 1596-1601 |
-| renderNotePills | 1603-1609 |
-| renderChordPill | 1611-1615 |
-| renderTonePills | 1617-1625 |
-| renderRevealCell | 1627-1630 |
-| renderChordRevealGrid | 1632-1635 |
-| renderChordDetectionMeta | 1637-1641 |
-| renderPressedPills | 1643-1648 |
-| buildNoteComparison | 1650-1657 |
-| buildAnswerNoteCell | 1659-1667 |
-| buildTargetNoteCell | 1669-1681 |
-| getSubmittedReplaySnapshot | 1711-1725 |
-| playSubmittedReplaySequence | 1727-1740 |
-| playRevealSequence | 1742-1792 |
-| playSelectedChord | 1794-1818 |
-| playTypedInputChord | 1820-1833 |
-| startHeldPlayback | 1835-1861 |
-| releaseHeldPlayback | 1863-1877 |
-| buildTypingRevealDetail | 1879-1899 |
-| submitTypedAnswer | 1901-1974 |
-| submitAnswer | 1976-2039 |
-| sanitizeRoundStateForKeyboardRange | 2041-2081 |
+| applyRoundStatePatch | 139-148 |
+| applySubmissionStatePatch | 150-159 |
+| normalizeQualityToken | 161-178 |
+| renderChordLink | 187-211 |
+| getKeyboardZoneEl | 239-239 |
+| normalizePitchClass | 240-240 |
+| getRootName | 241-241 |
+| getMidiFromNoteId | 242-242 |
+| buildChordLabel | 243-243 |
+| getPitchClassSetFromNoteIds | 245-253 |
+| getRootGuideNoteId | 259-274 |
+| getEffectiveKeyboardSelection | 276-288 |
+| getChordDifficultyId | 290-295 |
+| getChordDifficultyConfig | 297-300 |
+| getAllowedChordQualities | 302-307 |
+| getChordQualityHint | 309-312 |
+| getConsistentPreviewDuration | 320-323 |
+| playConsistentPreview | 329-347 |
+| releaseInteractivePressSession | 384-412 |
+| getReplayNoteIds | 414-438 |
+| getVoicingHintLabel | 440-444 |
+| randomSample | 446-453 |
+| getNiceTarget | 455-492 |
+| getQualityPitchClassSet | 494-500 |
+| parseChordInput | 502-541 |
+| detectChordFromNoteIds | 543-579 |
+| normalizeIntervals | 581-583 |
+| fitIntervalsToAvailableRange | 585-605 |
+| buildVoicedIntervals | 607-635 |
+| chooseRootCandidatesForIntervals | 637-646 |
+| buildChordFromRoot | 648-676 |
+| createChordTarget | 678-728 |
+| createNoteTarget | 730-765 |
+| createTarget | 767-774 |
+| clearTypingAutoNext | 776-780 |
+| ensureRoundPlaybackReady | 791-808 |
+| getTypedPreviewNoteIds | 810-844 |
+| updateTypedPreviewFromInput | 846-859 |
+| updateChordReadout | 861-933 |
+| updateModeVisibility | 935-952 |
+| updatePrimaryAction | 954-959 |
+| updateReplayAvailability | 961-968 |
+| getChordHelperHints | 970-988 |
+| createDeterministicHelperMask | 1006-1034 |
+| renderChordHelperBox | 1036-1054 |
+| updateStatus | 1056-1180 |
+| updateKeyStates | 1182-1243 |
+| setKeyboardEnabled | 1245-1248 |
+| updateKeyboardScale | 1250-1261 |
+| lockKeyboardForPlayback | 1263-1276 |
+| setSubmitted | 1278-1285 |
+| goHome | 1287-1339 |
+| refreshTarget | 1341-1367 |
+| startRound | 1369-1445 |
+| ensureRound | 1447-1456 |
+| playTarget | 1458-1472 |
+| startManualNote | 1474-1492 |
+| releaseManualNote | 1494-1502 |
+| releasePedalNotes | 1504-1514 |
+| startPedalHold | 1516-1522 |
+| stopPedalHold | 1524-1531 |
+| toggleSelection | 1533-1577 |
+| isSelectionCorrect | 1579-1596 |
+| getPlaybackSpan | 1598-1603 |
+| renderNotePills | 1605-1611 |
+| renderChordPill | 1613-1617 |
+| renderTonePills | 1619-1627 |
+| renderRevealCell | 1629-1632 |
+| renderChordRevealGrid | 1634-1637 |
+| renderChordDetectionMeta | 1639-1643 |
+| renderPressedPills | 1645-1650 |
+| buildNoteComparison | 1652-1659 |
+| buildAnswerNoteCell | 1661-1669 |
+| buildTargetNoteCell | 1671-1683 |
+| getSubmittedReplaySnapshot | 1713-1727 |
+| playSubmittedReplaySequence | 1729-1742 |
+| playRevealSequence | 1744-1794 |
+| playSelectedChord | 1796-1820 |
+| playTypedInputChord | 1822-1835 |
+| startHeldPlayback | 1837-1863 |
+| releaseHeldPlayback | 1865-1879 |
+| buildTypingRevealDetail | 1881-1901 |
+| submitTypedAnswer | 1903-1976 |
+| submitAnswer | 1978-2041 |
+| sanitizeRoundStateForKeyboardRange | 2043-2083 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1474

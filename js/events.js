@@ -467,6 +467,7 @@ const TUTORIAL_QUALITIES = [
     { id: "m9", label: "Minor 9", suffix: "m9", intervals: [0, 3, 7, 10, 14], roles: ["R", "b3", "5", "b7", "9"] },
     { id: "six", label: "Major 6", suffix: "6", intervals: [0, 4, 7, 9], roles: ["R", "3", "5", "6"] },
     { id: "m6", label: "Minor 6", suffix: "m6", intervals: [0, 3, 7, 9], roles: ["R", "b3", "5", "6"] },
+    { id: "add2", label: "Add2", suffix: "add2", intervals: [0, 2, 4, 7], roles: ["R", "2", "3", "5"] },
     { id: "add9", label: "Add9", suffix: "add9", intervals: [0, 4, 7, 14], roles: ["R", "3", "5", "9"] },
     { id: "sus2", label: "Sus2", suffix: "sus2", intervals: [0, 2, 7], roles: ["R", "2", "5"] },
     { id: "sus4", label: "Sus4", suffix: "sus4", intervals: [0, 5, 7], roles: ["R", "4", "5"] },
@@ -481,7 +482,7 @@ const TUTORIAL_QUALITY_GROUPS = [
     { label: "Core Triads", ids: ["maj", "min", "power5"] },
     { label: "Suspended", ids: ["sus2", "sus4"] },
     { label: "6th / 7th", ids: ["six", "m6", "maj7", "m7", "dom7"] },
-    { label: "9th / Add", ids: ["nine", "maj9", "m9", "add9"] },
+    { label: "9th / Add", ids: ["nine", "maj9", "m9", "add2", "add9"] },
     { label: "Altered", ids: ["dim", "aug"] }
 ];
 const TUTORIAL_MIDI_START = 48; // C3
@@ -597,6 +598,7 @@ const TUTORIAL_QUALITY_STEP_INDEX = Object.freeze({
     nine: 6,
     maj9: 6,
     m9: 6,
+    add2: 6,
     add9: 6
 });
 

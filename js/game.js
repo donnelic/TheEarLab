@@ -46,6 +46,7 @@ const CHORD_QUALITIES = [
     { id: "nine", suffix: "9", intervals: [0, 4, 7, 10, 14], aliases: ["9", "dom9", "dominant9"] },
     { id: "maj9", suffix: "maj9", intervals: [0, 4, 7, 11, 14], aliases: ["maj9", "major9", "ma9", "M9"] },
     { id: "min9", suffix: "m9", intervals: [0, 3, 7, 10, 14], aliases: ["m9", "min9", "minor9", "-9"] },
+    { id: "add2", suffix: "add2", intervals: [0, 2, 4, 7], aliases: ["add2"] },
     { id: "add9", suffix: "add9", intervals: [0, 4, 7, 14], aliases: ["add9"] },
     { id: "add11", suffix: "add11", intervals: [0, 4, 5, 7], aliases: ["add11"] },
     { id: "mMaj7", suffix: "mMaj7", intervals: [0, 3, 7, 11], aliases: ["mmaj7", "minmaj7", "minormajor7"] },
@@ -62,7 +63,7 @@ const CHORD_DIFFICULTY_CONFIG = {
         spacingChance: 0
     },
     medium: {
-        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "sus47", "maj7", "min7", "dom7", "add9", "six", "min6", "dim", "aug"],
+        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "sus47", "maj7", "min7", "dom7", "add2", "add9", "six", "min6", "dim", "aug"],
         voicing: "root",
         spacingChance: 0
     },
@@ -73,7 +74,7 @@ const CHORD_DIFFICULTY_CONFIG = {
         maxInversion: 1
     },
     hard: {
-        qualityIds: ["maj7", "min7", "dom7", "sus47", "dim", "aug", "m7b5", "dim7", "six", "min6", "sixNine", "nine", "maj9", "min9", "add9", "add11", "mMaj7", "maj7#11", "7b9"],
+        qualityIds: ["maj7", "min7", "dom7", "sus47", "dim", "aug", "m7b5", "dim7", "six", "min6", "sixNine", "nine", "maj9", "min9", "add2", "add9", "add11", "mMaj7", "maj7#11", "7b9"],
         voicing: "advanced",
         spacingChance: 0.8,
         maxInversion: 2
@@ -100,6 +101,7 @@ const CHORD_QUALITY_HINTS = {
     nine: "dominant 9",
     maj9: "major 9",
     min9: "minor 9",
+    add2: "add 2",
     add9: "add 9",
     add11: "add 11",
     mMaj7: "minor major 7",
