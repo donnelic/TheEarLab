@@ -601,6 +601,12 @@ body:not(.landing) .quick-start {
     -webkit-tap-highlight-color: transparent;
 }
 
+.chord-alias-asterisk {
+    margin-left: 2px;
+    font-weight: 800;
+    color: color-mix(in oklab, var(--yellow) 70%, var(--ink));
+}
+
 .chord-link-bubble {
     position: absolute;
     top: -30px;
@@ -1243,7 +1249,7 @@ body.modal-open {
     gap: 8px;
     align-items: center;
     justify-content: center;
-    padding: 4px 6px;
+    padding: 6px 10px;
     min-width: 0;
     max-width: 100%;
     overflow-x: auto;
@@ -1258,7 +1264,7 @@ body.modal-open {
 .tutorial-progress-tab {
     position: relative;
     z-index: 1;
-    border: 1px solid color-mix(in oklab, var(--input-border) 70%, var(--accent));
+    border: 1px solid color-mix(in oklab, var(--input-border) 70%, var(--yellow));
     background: color-mix(in oklab, var(--panel) 94%, transparent);
     color: var(--muted);
     font: inherit;
@@ -1276,25 +1282,26 @@ body.modal-open {
     content: "";
     position: absolute;
     top: 50%;
-    left: 0;
-    right: 0;
-    border-top: 1px dashed color-mix(in oklab, var(--input-border) 65%, var(--accent));
+    left: 10px;
+    right: 10px;
+    border-top: 1px dashed color-mix(in oklab, var(--input-border) 65%, var(--yellow));
+    transform: translateY(-50%);
     z-index: 0;
 }
 
 .tutorial-progress-tab.complete {
     color: color-mix(in oklab, var(--ink) 82%, var(--muted));
-    border-color: color-mix(in oklab, var(--input-border) 60%, var(--accent));
+    border-color: color-mix(in oklab, var(--input-border) 60%, var(--yellow));
 }
 
 .tutorial-progress-tab.active {
     color: var(--ink);
-    background: color-mix(in oklab, var(--accent) 14%, var(--panel));
-    border-color: color-mix(in oklab, var(--accent) 55%, var(--input-border));
+    background: color-mix(in oklab, var(--yellow) 18%, var(--panel));
+    border-color: color-mix(in oklab, var(--yellow) 55%, var(--input-border));
 }
 
 .tutorial-progress-tab:focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--accent) 65%, white);
+    outline: 2px solid color-mix(in oklab, var(--yellow) 65%, white);
     outline-offset: -2px;
 }
 

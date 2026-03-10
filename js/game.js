@@ -46,8 +46,7 @@ const CHORD_QUALITIES = [
     { id: "nine", suffix: "9", intervals: [0, 4, 7, 10, 14], aliases: ["9", "dom9", "dominant9"] },
     { id: "maj9", suffix: "maj9", intervals: [0, 4, 7, 11, 14], aliases: ["maj9", "major9", "ma9", "M9"] },
     { id: "min9", suffix: "m9", intervals: [0, 3, 7, 10, 14], aliases: ["m9", "min9", "minor9", "-9"] },
-    { id: "add2", suffix: "add2", intervals: [0, 2, 4, 7], aliases: ["add2"] },
-    { id: "add9", suffix: "add9", intervals: [0, 4, 7, 14], aliases: ["add9"] },
+    { id: "add9", suffix: "add9", intervals: [0, 4, 7, 14], aliases: ["add9", "add2"] },
     { id: "add11", suffix: "add11", intervals: [0, 4, 5, 7], aliases: ["add11"] },
     { id: "mMaj7", suffix: "mMaj7", intervals: [0, 3, 7, 11], aliases: ["mmaj7", "minmaj7", "minormajor7"] },
     { id: "maj7#11", suffix: "maj7#11", intervals: [0, 4, 6, 11], aliases: ["maj7#11", "major7#11", "lydian"] },
@@ -63,7 +62,7 @@ const CHORD_DIFFICULTY_CONFIG = {
         spacingChance: 0
     },
     medium: {
-        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "sus47", "maj7", "min7", "dom7", "add2", "add9", "six", "min6", "dim", "aug"],
+        qualityIds: ["maj", "min", "power5", "sus2", "sus4", "sus47", "maj7", "min7", "dom7", "add9", "six", "min6", "dim", "aug"],
         voicing: "root",
         spacingChance: 0
     },
@@ -74,7 +73,7 @@ const CHORD_DIFFICULTY_CONFIG = {
         maxInversion: 1
     },
     hard: {
-        qualityIds: ["maj7", "min7", "dom7", "sus47", "dim", "aug", "m7b5", "dim7", "six", "min6", "sixNine", "nine", "maj9", "min9", "add2", "add9", "add11", "mMaj7", "maj7#11", "7b9"],
+        qualityIds: ["maj7", "min7", "dom7", "sus47", "dim", "aug", "m7b5", "dim7", "six", "min6", "sixNine", "nine", "maj9", "min9", "add9", "add11", "mMaj7", "maj7#11", "7b9"],
         voicing: "advanced",
         spacingChance: 0.8,
         maxInversion: 2
@@ -101,7 +100,6 @@ const CHORD_QUALITY_HINTS = {
     nine: "dominant 9",
     maj9: "major 9",
     min9: "minor 9",
-    add2: "add 2",
     add9: "add 9",
     add11: "add 11",
     mMaj7: "minor major 7",
@@ -204,8 +202,11 @@ const renderChordLink = (label, { className = "" } = {}) => {
     const qualityId = escapeHtml(parsed.quality.id);
     const rootPcAttr = Number.isFinite(parsed.rootPc) ? ` data-root-pc="${parsed.rootPc}"` : "";
     const labelAttr = escapeHtml(parsed.label ?? label);
+    const aliasMark = shouldShowAliasAsterisk(parsed.quality.id)
+        ? '<span class="chord-alias-asterisk" aria-hidden="true">*</span>'
+        : "";
     return `<span class="${classAttr}" role="button" tabindex="0" data-quality-id="${qualityId}"${rootPcAttr} data-chord-label="${labelAttr}">
-        ${displayLabel}
+        ${displayLabel}${aliasMark}
         <span class="chord-link-bubble" aria-hidden="true">?</span>
     </span>`;
 };
@@ -294,6 +295,22 @@ const getChordDifficultyId = (value = state.chordDifficulty) => {
     return "easy";
 };
 
+const shouldShowAliasAsterisk = (qualityId, difficultyId = state.chordDifficulty) => {
+    if (!qualityId) return false;
+    if (getChordDifficultyId(difficultyId) !== "hard") return false;
+    return qualityId === "add9";
+};
+
+const getChordDisplayLabel = (label, qualityId, difficultyId = state.chordDifficulty) => {
+    if (!label) return label;
+    return shouldShowAliasAsterisk(qualityId, difficultyId) ? `${label}*` : label;
+};
+
+const getChordQualityDisplaySuffix = (quality, difficultyId = state.chordDifficulty) => {
+    const suffix = quality?.suffix || "major";
+    return shouldShowAliasAsterisk(quality?.id, difficultyId) ? `${suffix}*` : suffix;
+};
+
 const getChordDifficultyConfig = (difficulty = state.chordDifficulty) => {
     const id = getChordDifficultyId(difficulty);
     return CHORD_DIFFICULTY_CONFIG[id] ?? CHORD_DIFFICULTY_CONFIG.easy;
@@ -308,7 +325,8 @@ const getAllowedChordQualities = (difficulty = state.chordDifficulty) => {
 
 const getChordQualityHint = (qualityId) => {
     if (!qualityId) return "unknown quality";
-    return CHORD_QUALITY_HINTS[qualityId] ?? qualityId;
+    const base = CHORD_QUALITY_HINTS[qualityId] ?? qualityId;
+    return shouldShowAliasAsterisk(qualityId) ? `${base}*` : base;
 };
 
 const getInteractivePressBehavior = () => (
@@ -1692,17 +1710,11 @@ const buildChordRevealEntries = ({
 } = {}) => {
     const entries = [];
     if (targetChordLabel) {
-        entries.push(renderRevealCell(
-            REVEAL_COPY.targetChord || "Target chord",
-            renderTonePills([targetChordLabel], "good")
-        ));
+        entries.push(renderChordPill(REVEAL_COPY.targetChord || "Target chord", targetChordLabel, "good"));
     }
     entries.push(buildTargetNoteCell(targetNotes, answerNotes));
     if (answerChordLabel) {
-        entries.push(renderRevealCell(
-            REVEAL_COPY.yourChord || "Your chord",
-            renderTonePills([answerChordLabel], answerChordTone)
-        ));
+        entries.push(renderChordPill(REVEAL_COPY.yourChord || "Your chord", answerChordLabel, answerChordTone));
     }
     if (includeAnswerNotes) {
         entries.push(buildAnswerNoteCell(answerNotes, targetNotes));
@@ -1890,7 +1902,7 @@ const buildTypingRevealDetail = (parsed) => {
         mismatches.push(`root should be ${escapeHtml(state.targetChord.rootName)}`);
     }
     if (parsed.quality.id !== state.targetChord.quality.id) {
-        mismatches.push(`quality should be ${escapeHtml(state.targetChord.quality.suffix || "major")}`);
+        mismatches.push(`quality should be ${escapeHtml(getChordQualityDisplaySuffix(state.targetChord.quality))}`);
     }
     if (Number.isFinite(parsed.rootMidi) && Number.isFinite(state.targetChord.rootMidi) && parsed.rootMidi !== state.targetChord.rootMidi) {
         const expectedOctave = Math.floor(state.targetChord.rootMidi / 12) - 1;
@@ -1912,6 +1924,7 @@ const submitTypedAnswer = () => {
         resultEl.textContent = ACTION_COPY.noTargetChord || "No target chord available. Start a new round.";
         return;
     }
+    const targetDisplayLabel = getChordDisplayLabel(target.label, target.quality?.id);
     const answerNotes = parsed ? getTypedPreviewNoteIds(parsed) : [];
     const octaveValid = !parsed
         || !Number.isFinite(parsed.rootMidi)
@@ -1930,7 +1943,7 @@ const submitTypedAnswer = () => {
     }, "submission/typed-answer");
     setSubmitted(true);
     if (isCorrect) {
-        resultEl.textContent = ACTION_COPY.correctChord?.(target.label) ?? `Correct: ${target.label}`;
+        resultEl.textContent = ACTION_COPY.correctChord?.(targetDisplayLabel) ?? `Correct: ${targetDisplayLabel}`;
         revealEl.innerHTML = renderChordRevealGrid(buildChordRevealEntries({
             targetChordLabel: target.label,
             targetNotes: state.targetNotes,
