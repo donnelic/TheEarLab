@@ -434,34 +434,36 @@
         </div>
       </div>
     </section>
-    <section class="chord-readout" id="chord-readout" aria-live="polite" hidden>Selected chord: none</section>
-    <section class="typing-zone" id="typing-zone" hidden>
-      <label for="chord-answer">Type chord name</label>
-      <div class="typing-row">
-        <div class="typing-input-wrap">
-          <input id="chord-answer" type="text" placeholder="Example: Cmaj7 or C major 7" autocomplete="off" />
-          <button id="typing-help-toggle" class="typing-help-toggle" type="button"
-            aria-label="Open chord tutorial" title="Open chord tutorial">?</button>
+    <div class="game-stack">
+      <section class="chord-readout" id="chord-readout" aria-live="polite" hidden>Selected chord: none</section>
+      <section class="typing-zone" id="typing-zone" hidden>
+        <label for="chord-answer">Type chord name</label>
+        <div class="typing-row">
+          <div class="typing-input-wrap">
+            <input id="chord-answer" type="text" placeholder="Example: Cmaj7 or C major 7" autocomplete="off" />
+            <button id="typing-help-toggle" class="typing-help-toggle" type="button"
+              aria-label="Open chord tutorial" title="Open chord tutorial">?</button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="status" id="status-panel" hidden>
-      <div class="status-row">
-        <div><strong>Round</strong> <span id="round-count">1</span></div>
-        <div><strong>Selected</strong> <span id="selected-list">None</span></div>
-        <div><strong>Goal</strong> <span id="goal-count">2</span> <span id="goal-label">notes</span></div>
-        <div><strong>Mode</strong> <span id="mode-label">Normal</span></div>
-      </div>
-      <div class="status-actions">
-        <button id="game-settings-open" class="btn ghost" type="button">Game Settings</button>
-        <button id="hint-button" class="btn secondary hint-button" type="button">Hint</button>
-      </div>
-      <div class="result" id="result" aria-live="polite"></div>
-      <div class="helper-slot" id="helper-slot"></div>
-      <div class="reveal" id="reveal"></div>
-      <div id="hint-flag" class="hint-flag" hidden>Hint used</div>
-    </section>
+      <section class="status" id="status-panel" hidden>
+        <div class="status-row">
+          <div><strong>Round</strong> <span id="round-count">1</span></div>
+          <div><strong>Selected</strong> <span id="selected-list">None</span></div>
+          <div><strong>Goal</strong> <span id="goal-count">2</span> <span id="goal-label">notes</span></div>
+          <div><strong>Mode</strong> <span id="mode-label">Normal</span></div>
+        </div>
+        <div class="status-actions">
+          <button id="game-settings-open" class="btn ghost" type="button">Game Settings</button>
+          <button id="hint-button" class="btn secondary hint-button" type="button">Hint</button>
+        </div>
+        <div class="result" id="result" aria-live="polite"></div>
+        <div class="helper-slot" id="helper-slot"></div>
+        <div class="reveal" id="reveal"></div>
+        <div id="hint-flag" class="hint-flag" hidden>Hint used</div>
+      </section>
+    </div>
 
     <footer class="tips">
       Enter starts a round. Space plays your selection during a round.

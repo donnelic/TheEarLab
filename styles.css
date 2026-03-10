@@ -305,9 +305,7 @@ body:not(.landing) .tips {
 .hero,
 .actions,
 .quick-start,
-.chord-readout,
-.typing-zone,
-.status,
+.game-stack,
 .tips {
     width: min(100%, var(--section-width));
     margin-inline: auto;
@@ -581,9 +579,10 @@ body:not(.landing) .quick-start {
     overflow: visible;
     align-self: start;
     grid-row: 5;
-    width: 100%;
+    width: fit-content;
     border: none;
     margin-left: 0;
+    justify-self: start;
 }
 
 .chord-readout[hidden] {
@@ -600,6 +599,12 @@ body:not(.landing) .quick-start {
     gap: 7px;
     box-shadow: var(--surface-shadow-soft);
     grid-row: 6;
+}
+
+.game-stack {
+    display: grid;
+    gap: 12px;
+    justify-items: stretch;
 }
 
 .typing-zone label {
