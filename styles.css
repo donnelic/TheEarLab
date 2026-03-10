@@ -1220,6 +1220,7 @@ body.modal-open {
     gap: 8px;
     flex-wrap: nowrap;
     margin-top: 2px;
+    min-width: 0;
 }
 
 .tutorial-progress-wrap {
@@ -1227,8 +1228,9 @@ body.modal-open {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
+    max-width: calc(100% - 180px);
 }
 
 .tutorial-progress {
@@ -1259,7 +1261,7 @@ body.modal-open {
 .tutorial-progress-tab {
     position: relative;
     z-index: 1;
-    border: 1px solid color-mix(in oklab, var(--input-border) 70%, var(--yellow));
+    border: 1px solid color-mix(in oklab, var(--control-border) 80%, var(--muted));
     background: color-mix(in oklab, var(--panel) 94%, transparent);
     color: var(--muted);
     font: inherit;
@@ -1277,27 +1279,34 @@ body.modal-open {
     content: "";
     position: absolute;
     top: 50%;
-    left: 10px;
-    right: 10px;
-    border-top: 1px dashed color-mix(in oklab, var(--input-border) 65%, var(--yellow));
+    left: 16px;
+    right: 16px;
+    border-top: 1px dashed color-mix(in oklab, var(--control-border) 80%, var(--muted));
     transform: translateY(-50%);
     z-index: 0;
+    pointer-events: none;
 }
 
 .tutorial-progress-tab.complete {
     color: color-mix(in oklab, var(--ink) 82%, var(--muted));
-    border-color: color-mix(in oklab, var(--input-border) 60%, var(--yellow));
+    border-color: color-mix(in oklab, var(--control-border) 75%, var(--ink));
 }
 
 .tutorial-progress-tab.active {
     color: var(--ink);
-    background: color-mix(in oklab, var(--yellow) 18%, var(--panel));
-    border-color: color-mix(in oklab, var(--yellow) 55%, var(--input-border));
+    background: color-mix(in oklab, var(--accent-2) 20%, var(--panel));
+    border-color: color-mix(in oklab, var(--accent-2) 60%, var(--input-border));
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent-2) 40%, transparent);
+    transform: translateY(-1px);
 }
 
 .tutorial-progress-tab:focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--yellow) 65%, white);
+    outline: 2px solid color-mix(in oklab, var(--accent-2) 60%, white);
     outline-offset: -2px;
+}
+
+.tutorial-actions > button {
+    flex: 0 0 auto;
 }
 
 .tutorial-lab {
