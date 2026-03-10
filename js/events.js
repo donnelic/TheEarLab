@@ -989,7 +989,7 @@ const renderChordTutorialTabs = () => {
     if (!chordTutorialTabs) return;
     const tabs = CHORD_TUTORIAL_STEPS.map((step, index) => {
         const label = step.tabLabel || step.title || `Step ${index + 1}`;
-        const classes = ["tutorial-progress-tab"];
+        const classes = ["tutorial-progress-tab", "advanced-trigger"];
         if (index === tutorialState.stepIndex) classes.push("active");
         if (index < tutorialState.stepIndex) classes.push("complete");
         return `
@@ -1005,27 +1005,19 @@ const renderChordTutorialTabs = () => {
 
 const fitTutorialProgressTabs = () => {
     if (!chordTutorialTabs) return;
-    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
-    void chordTutorialTabs.offsetWidth;
-    const styles = getComputedStyle(chordTutorialTabs);
-    const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
-    const padRight = Number.parseFloat(styles.paddingRight) || 0;
-    const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
-    if (!available) return;
-    const baseWidth = chordTutorialTabs.scrollWidth;
-    if (!baseWidth || baseWidth <= available) return;
-    let nextScale = Math.max(0.62, Math.min(1, available / baseWidth));
-    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", nextScale.toFixed(3));
-    void chordTutorialTabs.offsetWidth;
-    const adjustedWidth = chordTutorialTabs.scrollWidth;
-    if (adjustedWidth > available + 0.5 && nextScale > 0.62) {
-        nextScale = Math.max(0.62, Math.min(nextScale, available / adjustedWidth));
-        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", nextScale.toFixed(3));
+    const minScale = 0.6;
+    let scale = 1;
+    for (let i = 0; i < 3; i += 1) {
+        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", scale.toFixed(3));
         void chordTutorialTabs.offsetWidth;
-    }
-    if (chordTutorialTabs.scrollWidth > available + 0.5 && nextScale > 0.62) {
-        nextScale = Math.max(0.62, Math.min(nextScale, nextScale * 0.98));
-        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", nextScale.toFixed(3));
+        const styles = getComputedStyle(chordTutorialTabs);
+        const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
+        const padRight = Number.parseFloat(styles.paddingRight) || 0;
+        const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
+        if (!available) return;
+        const contentWidth = Math.max(0, chordTutorialTabs.scrollWidth - padLeft - padRight);
+        if (!contentWidth || contentWidth <= available + 0.5) return;
+        scale = Math.max(minScale, Math.min(scale, available / contentWidth));
     }
 };
 

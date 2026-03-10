@@ -1270,17 +1270,17 @@ body.modal-open {
 .tutorial-progress-tab {
     position: relative;
     z-index: 1;
-    border: 2px solid color-mix(in oklab, var(--input-border) 85%, var(--muted));
-    background: color-mix(in oklab, var(--panel) 70%, var(--control-border));
+    border: 1px solid color-mix(in oklab, var(--input-border) 85%, var(--muted));
+    background: var(--input-bg);
     color: var(--muted);
     font: inherit;
     font-size: calc(0.72rem * var(--tutorial-tabs-scale));
     font-weight: 700;
-    padding: calc(6px * var(--tutorial-tabs-scale)) calc(12px * var(--tutorial-tabs-scale));
+    padding: calc(9px * var(--tutorial-tabs-scale)) calc(12px * var(--tutorial-tabs-scale));
     cursor: pointer;
     transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
     white-space: nowrap;
-    border-radius: 999px;
+    border-radius: 12px;
     flex: 0 0 auto;
 }
 
@@ -1298,15 +1298,14 @@ body.modal-open {
 
 .tutorial-progress-tab.complete {
     color: color-mix(in oklab, var(--ink) 85%, var(--muted));
-    border-color: color-mix(in oklab, var(--input-border) 70%, var(--tutorial-progress-accent));
+    border-color: color-mix(in oklab, var(--input-border) 70%, var(--muted));
 }
 
 .tutorial-progress-tab.active {
     color: var(--ink);
-    background: color-mix(in oklab, var(--tutorial-progress-accent) 20%, var(--panel));
-    border-color: color-mix(in oklab, var(--tutorial-progress-accent) 92%, var(--input-border));
-    border-width: 3px;
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--tutorial-progress-accent) 20%, transparent);
+    background: color-mix(in oklab, var(--tutorial-progress-accent) 18%, var(--input-bg));
+    border-color: var(--tutorial-progress-accent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--tutorial-progress-accent) 35%, transparent);
     transform: translateY(-1px);
 }
 
