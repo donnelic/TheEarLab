@@ -1007,7 +1007,10 @@ const fitTutorialProgressTabs = () => {
     if (!chordTutorialTabs) return;
     chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
     void chordTutorialTabs.offsetWidth;
-    const available = Math.max(0, chordTutorialTabs.clientWidth);
+    const styles = getComputedStyle(chordTutorialTabs);
+    const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
+    const padRight = Number.parseFloat(styles.paddingRight) || 0;
+    const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
     if (!available) return;
     const baseWidth = chordTutorialTabs.scrollWidth;
     if (!baseWidth || baseWidth <= available) return;

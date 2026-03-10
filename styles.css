@@ -1231,12 +1231,18 @@ body.modal-open {
     flex: 1 1 0;
     min-width: 0;
     max-width: calc(100% - 180px);
+    position: relative;
+    padding-top: 18px;
 }
 
 .tutorial-progress {
     color: var(--muted);
     font-size: 0.82rem;
     font-weight: 700;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .tutorial-progress-tabs {
@@ -1265,7 +1271,7 @@ body.modal-open {
     position: relative;
     z-index: 1;
     border: 2px solid color-mix(in oklab, var(--input-border) 85%, var(--muted));
-    background: color-mix(in oklab, var(--control-bg) 82%, var(--panel));
+    background: color-mix(in oklab, var(--panel) 70%, var(--control-border));
     color: var(--muted);
     font: inherit;
     font-size: calc(0.72rem * var(--tutorial-tabs-scale));
