@@ -1033,8 +1033,11 @@ const renderChordTutorialStep = () => {
         <div class="tutorial-step-body">${step.bodyHtml ?? step.body ?? ""}</div>
     `;
     chordTutorialStep.classList.remove("focus-flash");
-    void chordTutorialStep.offsetWidth;
-    chordTutorialStep.classList.add("focus-flash");
+    requestAnimationFrame(() => {
+        if (chordTutorialStep) {
+            chordTutorialStep.classList.add("focus-flash");
+        }
+    });
     chordTutorialProgress.textContent = `Step ${tutorialState.stepIndex + 1}/${total}`;
     if (chordTutorialPrev) chordTutorialPrev.disabled = tutorialState.stepIndex <= 0;
     if (chordTutorialNext) chordTutorialNext.textContent = tutorialState.stepIndex >= total - 1 ? "Done" : "Next";

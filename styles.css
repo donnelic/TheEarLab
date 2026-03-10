@@ -1166,16 +1166,16 @@ body.modal-open {
 }
 
 .tutorial-step.focus-flash {
-    animation: tutorial-focus-flash 0.9s ease;
+    animation: tutorial-focus-flash 0.35s ease;
 }
 
 @keyframes tutorial-focus-flash {
     0% {
-        box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 45%, transparent);
+        background: color-mix(in oklab, var(--accent) 10%, var(--status-bg));
     }
 
     100% {
-        box-shadow: 0 0 0 14px transparent;
+        background: var(--status-bg);
     }
 }
 
@@ -1214,35 +1214,34 @@ body.modal-open {
 }
 
 .tutorial-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: nowrap;
+    column-gap: 8px;
+    row-gap: 4px;
     margin-top: 2px;
     min-width: 0;
 }
 
 .tutorial-progress-wrap {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto auto;
     align-items: center;
     gap: 4px;
-    flex: 1 1 auto;
     min-width: 0;
     max-width: none;
+    grid-column: 2;
+    grid-row: 1 / span 2;
     position: relative;
-    padding-top: 18px;
 }
 
 .tutorial-progress {
     color: var(--muted);
     font-size: 0.82rem;
     font-weight: 700;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    text-align: center;
 }
 
 .tutorial-progress-tabs {
@@ -1318,7 +1317,8 @@ body.modal-open {
 }
 
 .tutorial-actions > button {
-    flex: 0 0 auto;
+    grid-row: 2;
+    align-self: center;
 }
 
 .tutorial-lab {
