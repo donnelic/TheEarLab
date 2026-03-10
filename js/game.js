@@ -46,7 +46,7 @@ const CHORD_QUALITIES = [
     { id: "nine", suffix: "9", intervals: [0, 4, 7, 10, 14], aliases: ["9", "dom9", "dominant9"] },
     { id: "maj9", suffix: "maj9", intervals: [0, 4, 7, 11, 14], aliases: ["maj9", "major9", "ma9", "M9"] },
     { id: "min9", suffix: "m9", intervals: [0, 3, 7, 10, 14], aliases: ["m9", "min9", "minor9", "-9"] },
-    { id: "add9", suffix: "add9", intervals: [0, 4, 7, 14], aliases: ["add9", "add2"] },
+    { id: "add9", suffix: "add9", intervals: [0, 2, 4, 7], aliases: ["add9", "add2"] },
     { id: "add11", suffix: "add11", intervals: [0, 4, 5, 7], aliases: ["add11"] },
     { id: "mMaj7", suffix: "mMaj7", intervals: [0, 3, 7, 11], aliases: ["mmaj7", "minmaj7", "minormajor7"] },
     { id: "maj7#11", suffix: "maj7#11", intervals: [0, 4, 6, 11], aliases: ["maj7#11", "major7#11", "lydian"] },
