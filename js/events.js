@@ -989,9 +989,15 @@ const getTutorialStepIndexForQuality = (qualityId) => {
 const renderChordTutorialTabs = () => {
     if (!chordTutorialTabs) return;
     const total = CHORD_TUTORIAL_STEPS.length;
-    const progress = total > 1 ? tutorialState.stepIndex / (total - 1) : 0;
-    chordTutorialTabs.style.setProperty("--tutorial-step-count", `${Math.max(1, total)}`);
+    const clampedTotal = Math.max(1, total);
+    const isLastStep = tutorialState.stepIndex >= clampedTotal - 1;
+    const progress = total > 1 ? tutorialState.stepIndex / (total - 1) : 1;
+    const fill = total > 0
+        ? Math.min(1, isLastStep ? 1 : (tutorialState.stepIndex + 0.5) / clampedTotal)
+        : 0;
+    chordTutorialTabs.style.setProperty("--tutorial-step-count", `${clampedTotal}`);
     chordTutorialTabs.style.setProperty("--tutorial-progress", progress.toFixed(3));
+    chordTutorialTabs.style.setProperty("--tutorial-progress-fill", fill.toFixed(3));
     const tabs = CHORD_TUTORIAL_STEPS.map((step, index) => {
         const label = step.tabLabel || step.title || `Step ${index + 1}`;
         const classes = ["tutorial-progress-tab"];

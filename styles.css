@@ -1260,6 +1260,7 @@ body.modal-open {
 .tutorial-progress-tabs {
     --tutorial-step-count: 1;
     --tutorial-progress: 0;
+    --tutorial-progress-fill: 0;
     --tutorial-progress-accent: var(--accent);
     --tutorial-node-size: 26px;
     --tutorial-track-height: 6px;
@@ -1355,7 +1356,7 @@ body.modal-open {
     top: var(--tutorial-track-top);
     left: var(--tutorial-progress-gutter);
     height: var(--tutorial-track-height);
-    width: calc((100% - (var(--tutorial-progress-gutter) * 2)) * var(--tutorial-progress));
+    width: calc((100% - (var(--tutorial-progress-gutter) * 2)) * var(--tutorial-progress-fill));
     border-radius: 999px;
     background: linear-gradient(90deg,
         color-mix(in oklab, var(--tutorial-progress-accent) 85%, white),
