@@ -1215,7 +1215,7 @@ body.modal-open {
 
 .tutorial-actions {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     gap: 8px;
     flex-wrap: nowrap;
@@ -1282,6 +1282,7 @@ body.modal-open {
     white-space: nowrap;
     border-radius: 12px;
     flex: 0 0 auto;
+    box-sizing: border-box;
 }
 
 .tutorial-progress-tabs::before {
@@ -1305,7 +1306,9 @@ body.modal-open {
     color: var(--ink);
     background: color-mix(in oklab, var(--tutorial-progress-accent) 18%, var(--input-bg));
     border-color: var(--tutorial-progress-accent);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--tutorial-progress-accent) 35%, transparent);
+    box-shadow:
+        0 0 0 2px var(--tutorial-progress-accent),
+        0 0 0 1px color-mix(in oklab, var(--tutorial-progress-accent) 35%, transparent) inset;
     transform: translateY(-1px);
 }
 
