@@ -1006,20 +1006,18 @@ const renderChordTutorialTabs = () => {
 
 const fitTutorialProgressTabs = () => {
     if (!chordTutorialTabs) return;
-    const minScale = 0.6;
-    let scale = 1;
-    for (let i = 0; i < 3; i += 1) {
-        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", scale.toFixed(3));
-        void chordTutorialTabs.offsetWidth;
-        const styles = getComputedStyle(chordTutorialTabs);
-        const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
-        const padRight = Number.parseFloat(styles.paddingRight) || 0;
-        const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
-        if (!available) return;
-        const contentWidth = Math.max(0, chordTutorialTabs.scrollWidth - padLeft - padRight);
-        if (!contentWidth || contentWidth <= available + 0.5) return;
-        scale = Math.max(minScale, Math.min(scale, available / contentWidth));
-    }
+    const minScale = 0.5;
+    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
+    void chordTutorialTabs.offsetWidth;
+    const styles = getComputedStyle(chordTutorialTabs);
+    const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
+    const padRight = Number.parseFloat(styles.paddingRight) || 0;
+    const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
+    if (!available) return;
+    const contentWidth = Math.max(0, chordTutorialTabs.scrollWidth - padLeft - padRight);
+    if (!contentWidth) return;
+    const scale = Math.max(minScale, Math.min(1, available / contentWidth));
+    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", scale.toFixed(3));
 };
 
 const renderChordTutorialStep = () => {

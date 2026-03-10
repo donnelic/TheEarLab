@@ -599,6 +599,8 @@ body:not(.landing) .quick-start {
     color: inherit;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    padding-top: 26px;
+    margin-top: -26px;
 }
 
 
@@ -622,6 +624,7 @@ body:not(.landing) .quick-start {
     pointer-events: auto;
     transition: opacity 0.18s ease, transform 0.18s ease;
     z-index: 2;
+    cursor: pointer;
 }
 
 .chord-link-bubble::after {
@@ -637,7 +640,8 @@ body:not(.landing) .quick-start {
 
 .chord-link:hover .chord-link-bubble,
 .chord-link:focus-visible .chord-link-bubble,
-.chord-link:focus-within .chord-link-bubble {
+.chord-link:focus-within .chord-link-bubble,
+.chord-link-bubble:hover {
     opacity: 1;
     transform: translate(-50%, -8px);
 }
@@ -1254,10 +1258,10 @@ body.modal-open {
     position: relative;
     display: flex;
     flex-wrap: nowrap;
-    gap: calc(8px * var(--tutorial-tabs-scale));
+    gap: calc(6px * var(--tutorial-tabs-scale));
     align-items: center;
     justify-content: center;
-    padding: calc(6px * var(--tutorial-tabs-scale)) calc(14px * var(--tutorial-tabs-scale));
+    padding: calc(4px * var(--tutorial-tabs-scale)) calc(10px * var(--tutorial-tabs-scale));
     min-width: 0;
     max-width: 100%;
     overflow-x: hidden;
@@ -1275,14 +1279,14 @@ body.modal-open {
     z-index: 1;
     display: inline-flex;
     align-items: center;
-    gap: calc(6px * var(--tutorial-tabs-scale));
+    gap: calc(5px * var(--tutorial-tabs-scale));
     border: 1px solid var(--input-border);
     background: color-mix(in oklab, var(--panel) 85%, var(--input-bg));
     color: var(--muted);
     font: inherit;
-    font-size: calc(0.7rem * var(--tutorial-tabs-scale));
+    font-size: calc(0.66rem * var(--tutorial-tabs-scale));
     font-weight: 700;
-    padding: calc(7px * var(--tutorial-tabs-scale)) calc(11px * var(--tutorial-tabs-scale));
+    padding: calc(6px * var(--tutorial-tabs-scale)) calc(9px * var(--tutorial-tabs-scale));
     cursor: pointer;
     transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
     white-space: nowrap;
@@ -1294,12 +1298,12 @@ body.modal-open {
 .tutorial-progress-step {
     display: grid;
     place-items: center;
-    width: calc(18px * var(--tutorial-tabs-scale));
-    height: calc(18px * var(--tutorial-tabs-scale));
+    width: calc(16px * var(--tutorial-tabs-scale));
+    height: calc(16px * var(--tutorial-tabs-scale));
     border-radius: 999px;
     border: 1px solid color-mix(in oklab, var(--input-border) 75%, var(--muted));
     color: var(--muted);
-    font-size: calc(0.62rem * var(--tutorial-tabs-scale));
+    font-size: calc(0.56rem * var(--tutorial-tabs-scale));
     font-weight: 800;
     background: color-mix(in oklab, var(--panel) 78%, var(--input-bg));
 }
@@ -1312,8 +1316,8 @@ body.modal-open {
     content: "";
     position: absolute;
     top: 50%;
-    left: calc(14px * var(--tutorial-tabs-scale));
-    right: calc(14px * var(--tutorial-tabs-scale));
+    left: calc(10px * var(--tutorial-tabs-scale));
+    right: calc(10px * var(--tutorial-tabs-scale));
     border-top: 1px dashed color-mix(in oklab, var(--input-border) 70%, var(--tutorial-progress-accent));
     transform: translateY(-50%);
     z-index: 0;
@@ -2762,8 +2766,7 @@ body.modal-open {
     display: grid;
     gap: 6px;
     max-width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: visible;
     min-height: 0;
 }
 
@@ -2784,10 +2787,12 @@ body.modal-open {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px 6px;
+    overflow: visible;
 }
 
 .reveal-cell {
     min-width: 0;
+    overflow: visible;
 }
 
 .keyboard-zone {
@@ -3097,6 +3102,7 @@ body.landing .pedal-box {
     gap: 6px;
     margin-top: 4px;
     min-width: 0;
+    overflow: visible;
 }
 
 .note-pill {
@@ -3114,6 +3120,7 @@ body.landing .pedal-box {
     justify-content: center;
     gap: 4px;
     padding-right: 9px;
+    overflow: visible;
 }
 
 .note-pill.chord-pill .chord-link-bubble {
