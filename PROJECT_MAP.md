@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-10 10:51:04 +01:00
+Generated: 2026-03-10 10:57:18 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -1108,9 +1108,9 @@ File lines: 1-1418
 | openSettings | 1119-1124 |
 | positionFloatingPanel | 1126-1155 |
 | setGameSettingsModalOpenState | 1157-1167 |
-| isGameSettingsModalOpen | 1169-1169 |
-| openGameSettingsModal | 1171-1182 |
-| closeGameSettingsModal | 1184-1192 |
+| isGameSettingsModalOpenInternal | 1169-1169 |
+| openGameSettingsModalInternal | 1171-1182 |
+| closeGameSettingsModalInternal | 1184-1192 |
 | positionPianoPanel | 1194-1197 |
 | positionInstrumentBrowserPanel | 1199-1202 |
 | getFloatingPanelConfig | 1207-1239 |

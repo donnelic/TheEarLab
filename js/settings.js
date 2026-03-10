@@ -1166,9 +1166,9 @@ const setGameSettingsModalOpenState = (isOpen) => {
     return true;
 };
 
-const isGameSettingsModalOpen = () => Boolean(gameSettingsModal && !gameSettingsModal.hidden);
+const isGameSettingsModalOpenInternal = () => Boolean(gameSettingsModal && !gameSettingsModal.hidden);
 
-const openGameSettingsModal = (options = {}) => {
+const openGameSettingsModalInternal = (options = {}) => {
     const { focusTrigger = false } = options;
     if (!gameSettingsModal) return false;
     closeSettings();
@@ -1181,7 +1181,7 @@ const openGameSettingsModal = (options = {}) => {
     return true;
 };
 
-const closeGameSettingsModal = (options = {}) => {
+const closeGameSettingsModalInternal = (options = {}) => {
     const { restoreFocus = false } = options;
     if (!gameSettingsModal || gameSettingsModal.hidden) return false;
     setGameSettingsModalOpenState(false);
@@ -1321,8 +1321,8 @@ const repositionOpenFloatingPanels = () => {
     });
 };
 
-const openOptionsPanel = (options = {}) => openGameSettingsModal(options);
-const closeOptionsPanel = (options = {}) => closeGameSettingsModal(options);
+const openOptionsPanel = (options = {}) => openGameSettingsModalInternal(options);
+const closeOptionsPanel = (options = {}) => closeGameSettingsModalInternal(options);
 const openAdvanced = () => openFloatingPanel("advanced");
 const closeAdvanced = (options = {}) => closeFloatingPanel("advanced", options);
 const openPianoPanel = () => openFloatingPanel("piano");
@@ -1385,9 +1385,9 @@ Object.assign(App.settings, {
     closeFloatingPanel,
     toggleFloatingPanel,
     closeAllFloatingPanels,
-    isGameSettingsModalOpen,
-    openGameSettingsModal,
-    closeGameSettingsModal,
+    isGameSettingsModalOpen: isGameSettingsModalOpenInternal,
+    openGameSettingsModal: openGameSettingsModalInternal,
+    closeGameSettingsModal: closeGameSettingsModalInternal,
     openOptionsPanel,
     closeOptionsPanel,
     openAdvanced,
