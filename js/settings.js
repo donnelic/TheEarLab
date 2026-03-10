@@ -8,6 +8,17 @@ const BROWSER_COPY = SETTINGS_UI_COPY.browsers || {};
 const ENVELOPE_DEFAULTS = SETTINGS_ENVELOPE_API.DEFAULT_SOUNDFONT_ENVELOPE || { attack: 0.016, decay: 0.95, sustain: 0.75, release: 1.2 };
 const PROFILE_EPSILON = 0.0001;
 
+const applySettingsStatePatch = (patch, mutation = "settings/patch") => {
+    if (typeof App.features?.settings?.applySettingsPatch === "function") {
+        App.features.settings.applySettingsPatch(patch, {
+            mutation,
+            source: "settings.js"
+        });
+        return;
+    }
+    Object.assign(state, patch || {});
+};
+
 const GM_FAMILY_RANGES = [
     { name: "Piano", min: 0, max: 7 },
     { name: "Chromatic Percussion", min: 8, max: 15 },
@@ -525,10 +536,145 @@ const saveCurrentResponseProfile = (inputLabel = "") => {
     return id;
 };
 
+const dialogState = {
+    resolve: null,
+    allowEmpty: false
+};
+
+const syncModalOpenClass = () => {
+    const anyOpen = Boolean(
+        (gameSettingsModal && !gameSettingsModal.hidden)
+        || (appDialog && !appDialog.hidden)
+        || (chordTutorialModal && !chordTutorialModal.hidden)
+    );
+    document.body.classList.toggle("modal-open", anyOpen);
+};
+
+const setAppDialogOpenState = (isOpen) => {
+    if (!appDialog) return false;
+    appDialog.hidden = !isOpen;
+    appDialog.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    syncModalOpenClass();
+    return true;
+};
+
+const openAppDialog = (options = {}) => {
+    if (!appDialog) {
+        return Promise.resolve({ confirmed: false, value: "" });
+    }
+    if (dialogState.resolve) {
+        closeAppDialog({ confirmed: false, value: "" });
+    }
+    const config = {
+        title: options.title || "Dialog",
+        body: options.body || "",
+        confirmLabel: options.confirmLabel || "Confirm",
+        cancelLabel: options.cancelLabel || "Cancel",
+        inputLabel: options.inputLabel || "Name",
+        inputPlaceholder: options.inputPlaceholder || "",
+        inputValue: options.inputValue || "",
+        inputVisible: Boolean(options.inputVisible),
+        allowEmpty: Boolean(options.allowEmpty)
+    };
+
+    if (appDialogTitle) appDialogTitle.textContent = config.title;
+    if (appDialogBody) appDialogBody.textContent = config.body;
+    if (appDialogConfirm) appDialogConfirm.textContent = config.confirmLabel;
+    if (appDialogCancel) appDialogCancel.textContent = config.cancelLabel;
+    if (appDialogInputLabel) appDialogInputLabel.textContent = config.inputLabel;
+
+    const inputRow = appDialogInput?.closest(".app-dialog-input-row") ?? null;
+    if (inputRow) {
+        inputRow.hidden = !config.inputVisible;
+    }
+    if (appDialogInput) {
+        appDialogInput.value = config.inputValue;
+        appDialogInput.placeholder = config.inputPlaceholder;
+    }
+
+    dialogState.allowEmpty = config.allowEmpty;
+    setAppDialogOpenState(true);
+
+    if (config.inputVisible && appDialogInput) {
+        appDialogInput.focus({ preventScroll: true });
+        appDialogInput.select();
+    } else if (appDialogConfirm) {
+        appDialogConfirm.focus({ preventScroll: true });
+    }
+
+    return new Promise((resolve) => {
+        dialogState.resolve = resolve;
+    });
+};
+
+const closeAppDialog = (result = { confirmed: false, value: "" }) => {
+    if (!dialogState.resolve) return;
+    const resolve = dialogState.resolve;
+    dialogState.resolve = null;
+    setAppDialogOpenState(false);
+    resolve(result);
+};
+
+const confirmAppDialog = () => {
+    const value = appDialogInput?.value ?? "";
+    if (!dialogState.allowEmpty && appDialogInput && appDialogInput.offsetParent !== null && !value.trim()) {
+        appDialogInput.focus({ preventScroll: true });
+        return;
+    }
+    closeAppDialog({ confirmed: true, value });
+};
+
+const cancelAppDialog = () => {
+    const value = appDialogInput?.value ?? "";
+    closeAppDialog({ confirmed: false, value });
+};
+
+if (appDialogConfirm) {
+    appDialogConfirm.addEventListener("click", (event) => {
+        event.preventDefault();
+        confirmAppDialog();
+    });
+}
+if (appDialogCancel) {
+    appDialogCancel.addEventListener("click", (event) => {
+        event.preventDefault();
+        cancelAppDialog();
+    });
+}
+if (appDialogBackdrop) {
+    appDialogBackdrop.addEventListener("click", (event) => {
+        event.preventDefault();
+        cancelAppDialog();
+    });
+}
+if (appDialogClose) {
+    appDialogClose.addEventListener("click", (event) => {
+        event.preventDefault();
+        cancelAppDialog();
+    });
+}
+if (appDialogInput) {
+    appDialogInput.addEventListener("keydown", (event) => {
+        if (event.code === "Enter") {
+            event.preventDefault();
+            confirmAppDialog();
+        }
+    });
+}
+
 const promptSaveCurrentResponseProfile = () => {
-    const label = window.prompt("Save articulation profile as:", `${getTonePreset(state.pianoTone)?.label ?? "Custom"} Profile`);
-    if (label === null) return null;
-    return saveCurrentResponseProfile(label);
+    return openAppDialog({
+        title: "Save articulation profile",
+        body: "Name this articulation profile so you can reuse it later.",
+        confirmLabel: "Save profile",
+        cancelLabel: "Cancel",
+        inputVisible: true,
+        inputLabel: "Profile name",
+        inputValue: `${getTonePreset(state.pianoTone)?.label ?? "Custom"} Profile`
+    }).then((result) => {
+        if (!result?.confirmed) return null;
+        return saveCurrentResponseProfile(result.value);
+    });
 };
 
 const discardManualProfileChanges = (save = true) => {
@@ -549,17 +695,20 @@ const resetAdsrTrim = (save = true) => {
     applyResponseProfileById(DEFAULTS.responseProfileId, { save });
 };
 
-const resolveInstrumentSwitchProfileAction = (nextTone, options = {}) => {
+const resolveInstrumentSwitchProfileAction = async (nextTone, options = {}) => {
     if (options.skipProfilePrompts || nextTone === state.pianoTone) {
         return { cancel: false, useRecommended: false };
     }
 
     if (state.responseProfileDirty) {
-        const shouldSave = window.confirm(
-            "You manually changed the articulation profile. Click OK to save it before switching instruments, or Cancel to discard those edits."
-        );
-        if (shouldSave) {
-            const saved = promptSaveCurrentResponseProfile();
+        const decision = await openAppDialog({
+            title: "Save articulation changes?",
+            body: "You manually changed the articulation profile. Save it before switching instruments?",
+            confirmLabel: "Save profile",
+            cancelLabel: "Discard changes"
+        });
+        if (decision?.confirmed) {
+            const saved = await promptSaveCurrentResponseProfile();
             if (!saved) return { cancel: true, useRecommended: false };
             return { cancel: false, useRecommended: false };
         }
@@ -569,10 +718,13 @@ const resolveInstrumentSwitchProfileAction = (nextTone, options = {}) => {
 
     if (state.responseProfileId !== DEFAULTS.responseProfileId) {
         const nextLabel = PIANO_PRESETS[nextTone]?.label ?? "this instrument";
-        const useRecommended = window.confirm(
-            `Switch to "${nextLabel}". Use that instrument's recommended articulation profile?`
-        );
-        return { cancel: false, useRecommended };
+        const useRecommended = await openAppDialog({
+            title: "Use recommended profile?",
+            body: `Switch to "${nextLabel}". Use that instrument's recommended articulation profile?`,
+            confirmLabel: "Use recommended",
+            cancelLabel: "Keep current"
+        });
+        return { cancel: false, useRecommended: Boolean(useRecommended?.confirmed) };
     }
 
     return { cancel: false, useRecommended: false };
@@ -588,7 +740,7 @@ const applyInstrumentPresetSelection = async () => {
 
 const setVolume = (value) => {
     const normalized = Math.min(Math.max(value, 0), 1);
-    state.volume = normalized;
+    applySettingsStatePatch({ volume: normalized }, "settings/volume");
     const gain = Math.pow(normalized, 1.8) * 0.5;
     if (masterGain) {
         masterGain.gain.setTargetAtTime(gain, audioContext.currentTime, 0.02);
@@ -598,19 +750,19 @@ const setVolume = (value) => {
     saveSettings();
 };
 
-const setPianoTone = (tone, options = {}) => {
+const setPianoTone = async (tone, options = {}) => {
     const presetIds = Object.keys(PIANO_PRESETS);
     if (!presetIds.length) {
-        state.pianoTone = "";
+        applySettingsStatePatch({ pianoTone: "" }, "settings/piano-tone");
         if (pianoLabel) pianoLabel.textContent = "No presets";
         return false;
     }
 
     const next = PIANO_PRESETS[tone] ? tone : (PIANO_PRESETS[DEFAULT_PIANO] ? DEFAULT_PIANO : presetIds[0]);
-    const action = resolveInstrumentSwitchProfileAction(next, options);
+    const action = await resolveInstrumentSwitchProfileAction(next, options);
     if (action.cancel) return false;
 
-    state.pianoTone = next;
+    applySettingsStatePatch({ pianoTone: next }, "settings/piano-tone");
 
     const selectedPreset = PIANO_PRESETS[next];
     if (selectedPreset?.sf2) {
@@ -623,9 +775,11 @@ const setPianoTone = (tone, options = {}) => {
     }
 
     if (action.useRecommended || options.forceRecommendedProfile) {
-        state.responseProfileId = DEFAULTS.responseProfileId;
-        state.adsrTrim = cloneTrim(DEFAULTS.adsrTrim);
-        state.responseProfileDirty = false;
+        applySettingsStatePatch({
+            responseProfileId: DEFAULTS.responseProfileId,
+            adsrTrim: cloneTrim(DEFAULTS.adsrTrim),
+            responseProfileDirty: false
+        }, "settings/piano-tone-profile");
     } else {
         syncDirtyFromApplied();
     }
@@ -655,7 +809,7 @@ const setPianoTone = (tone, options = {}) => {
 
 const setNoteLength = (value) => {
     const clamped = Math.min(Math.max(value, 0.4), 3.0);
-    state.noteDuration = clamped;
+    applySettingsStatePatch({ noteDuration: clamped }, "settings/note-length");
     lengthValue.textContent = `${clamped.toFixed(1)}s`;
     lengthSlider.value = clamped.toFixed(1);
     applyAdsrTrimUi();
@@ -666,7 +820,11 @@ const setNoteLength = (value) => {
 
 const setAdsrTrim = (key, value, options = {}) => {
     if (!(key in state.adsrTrim)) return;
-    state.adsrTrim[key] = clampTrim(value);
+    const nextTrim = {
+        ...state.adsrTrim,
+        [key]: clampTrim(value)
+    };
+    applySettingsStatePatch({ adsrTrim: nextTrim }, `settings/adsr-${key}`);
     syncDirtyFromApplied();
     applyAdsrTrimUi();
     renderResponseProfileBrowser();
@@ -701,8 +859,11 @@ const playPianoPreview = (presetKey) => {
 const setKeyCount = (value, options = {}) => {
     const { delayOverrideMs = null, preview = false } = options;
     const clamped = Math.min(Math.max(Math.round(value), 12), 36);
-    state.keyCount = clamped;
-    state.startMidi = clampStartMidi(state.startMidi);
+    const clampedStartMidi = clampStartMidi(state.startMidi);
+    applySettingsStatePatch({
+        keyCount: clamped,
+        startMidi: clampedStartMidi
+    }, "settings/key-count");
     keyCountValue.textContent = `${clamped} keys`;
     keyCountSlider.value = String(clamped);
     if (startNoteValue) {
@@ -717,7 +878,7 @@ const setKeyCount = (value, options = {}) => {
 
 const setStartMidi = (value, delayOverrideMs = null) => {
     const next = clampStartMidi(Math.round(value));
-    state.startMidi = next;
+    applySettingsStatePatch({ startMidi: next }, "settings/start-midi");
     if (startNoteValue) {
         startNoteValue.textContent = getMidiLabel(next);
     }
@@ -765,37 +926,43 @@ const refreshOptionsModeVisibility = () => {
 
 const setPracticeMode = (mode, options = {}) => {
     const previousMode = getEffectivePracticeMode();
+    const workingState = {
+        ...state,
+        practiceProfiles: typeof normalizePracticeProfiles === "function"
+            ? normalizePracticeProfiles(state.practiceProfiles)
+            : (state.practiceProfiles || {})
+    };
     if (typeof capturePracticeProfileFromState === "function") {
-        capturePracticeProfileFromState(previousMode, state);
+        capturePracticeProfileFromState(previousMode, workingState);
     }
 
     const normalized = ["random", "nice", "chord"].includes(mode) ? mode : "random";
-    state.practiceMode = normalized;
-    state.niceMode = normalized === "nice";
-    state.chordMode = normalized === "chord";
-
     const profiles = typeof normalizePracticeProfiles === "function"
-        ? normalizePracticeProfiles(state.practiceProfiles)
-        : (state.practiceProfiles || {});
-    state.practiceProfiles = profiles;
+        ? normalizePracticeProfiles(workingState.practiceProfiles)
+        : (workingState.practiceProfiles || {});
     const restored = profiles[normalized] ?? {};
-    state.mode = restored.mode === "ascending" ? "ascending" : DEFAULTS.mode;
-    state.blindMode = Boolean(restored.blindMode);
-    state.trainingMode = ["keyboard", "type", "both"].includes(restored.trainingMode)
+    const nextTrainingMode = ["keyboard", "type", "both"].includes(restored.trainingMode)
         ? restored.trainingMode
         : DEFAULTS.trainingMode;
-    state.chordDifficulty = ["easy", "medium", "voiced", "hard"].includes(restored.chordDifficulty)
+    const nextDifficulty = ["easy", "medium", "voiced", "hard"].includes(restored.chordDifficulty)
         ? restored.chordDifficulty
         : DEFAULTS.chordDifficulty;
-    state.chordExtraHelpers = Boolean(restored.chordExtraHelpers);
-    state.chordRootHint = Boolean(restored.chordRootHint);
-    state.typingShowPiano = restored.typingShowPiano !== false;
-    state.typingShowTyped = restored.typingShowTyped !== false;
-    state.hideLivePreview = Boolean(restored.hideLivePreview);
-
-    if (normalized !== "chord") {
-        state.trainingMode = "keyboard";
-    }
+    applySettingsStatePatch({
+        practiceMode: normalized,
+        niceMode: normalized === "nice",
+        chordMode: normalized === "chord",
+        practiceProfiles: profiles,
+        mode: restored.mode === "ascending" ? "ascending" : DEFAULTS.mode,
+        blindMode: Boolean(restored.blindMode),
+        trainingMode: normalized === "chord" ? nextTrainingMode : "keyboard",
+        chordDifficulty: nextDifficulty,
+        chordExtraHelpers: Boolean(restored.chordExtraHelpers),
+        chordRootHint: Boolean(restored.chordRootHint),
+        typingShowPiano: restored.typingShowPiano !== false,
+        typingShowTyped: restored.typingShowTyped !== false,
+        hideLivePreview: Boolean(restored.hideLivePreview),
+        rootHintSuppressed: false
+    }, "settings/practice-mode");
 
     if (niceNotesToggle) {
         niceNotesToggle.checked = state.niceMode;
@@ -926,7 +1093,7 @@ const commitNoteCountChange = (delayOverrideMs = null) => {
     if (pendingNoteCount === null) return;
     const nextValue = pendingNoteCount;
     pendingNoteCount = null;
-    state.noteCount = nextValue;
+    applySettingsStatePatch({ noteCount: nextValue }, "settings/note-count");
     noteCountInput.value = String(nextValue);
     noteCountValue.textContent = `${nextValue} notes`;
     handleCriticalSettingChange(delayOverrideMs);
@@ -956,14 +1123,219 @@ const openSettings = () => {
     updateKeyboardScale();
 };
 
+const positionFloatingPanel = (panel, trigger) => {
+    if (!panel || !trigger) return;
+    const padding = 18;
+    const gap = getPanelBottomGap();
+    const bottomLimit = window.innerHeight - gap;
+    const maxHeight = Math.max(220, bottomLimit - (padding * 2));
+    panel.style.maxHeight = `${maxHeight}px`;
+    const triggerRect = trigger.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const appRect = appEl.getBoundingClientRect();
+    const settingsRect = settingsPanel.getBoundingClientRect();
+    const measuredWidth = Math.max(panelRect.width, panel.offsetWidth || 0);
+    const measuredHeight = Math.max(panelRect.height, panel.scrollHeight || 0);
+    const boundedHeight = Math.min(measuredHeight, maxHeight);
+
+    let left = settingsRect.left - measuredWidth - padding;
+    const minLeft = appRect.right + padding;
+    left = Math.max(left, minLeft);
+    const maxLeft = settingsRect.left - measuredWidth - padding;
+    left = Math.min(left, maxLeft);
+    left = Math.max(padding, left);
+
+    let top = Math.max(padding, triggerRect.top);
+    if (top + boundedHeight > bottomLimit) {
+        top = Math.max(padding, bottomLimit - boundedHeight);
+    }
+
+    panel.style.left = `${left}px`;
+    panel.style.top = `${top}px`;
+};
+
+const setGameSettingsModalOpenState = (isOpen) => {
+    if (!gameSettingsModal) return false;
+    gameSettingsModal.classList.toggle("open", isOpen);
+    gameSettingsModal.hidden = !isOpen;
+    gameSettingsModal.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    if (optionsTrigger) {
+        optionsTrigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
+    syncModalOpenClass();
+    return true;
+};
+
+const isGameSettingsModalOpen = () => Boolean(gameSettingsModal && !gameSettingsModal.hidden);
+
+const openGameSettingsModal = (options = {}) => {
+    const { focusTrigger = false } = options;
+    if (!gameSettingsModal) return false;
+    closeSettings();
+    closeAllFloatingPanels();
+    setGameSettingsModalOpenState(true);
+    refreshOptionsModeVisibility();
+    if (focusTrigger && optionsTrigger) {
+        optionsTrigger.focus({ preventScroll: true });
+    }
+    return true;
+};
+
+const closeGameSettingsModal = (options = {}) => {
+    const { restoreFocus = false } = options;
+    if (!gameSettingsModal || gameSettingsModal.hidden) return false;
+    setGameSettingsModalOpenState(false);
+    if (restoreFocus && optionsTrigger) {
+        optionsTrigger.focus({ preventScroll: true });
+    }
+    return true;
+};
+
+const positionPianoPanel = () => {
+    if (!pianoPanel || !pianoTrigger) return;
+    positionFloatingPanel(pianoPanel, pianoTrigger);
+};
+
+const positionInstrumentBrowserPanel = () => {
+    if (!instrumentBrowserPanel || !instrumentBrowserTrigger) return;
+    positionFloatingPanel(instrumentBrowserPanel, instrumentBrowserTrigger);
+};
+
+const FLOATING_PANEL_KEYS = Object.freeze(["advanced", "piano", "instrument"]);
+let activeFloatingPanelKey = null;
+
+const getFloatingPanelConfig = (panelKey) => {
+    switch (panelKey) {
+    case "advanced":
+        return {
+            panel: advancedPanel,
+            trigger: advancedTrigger,
+            reposition: () => positionFloatingPanel(advancedPanel, advancedTrigger),
+            onOpen: () => {
+                refreshResponseProfileBrowser();
+            }
+        };
+    case "piano":
+        return {
+            panel: pianoPanel,
+            trigger: pianoTrigger,
+            reposition: positionPianoPanel,
+            onOpen: () => {
+                void refreshSoundfontCatalog({ loadAllPacks: false });
+            }
+        };
+    case "instrument":
+        return {
+            panel: instrumentBrowserPanel,
+            trigger: instrumentBrowserTrigger,
+            reposition: positionInstrumentBrowserPanel,
+            onOpen: () => {
+                void refreshSoundfontCatalog({ loadAllPacks: true }).then(() => refreshInstrumentPresetBrowser());
+            }
+        };
+    default:
+        return null;
+    }
+};
+
+const isFloatingPanelOpen = (panelKey) => {
+    const config = getFloatingPanelConfig(panelKey);
+    return Boolean(config?.panel?.classList.contains("open"));
+};
+
+const setFloatingPanelOpenState = (panel, trigger, isOpen) => {
+    if (!panel || !trigger) return;
+    panel.classList.toggle("open", isOpen);
+    panel.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+};
+
+const getOpenFloatingPanelKey = () => (
+    FLOATING_PANEL_KEYS.find((panelKey) => isFloatingPanelOpen(panelKey)) ?? null
+);
+
+const closeFloatingPanel = (panelKey, options = {}) => {
+    const { restoreFocus = false } = options;
+    const config = getFloatingPanelConfig(panelKey);
+    if (!config?.panel || !config.trigger) return false;
+    if (!config.panel.classList.contains("open")) return false;
+    setFloatingPanelOpenState(config.panel, config.trigger, false);
+    if (restoreFocus) {
+        config.trigger.focus({ preventScroll: true });
+    }
+    if (activeFloatingPanelKey === panelKey) {
+        activeFloatingPanelKey = getOpenFloatingPanelKey();
+    }
+    return true;
+};
+
+const closeAllFloatingPanels = (options = {}) => {
+    const { except = null, restoreFocus = false } = options;
+    FLOATING_PANEL_KEYS.forEach((panelKey) => {
+        if (panelKey === except) return;
+        closeFloatingPanel(panelKey, { restoreFocus });
+    });
+};
+
+const openFloatingPanel = (panelKey, options = {}) => {
+    const { focusTrigger = false } = options;
+    const config = getFloatingPanelConfig(panelKey);
+    if (!config?.panel || !config.trigger) return false;
+    closeAllFloatingPanels({ except: panelKey });
+    setFloatingPanelOpenState(config.panel, config.trigger, true);
+    if (typeof config.reposition === "function") {
+        config.reposition();
+        requestAnimationFrame(() => {
+            if (!isFloatingPanelOpen(panelKey)) return;
+            config.reposition();
+        });
+        setTimeout(() => {
+            if (!isFloatingPanelOpen(panelKey)) return;
+            config.reposition();
+        }, 80);
+    }
+    if (focusTrigger) {
+        config.trigger.focus({ preventScroll: true });
+    }
+    if (typeof config.onOpen === "function") {
+        config.onOpen();
+    }
+    activeFloatingPanelKey = panelKey;
+    return true;
+};
+
+const toggleFloatingPanel = (panelKey) => {
+    if (isFloatingPanelOpen(panelKey)) {
+        return closeFloatingPanel(panelKey);
+    }
+    return openFloatingPanel(panelKey);
+};
+
+const repositionOpenFloatingPanels = () => {
+    FLOATING_PANEL_KEYS.forEach((panelKey) => {
+        if (!isFloatingPanelOpen(panelKey)) return;
+        const config = getFloatingPanelConfig(panelKey);
+        if (typeof config?.reposition === "function") {
+            config.reposition();
+        }
+    });
+};
+
+const openOptionsPanel = (options = {}) => openGameSettingsModal(options);
+const closeOptionsPanel = (options = {}) => closeGameSettingsModal(options);
+const openAdvanced = () => openFloatingPanel("advanced");
+const closeAdvanced = (options = {}) => closeFloatingPanel("advanced", options);
+const openPianoPanel = () => openFloatingPanel("piano");
+const closePianoPanel = (options = {}) => closeFloatingPanel("piano", options);
+const openInstrumentBrowser = () => openFloatingPanel("instrument");
+const closeInstrumentBrowser = (options = {}) => closeFloatingPanel("instrument", options);
+
 const closeSettings = () => {
     settingsPanel.classList.remove("open");
     settingsPanel.setAttribute("aria-hidden", "true");
     settingsToggle.setAttribute("aria-expanded", "false");
-    closeOptionsPanel();
-    closePianoPanel();
-    closeAdvanced();
-    closeInstrumentBrowser();
+    closeAllFloatingPanels();
+    activeFloatingPanelKey = null;
     commitCriticalChange(200);
     commitNoteCountChange(200);
     if (state.active && pendingCriticalRestart) {
@@ -978,121 +1350,16 @@ const closeSettings = () => {
     updateKeyboardScale();
 };
 
-const positionFloatingPanel = (panel, trigger) => {
-    if (!panel || !trigger) return;
-    const padding = 18;
-    const gap = getPanelBottomGap();
-    const maxHeight = Math.max(220, window.innerHeight - gap - (padding * 2));
-    panel.style.maxHeight = `${maxHeight}px`;
-    const triggerRect = trigger.getBoundingClientRect();
-    const panelRect = panel.getBoundingClientRect();
-    const appRect = appEl.getBoundingClientRect();
-    const settingsRect = settingsPanel.getBoundingClientRect();
-
-    let left = settingsRect.left - panelRect.width - padding;
-    const minLeft = appRect.right + padding;
-    left = Math.max(left, minLeft);
-    const maxLeft = settingsRect.left - panelRect.width - padding;
-    left = Math.min(left, maxLeft);
-    left = Math.max(padding, left);
-
-    let top = Math.max(padding, triggerRect.top);
-    const bottomLimit = window.innerHeight - gap;
-    if (top + panelRect.height > bottomLimit) {
-        top = Math.max(padding, bottomLimit - panelRect.height);
-    }
-
-    panel.style.left = `${left}px`;
-    panel.style.top = `${top}px`;
-};
-
-const positionOptionsPanel = () => {
-    if (!optionsPanel || !optionsTrigger) return;
-    positionFloatingPanel(optionsPanel, optionsTrigger);
-};
-
-const openOptionsPanel = () => {
-    if (!optionsPanel || !optionsTrigger) return;
-    closeAdvanced();
-    closePianoPanel();
-    closeInstrumentBrowser();
-    optionsPanel.classList.add("open");
-    optionsPanel.setAttribute("aria-hidden", "false");
-    optionsTrigger.setAttribute("aria-expanded", "true");
-    positionOptionsPanel();
-};
-
-const closeOptionsPanel = () => {
-    if (!optionsPanel || !optionsTrigger) return;
-    optionsPanel.classList.remove("open");
-    optionsPanel.setAttribute("aria-hidden", "true");
-    optionsTrigger.setAttribute("aria-expanded", "false");
-};
-
-const openAdvanced = () => {
-    closeOptionsPanel();
-    closePianoPanel();
-    closeInstrumentBrowser();
-    advancedPanel.classList.add("open");
-    advancedPanel.setAttribute("aria-hidden", "false");
-    positionFloatingPanel(advancedPanel, advancedTrigger);
-    refreshResponseProfileBrowser();
-};
-
-const closeAdvanced = () => {
-    advancedPanel.classList.remove("open");
-    advancedPanel.setAttribute("aria-hidden", "true");
-};
-
-const positionPianoPanel = () => {
-    if (!pianoPanel || !pianoTrigger) return;
-    positionFloatingPanel(pianoPanel, pianoTrigger);
-};
-
-const openPianoPanel = () => {
-    if (!pianoPanel || !pianoTrigger) return;
-    closeOptionsPanel();
-    closeAdvanced();
-    closeInstrumentBrowser();
-    pianoPanel.classList.add("open");
-    pianoPanel.setAttribute("aria-hidden", "false");
-    pianoTrigger.setAttribute("aria-expanded", "true");
-    positionPianoPanel();
-    void refreshSoundfontCatalog({ loadAllPacks: false });
-};
-
-const closePianoPanel = () => {
-    if (!pianoPanel || !pianoTrigger) return;
-    pianoPanel.classList.remove("open");
-    pianoPanel.setAttribute("aria-hidden", "true");
-    pianoTrigger.setAttribute("aria-expanded", "false");
-};
-
-const positionInstrumentBrowserPanel = () => {
-    if (!instrumentBrowserPanel || !instrumentBrowserTrigger) return;
-    positionFloatingPanel(instrumentBrowserPanel, instrumentBrowserTrigger);
-};
-
-const openInstrumentBrowser = () => {
-    if (!instrumentBrowserPanel || !instrumentBrowserTrigger) return;
-    closeOptionsPanel();
-    closeAdvanced();
-    closePianoPanel();
-    instrumentBrowserPanel.classList.add("open");
-    instrumentBrowserPanel.setAttribute("aria-hidden", "false");
-    instrumentBrowserTrigger.setAttribute("aria-expanded", "true");
-    positionInstrumentBrowserPanel();
-    void refreshSoundfontCatalog({ loadAllPacks: true }).then(() => refreshInstrumentPresetBrowser());
-};
-
-const closeInstrumentBrowser = () => {
-    if (!instrumentBrowserPanel || !instrumentBrowserTrigger) return;
-    instrumentBrowserPanel.classList.remove("open");
-    instrumentBrowserPanel.setAttribute("aria-hidden", "true");
-    instrumentBrowserTrigger.setAttribute("aria-expanded", "false");
-};
+App.dialog = App.dialog || {};
+Object.assign(App.dialog, {
+    open: openAppDialog,
+    close: closeAppDialog,
+    isOpen: () => Boolean(appDialog && !appDialog.hidden),
+    syncModalOpenClass
+});
 
 Object.assign(App.settings, {
+    applySettingsStatePatch,
     clampNoteCount,
     setVolume,
     setPianoTone,
@@ -1103,6 +1370,7 @@ Object.assign(App.settings, {
     setKeyCountVisual,
     setPracticeMode,
     refreshOptionsModeVisibility,
+    syncModalOpenClass,
     applyUiFromState,
     commitCriticalChange,
     commitNoteCountChange,
@@ -1111,7 +1379,15 @@ Object.assign(App.settings, {
     openSettings,
     closeSettings,
     positionFloatingPanel,
-    positionOptionsPanel,
+    getOpenFloatingPanelKey,
+    repositionOpenFloatingPanels,
+    openFloatingPanel,
+    closeFloatingPanel,
+    toggleFloatingPanel,
+    closeAllFloatingPanels,
+    isGameSettingsModalOpen,
+    openGameSettingsModal,
+    closeGameSettingsModal,
     openOptionsPanel,
     closeOptionsPanel,
     openAdvanced,

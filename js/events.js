@@ -17,6 +17,53 @@ document.addEventListener("pointerdown", primeAudioFromGesture, true);
 document.addEventListener("keydown", primeAudioFromGesture, true);
 document.addEventListener("touchstart", primeAudioFromGesture, true);
 
+const ROUND_RESTART_POLICY_BY_SETTING = Object.freeze({
+    playbackOrder: () => state.active,
+    trainingMode: () => state.active && getEventsChordRound(),
+    chordDifficulty: () => state.active && getEventsChordRound(),
+    chordRootHint: () => state.active && getEventsChordRound()
+});
+
+const shouldRestartRoundForSetting = (settingKey) => {
+    const resolver = ROUND_RESTART_POLICY_BY_SETTING[settingKey];
+    return typeof resolver === "function" ? Boolean(resolver()) : false;
+};
+
+const patchSettingsState = (patch, mutation = "events/settings-patch") => {
+    if (typeof App.settings?.applySettingsStatePatch === "function") {
+        App.settings.applySettingsStatePatch(patch, mutation);
+        return;
+    }
+    Object.assign(state, patch || {});
+};
+
+const applySettingMutationEffects = (
+    settingKey,
+    {
+        save = true,
+        refreshStatus = true,
+        refreshKeys = true,
+        restartOverride = null,
+        restartDelayMs = 200
+    } = {}
+) => {
+    if (refreshStatus) {
+        updateStatus();
+    }
+    if (refreshKeys) {
+        updateKeyStates();
+    }
+    const shouldRestart = restartOverride === null
+        ? shouldRestartRoundForSetting(settingKey)
+        : Boolean(restartOverride);
+    if (shouldRestart) {
+        handleCriticalSettingChange(restartDelayMs);
+    }
+    if (save) {
+        saveSettings();
+    }
+};
+
 noteCountInput.addEventListener("input", (event) => {
     const next = clampNoteCount(event.target.value);
     pendingNoteCount = next;
@@ -34,10 +81,16 @@ noteCountInput.addEventListener("pointerup", () => {
 
 segmentedButtons.forEach((button) => {
     button.addEventListener("click", () => {
+        const nextMode = button.dataset.mode === "ascending" ? "ascending" : "simultaneous";
+        if (state.mode === nextMode && button.classList.contains("active")) {
+            return;
+        }
         segmentedButtons.forEach((btn) => btn.classList.remove("active"));
         button.classList.add("active");
-        state.mode = button.dataset.mode;
-        saveSettings();
+        patchSettingsState({ mode: nextMode }, "events/playback-order");
+        applySettingMutationEffects("playbackOrder", {
+            refreshKeys: false
+        });
     });
 });
 
@@ -51,17 +104,20 @@ quickModeButtons.forEach((button) => {
 });
 
 blindToggle.addEventListener("change", (event) => {
-    state.blindMode = event.target.checked;
-    handleCriticalSettingChange(200);
-    updateStatus();
-    saveSettings();
+    patchSettingsState({ blindMode: event.target.checked }, "events/blind-mode");
+    applySettingMutationEffects("blindMode", {
+        refreshKeys: false,
+        restartOverride: false
+    });
 });
 
 if (hideLivePreviewToggle) {
     hideLivePreviewToggle.addEventListener("change", (event) => {
-        state.hideLivePreview = Boolean(event.target.checked);
-        updateStatus();
-        saveSettings();
+        patchSettingsState({ hideLivePreview: Boolean(event.target.checked) }, "events/hide-live-preview");
+        applySettingMutationEffects("hideLivePreview", {
+            refreshKeys: false,
+            restartOverride: false
+        });
     });
 }
 
@@ -71,11 +127,12 @@ niceNotesToggle.addEventListener("change", (event) => {
     } else if (getEffectivePracticeMode() === "nice") {
         setPracticeMode("random");
     } else {
-        state.niceMode = false;
+        patchSettingsState({ niceMode: false }, "events/nice-mode");
         updateNoteCountMax();
-        handleCriticalSettingChange(200);
-        updateStatus();
-        saveSettings();
+        applySettingMutationEffects("niceMode", {
+            refreshKeys: false,
+            restartOverride: false
+        });
     }
 });
 
@@ -96,76 +153,73 @@ if (trainingModeSelect) {
     trainingModeSelect.addEventListener("change", (event) => {
         const value = String(event.target.value ?? "");
         const next = ["keyboard", "type", "both"].includes(value) ? value : "keyboard";
-        state.trainingMode = next;
-        if (getEffectivePracticeMode() !== "chord") {
-            state.trainingMode = "keyboard";
-        }
+        patchSettingsState({
+            trainingMode: getEffectivePracticeMode() === "chord" ? next : "keyboard"
+        }, "events/training-mode");
         refreshOptionsModeVisibility();
         if (typeof App.game?.clearTypingAutoNext === "function") {
             App.game.clearTypingAutoNext();
         }
-        handleCriticalSettingChange(200);
-        updateStatus();
-        updateKeyStates();
-        saveSettings();
+        applySettingMutationEffects("trainingMode");
     });
 }
 
 if (chordDifficultySelect) {
     chordDifficultySelect.addEventListener("change", (event) => {
         const value = String(event.target.value ?? "").trim().toLowerCase();
-        state.chordDifficulty = value === "playful"
+        patchSettingsState({
+            chordDifficulty: value === "playful"
             ? "voiced"
             : (["easy", "medium", "voiced", "hard"].includes(value)
                 ? value
-                : DEFAULTS.chordDifficulty);
-        if (getEventsChordRound()) {
-            handleCriticalSettingChange(200);
-        }
-        updateStatus();
-        saveSettings();
+                : DEFAULTS.chordDifficulty)
+        }, "events/chord-difficulty");
+        applySettingMutationEffects("chordDifficulty", {
+            refreshKeys: false
+        });
     });
 }
 
 if (chordExtraHelpersToggle) {
     chordExtraHelpersToggle.addEventListener("change", (event) => {
-        state.chordExtraHelpers = Boolean(event.target.checked);
-        if (getEventsChordRound()) {
-            handleCriticalSettingChange(200);
-        }
-        updateStatus();
-        saveSettings();
+        patchSettingsState({ chordExtraHelpers: Boolean(event.target.checked) }, "events/chord-extra-helpers");
+        applySettingMutationEffects("chordExtraHelpers", {
+            refreshKeys: false,
+            restartOverride: false
+        });
     });
 }
 
 if (chordRootHintToggle) {
     chordRootHintToggle.addEventListener("change", (event) => {
-        state.chordRootHint = Boolean(event.target.checked);
-        updateStatus();
-        saveSettings();
+        patchSettingsState({
+            chordRootHint: Boolean(event.target.checked),
+            rootHintSuppressed: false
+        }, "events/chord-root-hint");
+        applySettingMutationEffects("chordRootHint");
     });
 }
 
 if (typingShowPianoToggle) {
     typingShowPianoToggle.addEventListener("change", (event) => {
-        state.typingShowPiano = Boolean(event.target.checked);
+        patchSettingsState({ typingShowPiano: Boolean(event.target.checked) }, "events/typing-show-piano");
         refreshOptionsModeVisibility();
-        updateStatus();
-        updateKeyStates();
-        saveSettings();
+        applySettingMutationEffects("typingShowPiano", {
+            restartOverride: false
+        });
     });
 }
 
 if (typingShowTypedToggle) {
     typingShowTypedToggle.addEventListener("change", (event) => {
-        state.typingShowTyped = Boolean(event.target.checked);
+        patchSettingsState({ typingShowTyped: Boolean(event.target.checked) }, "events/typing-show-typed");
         refreshOptionsModeVisibility();
         if (typeof App.game?.updateTypedPreviewFromInput === "function") {
             App.game.updateTypedPreviewFromInput();
         }
-        updateStatus();
-        updateKeyStates();
-        saveSettings();
+        applySettingMutationEffects("typingShowTyped", {
+            restartOverride: false
+        });
     });
 }
 
@@ -175,9 +229,9 @@ resetSettingsButton.addEventListener("click", () => {
     updateNoteCountMax();
     applyUiFromState();
     setVolume(state.volume);
-    setPianoTone(state.pianoTone, { save: false, skipProfilePrompts: true });
+    void setPianoTone(state.pianoTone, { save: false, skipProfilePrompts: true });
     setNoteLength(state.noteDuration);
-    setKeyCount(state.keyCount, { delayOverrideMs: 0 });
+    setKeyCount(state.keyCount, { preview: true });
     saveSettings();
     handleCriticalSettingChange(200);
     updateStatus();
@@ -194,7 +248,9 @@ settingsToggle.addEventListener("click", (event) => {
 
 themeToggle.addEventListener("click", (event) => {
     event.stopPropagation();
-    state.theme = state.theme === "dark" ? "light" : "dark";
+    patchSettingsState({
+        theme: state.theme === "dark" ? "light" : "dark"
+    }, "events/theme");
     document.body.classList.toggle("theme-dark", state.theme === "dark");
     themeToggle.setAttribute("aria-pressed", state.theme === "dark");
     saveSettings();
@@ -204,10 +260,6 @@ if (homeToggle) {
     homeToggle.addEventListener("click", (event) => {
         event.stopPropagation();
         closeSettings();
-        closeOptionsPanel();
-        closeAdvanced();
-        closePianoPanel();
-        closeInstrumentBrowser();
         if (typeof App.game?.goHome === "function") {
             App.game.goHome();
         }
@@ -215,17 +267,22 @@ if (homeToggle) {
 }
 
 settingsPanel.addEventListener("click", (event) => {
-    if (!optionsPanel?.contains(event.target) && !optionsTrigger?.contains(event.target)) {
-        closeOptionsPanel();
-    }
-    if (!advancedPanel.contains(event.target) && !advancedTrigger.contains(event.target)) {
-        closeAdvanced();
-    }
-    if (!pianoPanel?.contains(event.target) && !pianoTrigger?.contains(event.target)) {
-        closePianoPanel();
-    }
-    if (!instrumentBrowserPanel?.contains(event.target) && !instrumentBrowserTrigger?.contains(event.target)) {
-        closeInstrumentBrowser();
+    const openPanelKey = typeof getOpenFloatingPanelKey === "function"
+        ? getOpenFloatingPanelKey()
+        : null;
+    if (openPanelKey) {
+        const panelRefs = {
+            advanced: { panel: advancedPanel, trigger: advancedTrigger },
+            piano: { panel: pianoPanel, trigger: pianoTrigger },
+            instrument: { panel: instrumentBrowserPanel, trigger: instrumentBrowserTrigger }
+        };
+        const refs = panelRefs[openPanelKey];
+        if (refs?.panel && refs?.trigger) {
+            const clickedInsideOpenPanel = refs.panel.contains(event.target) || refs.trigger.contains(event.target);
+            if (!clickedInsideOpenPanel) {
+                closeAllFloatingPanels();
+            }
+        }
     }
     event.stopPropagation();
 });
@@ -233,42 +290,39 @@ settingsPanel.addEventListener("click", (event) => {
 if (optionsTrigger) {
     optionsTrigger.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (!optionsPanel) return;
-        if (optionsPanel.classList.contains("open")) {
-            closeOptionsPanel();
-        } else {
-            openOptionsPanel();
-        }
+        openGameSettingsModal(optionsTrigger);
     });
 }
 
-if (optionsPanel) {
-    optionsPanel.addEventListener("click", (event) => {
-        event.stopPropagation();
+if (gameSettingsOpen) {
+    gameSettingsOpen.addEventListener("click", (event) => {
+        event.preventDefault();
+        openGameSettingsModal(gameSettingsOpen);
+    });
+}
+
+if (gameSettingsBackdrop) {
+    gameSettingsBackdrop.addEventListener("click", (event) => {
+        event.preventDefault();
+        closeGameSettingsModal();
+    });
+}
+
+if (gameSettingsClose) {
+    gameSettingsClose.addEventListener("click", (event) => {
+        event.preventDefault();
+        closeGameSettingsModal();
     });
 }
 
 document.addEventListener("click", () => {
     closeSettings();
-    closeOptionsPanel();
-    closeAdvanced();
-    closePianoPanel();
-    closeInstrumentBrowser();
 });
 
 window.addEventListener("resize", () => {
     updateKeyboardScale();
-    if (optionsPanel?.classList.contains("open")) {
-        positionOptionsPanel();
-    }
-    if (advancedPanel?.classList.contains("open")) {
-        positionFloatingPanel(advancedPanel, advancedTrigger);
-    }
-    if (pianoPanel?.classList.contains("open")) {
-        positionPianoPanel();
-    }
-    if (instrumentBrowserPanel?.classList.contains("open")) {
-        positionInstrumentBrowserPanel();
+    if (typeof repositionOpenFloatingPanels === "function") {
+        repositionOpenFloatingPanels();
     }
     if (isChordTutorialOpen()) {
         fitTutorialLayout({ recompute: false });
@@ -464,7 +518,7 @@ const CHORD_TUTORIAL_STEPS = [
         title: "5. Diminished and Augmented",
         bodyHtml: `
             <p><strong>Diminished (dim)</strong>: 0, b3, b5. Example: Cdim = C-Eb-Gb.</p>
-            <p><strong>Augmented (aug)</strong>: 0, 3, #5. Example: Caug = C-E-G#.</p>
+            <p><strong>Augmented (aug)</strong>: 0, 4, 8 (R, 3, #5). Example: Caug = C-E-G#.</p>
             <p>These are tense colors used for motion and resolution.</p>
         `,
         unlockedRootPcs: [0, 1, 2, 4, 5, 7, 9, 11],
@@ -940,7 +994,10 @@ const closeChordTutorial = () => {
     chordTutorialModal.hidden = true;
     chordTutorialModal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("tutorial-open");
-    const fallback = tutorialReturnFocusEl ?? chordTutorialOpen ?? typingHelpToggle ?? chordTutorialOpenOptions;
+    if (typeof App.settings?.syncModalOpenClass === "function") {
+        App.settings.syncModalOpenClass();
+    }
+    const fallback = tutorialReturnFocusEl ?? typingHelpToggle ?? chordTutorialOpenOptions;
     if (fallback && typeof fallback.focus === "function") {
         fallback.focus();
     }
@@ -962,8 +1019,16 @@ const openChordTutorial = (stepIndex = 0, sourceEl = null) => {
     chordTutorialModal.hidden = false;
     chordTutorialModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("tutorial-open");
+    if (typeof App.settings?.syncModalOpenClass === "function") {
+        App.settings.syncModalOpenClass();
+    }
     renderChordTutorialStep();
     requestAnimationFrame(() => fitTutorialLayout({ recompute: true }));
+    if (chordTutorialClose) {
+        chordTutorialClose.focus({ preventScroll: true });
+    } else {
+        focusFirstInModal(chordTutorialModal);
+    }
 };
 
 const registerTutorialOpenTrigger = (triggerEl, stepIndex = 0) => {
@@ -975,7 +1040,6 @@ const registerTutorialOpenTrigger = (triggerEl, stepIndex = 0) => {
     });
 };
 
-registerTutorialOpenTrigger(chordTutorialOpen, 0);
 registerTutorialOpenTrigger(chordTutorialOpenOptions, 0);
 registerTutorialOpenTrigger(typingHelpToggle, 0);
 
@@ -1232,7 +1296,7 @@ lengthSlider.addEventListener("dblclick", () => {
 });
 
 keyCountSlider.addEventListener("dblclick", () => {
-    pendingKeyCount = DEFAULTS.keyCount;
+    pendingKeyCount = null;
     setKeyCount(DEFAULTS.keyCount);
 });
 
@@ -1348,11 +1412,7 @@ if (instrumentPresetApply) {
 
 advancedTrigger.addEventListener("click", (event) => {
     event.stopPropagation();
-    if (advancedPanel.classList.contains("open")) {
-        closeAdvanced();
-    } else {
-        openAdvanced();
-    }
+    toggleFloatingPanel("advanced");
 });
 
 advancedPanel.addEventListener("click", (event) => {
@@ -1362,12 +1422,7 @@ advancedPanel.addEventListener("click", (event) => {
 if (pianoTrigger) {
     pianoTrigger.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (pianoPanel.classList.contains("open")) {
-            closePianoPanel();
-        } else {
-            closeAdvanced();
-            openPianoPanel();
-        }
+        toggleFloatingPanel("piano");
     });
 }
 
@@ -1380,13 +1435,7 @@ if (pianoPanel) {
 if (instrumentBrowserTrigger) {
     instrumentBrowserTrigger.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (instrumentBrowserPanel.classList.contains("open")) {
-            closeInstrumentBrowser();
-        } else {
-            closeAdvanced();
-            closePianoPanel();
-            openInstrumentBrowser();
-        }
+        toggleFloatingPanel("instrument");
     });
 }
 
@@ -1410,7 +1459,7 @@ const bindPianoOptionEvents = () => {
         const option = event.target.closest(".piano-option");
         if (!option) return;
         const tone = option.dataset.piano;
-        setPianoTone(tone);
+        void setPianoTone(tone);
     });
 
     pianoOptionsContainer.addEventListener("keydown", (event) => {
@@ -1419,7 +1468,7 @@ const bindPianoOptionEvents = () => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         const tone = option.dataset.piano;
-        setPianoTone(tone);
+        void setPianoTone(tone);
     });
 };
 
@@ -1553,6 +1602,121 @@ keyboardEl.addEventListener("click", (event) => {
     event.preventDefault();
 });
 
+let gameSettingsReturnFocusEl = null;
+const FOCUSABLE_SELECTOR = "button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])";
+
+const isElementVisible = (el) => {
+    if (!el) return false;
+    if (el.hasAttribute("hidden")) return false;
+    if (el.getAttribute("aria-hidden") === "true") return false;
+    const style = window.getComputedStyle(el);
+    return style.display !== "none" && style.visibility !== "hidden";
+};
+
+const getFocusableElements = (root) => {
+    if (!root) return [];
+    return Array.from(root.querySelectorAll(FOCUSABLE_SELECTOR))
+        .filter((el) => !el.disabled && el.tabIndex !== -1 && isElementVisible(el));
+};
+
+const getModalFocusRoot = (modalEl) => (
+    modalEl?.querySelector(".game-settings-card, .tutorial-card, .app-dialog-card") ?? modalEl
+);
+
+const focusFirstInModal = (modalEl) => {
+    const root = getModalFocusRoot(modalEl);
+    const focusables = getFocusableElements(root);
+    if (focusables.length) {
+        focusables[0].focus({ preventScroll: true });
+    }
+};
+
+const trapModalFocus = (modalEl, event) => {
+    if (event.code !== "Tab") return false;
+    const root = getModalFocusRoot(modalEl);
+    const focusables = getFocusableElements(root);
+    if (!focusables.length) return false;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey) {
+        if (active === first || !root.contains(active)) {
+            event.preventDefault();
+            last.focus({ preventScroll: true });
+            return true;
+        }
+        return false;
+    }
+    if (active === last || !root.contains(active)) {
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+        return true;
+    }
+    return false;
+};
+
+const isTextEditableTarget = (target) => {
+    if (!target) return false;
+    const tag = target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+    return Boolean(target.isContentEditable);
+};
+
+const getActiveModalEl = () => {
+    if (App.dialog?.isOpen?.()) return appDialog;
+    if (gameSettingsModal && !gameSettingsModal.hidden) return gameSettingsModal;
+    if (isChordTutorialOpen()) return chordTutorialModal;
+    return null;
+};
+
+const closeGameSettingsModal = () => {
+    if (typeof App.settings?.closeGameSettingsModal === "function") {
+        App.settings.closeGameSettingsModal({ restoreFocus: false });
+    }
+    const fallback = gameSettingsReturnFocusEl ?? gameSettingsOpen ?? optionsTrigger;
+    if (fallback && typeof fallback.focus === "function") {
+        fallback.focus({ preventScroll: true });
+    }
+    gameSettingsReturnFocusEl = null;
+};
+
+const openGameSettingsModal = (sourceEl = null) => {
+    gameSettingsReturnFocusEl = sourceEl ?? document.activeElement;
+    if (typeof App.settings?.openGameSettingsModal === "function") {
+        App.settings.openGameSettingsModal();
+    }
+    focusFirstInModal(gameSettingsModal);
+};
+
+const closeActiveModal = () => {
+    if (App.dialog?.isOpen?.()) {
+        App.dialog.close();
+        return true;
+    }
+    if (gameSettingsModal && !gameSettingsModal.hidden) {
+        closeGameSettingsModal();
+        return true;
+    }
+    if (isChordTutorialOpen()) {
+        closeChordTutorial();
+        return true;
+    }
+    return false;
+};
+
+const moveFocusInPanel = (panelEl, direction) => {
+    if (!panelEl) return false;
+    const focusables = getFocusableElements(panelEl);
+    if (!focusables.length) return false;
+    const active = document.activeElement;
+    const index = focusables.indexOf(active);
+    const nextIndex = index === -1
+        ? 0
+        : (index + direction + focusables.length) % focusables.length;
+    focusables[nextIndex].focus({ preventScroll: true });
+    return true;
+};
+
 document.addEventListener("keydown", (event) => {
     const tag = event.target.tagName;
     const chordInputFocused = event.target === chordAnswerInput;
@@ -1560,46 +1724,88 @@ document.addEventListener("keydown", (event) => {
         event.preventDefault();
         return;
     }
-    if (event.code === "Escape" && isChordTutorialOpen()) {
-        event.preventDefault();
-        closeChordTutorial();
+    const activeModal = getActiveModalEl();
+    if (activeModal) {
+        if (event.code === "Escape") {
+            event.preventDefault();
+            closeActiveModal();
+            return;
+        }
+        if (trapModalFocus(activeModal, event)) {
+            return;
+        }
+        if (activeModal === chordTutorialModal) {
+            const insideTutorial = chordTutorialModal?.contains(event.target);
+            if (event.code === "ArrowLeft" && insideTutorial) {
+                event.preventDefault();
+                if (chordTutorialPrev && !chordTutorialPrev.disabled) {
+                    chordTutorialPrev.click();
+                }
+                return;
+            }
+            if (event.code === "ArrowRight" && insideTutorial) {
+                event.preventDefault();
+                if (chordTutorialNext && !chordTutorialNext.disabled) {
+                    chordTutorialNext.click();
+                }
+                return;
+            }
+            if (!insideTutorial) {
+                event.preventDefault();
+                return;
+            }
+        }
         return;
     }
-    if (isChordTutorialOpen()) {
-        const insideTutorial = chordTutorialModal?.contains(event.target);
-        if (event.code === "ArrowLeft" && insideTutorial) {
+
+    const openPanelKey = typeof getOpenFloatingPanelKey === "function"
+        ? getOpenFloatingPanelKey()
+        : null;
+    if (openPanelKey) {
+        const panelMap = {
+            advanced: advancedPanel,
+            piano: pianoPanel,
+            instrument: instrumentBrowserPanel
+        };
+        const openPanel = panelMap[openPanelKey] ?? null;
+        if (event.code === "Escape") {
             event.preventDefault();
-            if (chordTutorialPrev && !chordTutorialPrev.disabled) {
-                chordTutorialPrev.click();
+            closeFloatingPanel(openPanelKey, { restoreFocus: true });
+            return;
+        }
+        if (event.code === "Tab" && openPanel && !openPanel.contains(event.target)) {
+            event.preventDefault();
+            const focusables = getFocusableElements(openPanel);
+            if (!focusables.length) return;
+            const target = event.shiftKey ? focusables[focusables.length - 1] : focusables[0];
+            target.focus({ preventScroll: true });
+            return;
+        }
+        if (openPanel && !isTextEditableTarget(event.target)) {
+            if (event.code === "ArrowUp" || event.code === "ArrowLeft") {
+                event.preventDefault();
+                moveFocusInPanel(openPanel, -1);
+                return;
             }
-            return;
-        }
-        if (event.code === "ArrowRight" && insideTutorial) {
-            event.preventDefault();
-            if (chordTutorialNext && !chordTutorialNext.disabled) {
-                chordTutorialNext.click();
+            if (event.code === "ArrowDown" || event.code === "ArrowRight") {
+                event.preventDefault();
+                moveFocusInPanel(openPanel, 1);
+                return;
             }
-            return;
         }
-        if (!insideTutorial) {
-            event.preventDefault();
-            return;
-        }
-        return;
     }
+
     if (event.code === "Escape") {
         closeSettings();
-        closeOptionsPanel();
-        closeAdvanced();
-        closePianoPanel();
-        closeInstrumentBrowser();
     }
 
     if (chordInputFocused && event.code === "Space") {
         event.preventDefault();
         triggerReplayAction(event);
         if (!holdState.active) {
-            resultEl.textContent = EVENTS_ACTION_COPY.typeOrSelectFirst || "Type a valid chord or select notes first.";
+            resultEl.textContent = (state.blindMode && !state.submitted)
+                ? "Blind mode is on: replay is disabled until you submit."
+                : (EVENTS_ACTION_COPY.typeOrSelectFirst || "Type a valid chord or select notes first.");
         }
         return;
     }

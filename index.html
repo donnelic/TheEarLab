@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Note Recognition Piano Trainer</title>
-  <link rel="stylesheet" href="styles.css?v=20260306105900" />
+  <link rel="stylesheet" href="styles.css?v=20260310104635" />
 </head>
 
 <body>
@@ -35,22 +35,24 @@
   </button>
 
   <aside id="settings-panel" class="settings-panel" aria-hidden="true">
-    <h2>Settings</h2>
+    <h2>Control Center</h2>
     <div class="settings-body">
       <div class="settings-grid">
+        <div class="settings-section-title">Practice</div>
         <div class="control">
           <label>Game Settings</label>
           <div class="control-row">
             <button id="options-trigger" class="panel-trigger" type="button" aria-expanded="false"
-              aria-controls="options-panel">
+              aria-controls="game-settings-modal">
               Open game settings
             </button>
           </div>
           <div class="control-row">
-            <span class="unit">Opens a popup with mode-specific options</span>
+            <span class="unit">Opens a centered panel with practice and feedback options</span>
           </div>
         </div>
 
+        <div class="settings-section-title">Sound &amp; Instrument</div>
         <div class="control">
           <label for="piano-volume">Piano volume</label>
           <div class="control-row">
@@ -77,6 +79,7 @@
           </div>
         </div>
 
+        <div class="settings-section-title">Articulation</div>
         <div class="control">
           <label for="note-length">Note length</label>
           <div class="control-row">
@@ -88,6 +91,7 @@
           </div>
         </div>
 
+        <div class="settings-section-title">Keyboard Layout</div>
         <div class="control">
           <label for="key-count">Key count</label>
           <div class="control-row">
@@ -195,179 +199,197 @@
     </div>
   </section>
 
-  <section id="options-panel" class="options-panel" aria-hidden="true">
-    <h3>Game Settings</h3>
-    <div class="options-grid">
-      <div class="options-section-title">General</div>
+  <section id="game-settings-modal" class="game-settings-modal" aria-hidden="true" hidden>
+    <button id="game-settings-backdrop" class="tutorial-backdrop" type="button" aria-label="Close game settings"></button>
+    <div class="game-settings-card" role="dialog" aria-modal="true" aria-labelledby="game-settings-title">
+      <div class="game-settings-head">
+        <div>
+          <div class="game-settings-kicker">Game Settings</div>
+          <h4 id="game-settings-title">Practice &amp; Feedback</h4>
+        </div>
+        <button id="game-settings-close" class="typing-learn-btn tutorial-close" type="button">Close</button>
+      </div>
+      <div class="game-settings-grid">
+        <div class="game-settings-group">
+          <div class="game-settings-group-title">Practice focus</div>
+          <div class="game-settings-group-body">
+            <div class="control compact">
+              <label for="practice-mode">Practice mode</label>
+              <div class="control-row">
+                <select id="practice-mode">
+                  <option value="random">Random Notes</option>
+                  <option value="nice">Harmonic Notes</option>
+                  <option value="chord">Chord Practice</option>
+                </select>
+              </div>
+            </div>
 
-      <div class="control compact">
-        <label for="practice-mode">Practice mode</label>
-        <div class="control-row">
-          <select id="practice-mode">
-            <option value="random">Random Notes</option>
-            <option value="nice">Harmonic Notes</option>
-            <option value="chord">Chord Practice</option>
-          </select>
+            <div class="control compact" data-option-group="notes">
+              <label for="note-count">Notes per round</label>
+              <div class="control-row">
+                <input id="note-count" type="range" min="1" max="6" step="1" value="2" />
+                <span class="volume-value" id="note-count-value">2 notes</span>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="legacy" hidden>
+              <label for="nice-notes">Nice notes</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="nice-notes">
+                  <input id="nice-notes" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Consonant note targets</span>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="legacy" hidden>
+              <label for="chord-rounds">Chord rounds</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="chord-rounds">
+                  <input id="chord-rounds" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Generate chord targets</span>
+              </div>
+            </div>
+
+            <div class="control">
+              <label>Playback order</label>
+              <div class="segmented" role="group" aria-label="Play style">
+                <button class="segmented-btn active" type="button" data-mode="simultaneous">Together</button>
+                <button class="segmented-btn" type="button" data-mode="ascending">Low to high</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-settings-group" data-option-group="chord">
+          <div class="game-settings-group-title">Chord training</div>
+          <div class="game-settings-group-body">
+            <div class="control compact">
+              <label for="training-mode">Answer input</label>
+              <div class="control-row">
+                <select id="training-mode">
+                  <option value="keyboard">Play on keyboard</option>
+                  <option value="type">Type chord name</option>
+                  <option value="both">Keyboard + typing</option>
+                </select>
+              </div>
+              <div class="control-row">
+                <span class="unit">In both mode, press Enter in the typing field for typed answers, or Submit for
+                  keyboard answers</span>
+              </div>
+            </div>
+
+            <div class="control compact">
+              <label for="chord-difficulty">Chord set</label>
+              <div class="control-row">
+                <select id="chord-difficulty">
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="voiced">Voiced (Easy/Medium)</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="control compact">
+              <label for="chord-extra-helpers">Extra helpers</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="chord-extra-helpers">
+                  <input id="chord-extra-helpers" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Show hints like chord size, family and voicing style</span>
+              </div>
+            </div>
+
+            <div class="control compact">
+              <label for="chord-root-hint">Reveal root note</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="chord-root-hint">
+                  <input id="chord-root-hint" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Show the target root on the keyboard (green anchor) while keeping full quality hidden</span>
+              </div>
+            </div>
+
+            <div class="control compact">
+              <label>Chord tutorial</label>
+              <div class="control-row">
+                <button id="chord-tutorial-open-options" class="advanced-trigger" type="button">Open chord guide</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-settings-group">
+          <div class="game-settings-group-title">Answer aids</div>
+          <div class="game-settings-group-body">
+            <div class="control compact">
+              <label for="blind-mode">Blind mode</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="blind-mode">
+                  <input id="blind-mode" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Mute key sound while selecting notes</span>
+              </div>
+            </div>
+
+            <div class="control compact">
+              <label for="hide-live-preview">Hide live answer preview</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="hide-live-preview">
+                  <input id="hide-live-preview" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Hide selected/typed note names until you submit</span>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="typing">
+              <label for="typing-show-piano">Keyboard guide</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="typing-show-piano">
+                  <input id="typing-show-piano" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">In typing-only mode, keep the keyboard visible as a guide</span>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="typing">
+              <label for="typing-show-typed">Typed chord preview</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="typing-show-typed">
+                  <input id="typing-show-typed" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Highlight the notes detected from your typed chord name</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div class="control compact" data-option-group="notes">
-        <label for="note-count">Notes per round</label>
-        <div class="control-row">
-          <input id="note-count" type="range" min="1" max="6" step="1" value="2" />
-          <span class="volume-value" id="note-count-value">2 notes</span>
-        </div>
-      </div>
-
-      <div class="control">
-        <label>Playback order</label>
-        <div class="segmented" role="group" aria-label="Play style">
-          <button class="segmented-btn active" type="button" data-mode="simultaneous">Together</button>
-          <button class="segmented-btn" type="button" data-mode="ascending">Low to high</button>
-        </div>
-      </div>
-
-      <div class="control compact">
-        <label for="blind-mode">Blind mode</label>
-        <div class="control-row">
-          <label class="switch" for="blind-mode">
-            <input id="blind-mode" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">Mute key sound while selecting notes</span>
-        </div>
-      </div>
-
-      <div class="control compact">
-        <label for="hide-live-preview">Hide live answer preview</label>
-        <div class="control-row">
-          <label class="switch" for="hide-live-preview">
-            <input id="hide-live-preview" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">Hide selected/typed note names until you submit</span>
-        </div>
-      </div>
-
-      <div class="control compact" data-option-group="legacy" hidden>
-        <label for="nice-notes">Nice notes</label>
-        <div class="control-row">
-          <label class="switch" for="nice-notes">
-            <input id="nice-notes" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">Consonant note targets</span>
-        </div>
-      </div>
-
-      <div class="control compact" data-option-group="legacy" hidden>
-        <label for="chord-rounds">Chord rounds</label>
-        <div class="control-row">
-          <label class="switch" for="chord-rounds">
-            <input id="chord-rounds" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">Generate chord targets</span>
-        </div>
-      </div>
-
-      <div class="options-section-title" data-option-group="chord">Chord mode</div>
-
-      <div class="control compact" data-option-group="chord">
-        <label for="training-mode">Answer input</label>
-        <div class="control-row">
-          <select id="training-mode">
-            <option value="keyboard">Play on keyboard</option>
-            <option value="type">Type chord name</option>
-            <option value="both">Keyboard + typing</option>
-          </select>
-        </div>
-        <div class="control-row">
-          <span class="unit">In both mode, press Enter in the typing field for typed answers, or Submit for keyboard answers</span>
-        </div>
-      </div>
-
-      <div class="control compact" data-option-group="chord">
-        <label for="chord-difficulty">Chord set</label>
-        <div class="control-row">
-          <select id="chord-difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="voiced">Voiced (Easy/Medium)</option>
-            <option value="hard">Hard</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="control compact" data-option-group="chord">
-        <label for="chord-extra-helpers">Extra helpers</label>
-        <div class="control-row">
-          <label class="switch" for="chord-extra-helpers">
-            <input id="chord-extra-helpers" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">Show hints like chord size, family and voicing style</span>
-        </div>
-      </div>
-
-      <div class="control compact" data-option-group="chord">
-        <label for="chord-root-hint">Reveal root note</label>
-        <div class="control-row">
-          <label class="switch" for="chord-root-hint">
-            <input id="chord-root-hint" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">Show the target chord root without revealing the full quality</span>
-        </div>
-      </div>
-
-      <div class="control compact" data-option-group="chord">
-        <label>Chord tutorial</label>
-        <div class="control-row">
-          <button id="chord-tutorial-open-options" class="advanced-trigger" type="button">Open chord guide</button>
-        </div>
-      </div>
-
-      <div class="options-section-title" data-option-group="typing">Typing helpers</div>
-
-      <div class="control compact" data-option-group="typing">
-        <label for="typing-show-piano">Keyboard guide</label>
-        <div class="control-row">
-          <label class="switch" for="typing-show-piano">
-            <input id="typing-show-piano" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">In typing-only mode, keep the keyboard visible as a guide</span>
-        </div>
-      </div>
-
-      <div class="control compact" data-option-group="typing">
-        <label for="typing-show-typed">Typed chord preview</label>
-        <div class="control-row">
-          <label class="switch" for="typing-show-typed">
-            <input id="typing-show-typed" type="checkbox" />
-            <span class="switch-track">
-              <span class="switch-thumb"></span>
-            </span>
-          </label>
-          <span class="unit">Highlight the notes detected from your typed chord name</span>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -432,6 +454,7 @@
         <div><strong>Mode</strong> <span id="mode-label">Normal</span></div>
       </div>
       <div class="status-actions">
+        <button id="game-settings-open" class="btn ghost" type="button">Game Settings</button>
         <button id="hint-button" class="btn secondary hint-button" type="button">Hint</button>
       </div>
       <div class="result" id="result" aria-live="polite"></div>
@@ -479,13 +502,43 @@
     </div>
   </section>
 
-  <script src="vendor/libfluidsynth-2.4.6.js?v=20260306105900" defer></script>
-  <script src="vendor/js-synthesizer.min.js?v=20260306105900" defer></script>
-  <script src="js/core.js?v=20260306105900" defer></script>
-  <script src="js/audio.js?v=20260306105900" defer></script>
-  <script src="js/game.js?v=20260306105900" defer></script>
-  <script src="js/settings.js?v=20260306105900" defer></script>
-  <script src="js/events.js?v=20260306105900" defer></script>
+  <section id="app-dialog" class="app-dialog" aria-hidden="true" hidden>
+    <button id="app-dialog-backdrop" class="tutorial-backdrop" type="button" aria-label="Close dialog"></button>
+    <div class="app-dialog-card" role="dialog" aria-modal="true" aria-labelledby="app-dialog-title">
+      <div class="app-dialog-head">
+        <h4 id="app-dialog-title">Dialog</h4>
+        <button id="app-dialog-close" class="typing-learn-btn tutorial-close" type="button">Close</button>
+      </div>
+      <div id="app-dialog-body" class="app-dialog-body"></div>
+      <div class="app-dialog-input-row">
+        <label for="app-dialog-input" class="app-dialog-input-label">Name</label>
+        <input id="app-dialog-input" type="text" />
+      </div>
+      <div class="app-dialog-actions">
+        <button id="app-dialog-cancel" class="btn ghost" type="button">Cancel</button>
+        <button id="app-dialog-confirm" class="btn primary" type="button">Confirm</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="vendor/libfluidsynth-2.4.6.js?v=20260310104635" defer></script>
+  <script src="vendor/js-synthesizer.min.js?v=20260310104635" defer></script>
+  <script src="js/core.js?v=20260310104635" defer></script>
+  <script src="js/store/reducers.js?v=20260310104635" defer></script>
+  <script src="js/store/actions.js?v=20260310104635" defer></script>
+  <script src="js/store/selectors.js?v=20260310104635" defer></script>
+  <script src="js/store/store.js?v=20260310104635" defer></script>
+  <script src="js/features/round/state-mutations.js?v=20260310104635" defer></script>
+  <script src="js/features/settings/state-mutations.js?v=20260310104635" defer></script>
+  <script src="js/features/chords/index.js?v=20260310104635" defer></script>
+  <script src="js/features/typing/index.js?v=20260310104635" defer></script>
+  <script src="js/features/tutorial/index.js?v=20260310104635" defer></script>
+  <script src="js/features/audio-preview/index.js?v=20260310104635" defer></script>
+  <script src="js/features/input/index.js?v=20260310104635" defer></script>
+  <script src="js/audio.js?v=20260310104635" defer></script>
+  <script src="js/game.js?v=20260310104635" defer></script>
+  <script src="js/settings.js?v=20260310104635" defer></script>
+  <script src="js/events.js?v=20260310104635" defer></script>
 </body>
 
 </html>

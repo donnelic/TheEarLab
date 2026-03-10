@@ -596,7 +596,7 @@ const refreshSoundfontCatalog = async (options = {}) => {
         }
         renderPianoOptions();
         if (typeof setPianoTone === "function") {
-            setPianoTone(state.pianoTone, { save: false, resetTrim: false });
+            void setPianoTone(state.pianoTone, { save: false, resetTrim: false });
         }
 
         return getSoundfontList();
@@ -1306,7 +1306,8 @@ const scheduleKeyAnimation = (noteId, delaySeconds = 0, holdMs = 360) => {
 const playNotes = (noteIds, mode, startTime, options = {}) => {
     const ctx = ensureAudio();
     const now = Math.max(ctx.currentTime, startTime ?? ctx.currentTime);
-    const ids = [...noteIds];
+    const ids = Array.from(new Set((Array.isArray(noteIds) ? noteIds : []).filter((id) => noteMap.has(id))));
+    if (!ids.length) return 0;
     const { animate = true, animationDelay, animationHoldMs, preset, _skipReadyGate = false } = options;
     const noteDuration = options.durationOverride ?? state.noteDuration;
     const gainScale = 1;
@@ -1333,6 +1334,7 @@ const playNotes = (noteIds, mode, startTime, options = {}) => {
         ids.sort((a, b) => noteMap.get(a).midi - noteMap.get(b).midi);
         ids.forEach((id, index) => {
             const note = noteMap.get(id);
+            if (!note) return;
             const t = now + index * ARP_STEP;
             playPianoNote(note.frequency, t, noteDuration, gainScale, id, preset);
             if (animate) {
@@ -1345,6 +1347,7 @@ const playNotes = (noteIds, mode, startTime, options = {}) => {
 
     ids.forEach((id) => {
         const note = noteMap.get(id);
+        if (!note) return;
         playPianoNote(note.frequency, now, noteDuration, gainScale, id, preset);
         if (animate) {
             const delay = animationDelay !== undefined ? animationDelay : now - ctx.currentTime;

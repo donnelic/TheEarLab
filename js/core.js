@@ -1,6 +1,6 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260306105900";
+const BUILD_ID = "20260310104635";
 App.buildId = BUILD_ID;
 
 const dom = {
@@ -37,7 +37,10 @@ const dom = {
     hintButton: document.getElementById("hint-button"),
     hintFlag: document.getElementById("hint-flag"),
     optionsTrigger: document.getElementById("options-trigger"),
-    optionsPanel: document.getElementById("options-panel"),
+    gameSettingsOpen: document.getElementById("game-settings-open"),
+    gameSettingsModal: document.getElementById("game-settings-modal"),
+    gameSettingsBackdrop: document.getElementById("game-settings-backdrop"),
+    gameSettingsClose: document.getElementById("game-settings-close"),
     advancedTrigger: document.getElementById("advanced-trigger"),
     advancedPanel: document.getElementById("advanced-panel"),
     instrumentBrowserTrigger: document.getElementById("instrument-browser-trigger"),
@@ -75,8 +78,6 @@ const dom = {
     typingZone: document.getElementById("typing-zone"),
     chordAnswerInput: document.getElementById("chord-answer"),
     typingHelpToggle: document.getElementById("typing-help-toggle"),
-    typingHelpText: document.getElementById("typing-help-text"),
-    chordTutorialOpen: document.getElementById("chord-tutorial-open"),
     chordTutorialOpenOptions: document.getElementById("chord-tutorial-open-options"),
     chordTutorialModal: document.getElementById("chord-tutorial-modal"),
     chordTutorialBackdrop: document.getElementById("chord-tutorial-backdrop"),
@@ -110,7 +111,16 @@ const dom = {
     blackKeysContainer: document.getElementById("black-keys"),
     keyboardEl: document.getElementById("keyboard"),
     pedalIcon: document.getElementById("pedal-icon"),
-    pianoOptionsContainer: document.getElementById("piano-options")
+    pianoOptionsContainer: document.getElementById("piano-options"),
+    appDialog: document.getElementById("app-dialog"),
+    appDialogBackdrop: document.getElementById("app-dialog-backdrop"),
+    appDialogClose: document.getElementById("app-dialog-close"),
+    appDialogTitle: document.getElementById("app-dialog-title"),
+    appDialogBody: document.getElementById("app-dialog-body"),
+    appDialogInput: document.getElementById("app-dialog-input"),
+    appDialogInputLabel: document.querySelector(".app-dialog-input-label"),
+    appDialogConfirm: document.getElementById("app-dialog-confirm"),
+    appDialogCancel: document.getElementById("app-dialog-cancel")
 };
 
 const {
@@ -147,7 +157,10 @@ const {
     hintButton,
     hintFlag,
     optionsTrigger,
-    optionsPanel,
+    gameSettingsOpen,
+    gameSettingsModal,
+    gameSettingsBackdrop,
+    gameSettingsClose,
     advancedTrigger,
     advancedPanel,
     instrumentBrowserTrigger,
@@ -185,8 +198,6 @@ const {
     typingZone,
     chordAnswerInput,
     typingHelpToggle,
-    typingHelpText,
-    chordTutorialOpen,
     chordTutorialOpenOptions,
     chordTutorialModal,
     chordTutorialBackdrop,
@@ -220,7 +231,16 @@ const {
     blackKeysContainer,
     keyboardEl,
     pedalIcon,
-    pianoOptionsContainer
+    pianoOptionsContainer,
+    appDialog,
+    appDialogBackdrop,
+    appDialogClose,
+    appDialogTitle,
+    appDialogBody,
+    appDialogInput,
+    appDialogInputLabel,
+    appDialogConfirm,
+    appDialogCancel
 } = dom;
 
 let pianoOptions = [];
@@ -329,6 +349,7 @@ const UI_COPY = {
     helpers: {
         title: "Chord helper",
         rootNote: "Root note",
+        rootHidden: "Hidden",
         chordSize: "Chord size",
         chordType: "Chord type",
         voicing: "Voicing",
@@ -480,7 +501,8 @@ const DEFAULTS = {
     typingShowPiano: true,
     typingShowTyped: true,
     hideLivePreview: false,
-    practiceProfiles: createDefaultPracticeProfiles()
+    practiceProfiles: createDefaultPracticeProfiles(),
+    rootHintSuppressed: false
 };
 
 const state = {
@@ -519,7 +541,8 @@ const state = {
     typedAnswer: "",
     typedPreviewNotes: [],
     submissionSource: null,
-    submittedComparisonNotes: []
+    submittedComparisonNotes: [],
+    rootHintSuppressed: DEFAULTS.rootHintSuppressed
 };
 App.defaults = DEFAULTS;
 App.state = state;
@@ -733,6 +756,7 @@ const resetAllSettings = () => {
     state.typedPreviewNotes = [];
     state.submissionSource = null;
     state.submittedComparisonNotes = [];
+    state.rootHintSuppressed = DEFAULTS.rootHintSuppressed;
 };
 
 let audioContext;
@@ -810,6 +834,12 @@ const getNoteIdByMidi = (midi) => {
 let notes = buildNotes(state.keyCount);
 notes.forEach((note) => noteMap.set(note.id, note));
 noteCountInput.max = notes.length;
+
+App.runtimeRefs = {
+    noteMap,
+    keyMap,
+    getNotes: () => notes
+};
 
 const CONSONANT_INTERVALS = new Set([0, 3, 4, 5, 7, 8, 9, 12]);
 const recentNiceCombos = [];
@@ -998,6 +1028,10 @@ const rebuildKeyboard = () => {
     notes.forEach((note) => noteMap.set(note.id, note));
     updateNoteCountMax();
     renderKeyboard();
+    if (typeof App.game?.sanitizeRoundStateForKeyboardRange === "function") {
+        App.game.sanitizeRoundStateForKeyboardRange();
+        return;
+    }
     updateKeyStates();
 };
 

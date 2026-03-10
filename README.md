@@ -63,7 +63,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - In the simple selector card UI, instrument name is primary and program ID is shown as muted text.
 - Full SF2 instrument browsing is in a separate `Instrument Browser` panel (grouped by inferred GM families for bank 0).
 - Advanced panel is now dedicated to `Articulation Profile` controls and profile management.
-- Game settings (`Play style`, `Blind mode`, mode-specific chord controls, typing controls) live in the `Game Settings` popup opened from settings.
+- Game settings (`Play style`, `Blind mode`, mode-specific chord controls, typing controls) live in a centered `Game Settings` panel, opened from the Control Center or directly from the in-round status bar.
 - Floating settings popups now run through one shared panel manager (single-open behavior, consistent click-outside/escape close, shared resize repositioning).
 - Round-affecting settings now follow a shared refresh policy: active rounds auto-restart only for changes that require target regeneration/playback context refresh (for example play style, practice/input mode, chord set/root hint, note count, key range/start note).
 - Migrated round/settings/submission state flows now dispatch through `App.store` patch actions (with optional action logging + invariant checks for development diagnostics).
