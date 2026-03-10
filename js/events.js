@@ -988,6 +988,10 @@ const getTutorialStepIndexForQuality = (qualityId) => {
 
 const renderChordTutorialTabs = () => {
     if (!chordTutorialTabs) return;
+    const total = CHORD_TUTORIAL_STEPS.length;
+    const progress = total > 1 ? tutorialState.stepIndex / (total - 1) : 0;
+    chordTutorialTabs.style.setProperty("--tutorial-step-count", `${Math.max(1, total)}`);
+    chordTutorialTabs.style.setProperty("--tutorial-progress", progress.toFixed(3));
     const tabs = CHORD_TUTORIAL_STEPS.map((step, index) => {
         const label = step.tabLabel || step.title || `Step ${index + 1}`;
         const classes = ["tutorial-progress-tab"];
@@ -995,7 +999,8 @@ const renderChordTutorialTabs = () => {
         if (index < tutorialState.stepIndex) classes.push("complete");
         return `
             <button class="${classes.join(" ")}" type="button" data-step-index="${index}"
-                role="tab" aria-selected="${index === tutorialState.stepIndex ? "true" : "false"}">
+                role="tab" aria-selected="${index === tutorialState.stepIndex ? "true" : "false"}"
+                aria-label="Step ${index + 1}: ${label}" ${index === tutorialState.stepIndex ? "aria-current=\"step\"" : ""}>
                 <span class="tutorial-progress-step">${index + 1}</span>
                 <span class="tutorial-progress-label">${label}</span>
             </button>
@@ -1007,34 +1012,9 @@ const renderChordTutorialTabs = () => {
 
 const fitTutorialProgressTabs = () => {
     if (!chordTutorialTabs) return;
-    const minScale = 0.55;
-    const measure = () => {
-        const styles = getComputedStyle(chordTutorialTabs);
-        const padLeft = Number.parseFloat(styles.paddingLeft) || 0;
-        const padRight = Number.parseFloat(styles.paddingRight) || 0;
-        const available = Math.max(0, chordTutorialTabs.clientWidth - padLeft - padRight);
-        const contentWidth = Math.max(0, chordTutorialTabs.scrollWidth - padLeft - padRight);
-        return { available, contentWidth };
-    };
-
-    chordTutorialTabs.classList.remove("compact");
-    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
-    void chordTutorialTabs.offsetWidth;
-    let { available, contentWidth } = measure();
-    if (!available || !contentWidth) return;
-    let scale = Math.min(1, available / contentWidth);
-
-    if (scale < 0.72) {
-        chordTutorialTabs.classList.add("compact");
-        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
-        void chordTutorialTabs.offsetWidth;
-        ({ available, contentWidth } = measure());
-        if (!available || !contentWidth) return;
-        scale = Math.min(1, available / contentWidth);
-    }
-
-    scale = Math.max(minScale, scale);
-    chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", scale.toFixed(3));
+    const total = Math.max(1, CHORD_TUTORIAL_STEPS.length);
+    const stepWidth = chordTutorialTabs.clientWidth / total;
+    chordTutorialTabs.classList.toggle("compact", stepWidth < 66);
 };
 
 const renderChordTutorialStep = () => {
