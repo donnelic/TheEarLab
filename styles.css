@@ -1273,19 +1273,39 @@ body.modal-open {
 .tutorial-progress-tab {
     position: relative;
     z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: calc(6px * var(--tutorial-tabs-scale));
     border: 1px solid var(--input-border);
-    background: var(--input-bg);
+    background: color-mix(in oklab, var(--panel) 85%, var(--input-bg));
     color: var(--muted);
     font: inherit;
-    font-size: calc(0.72rem * var(--tutorial-tabs-scale));
+    font-size: calc(0.7rem * var(--tutorial-tabs-scale));
     font-weight: 700;
-    padding: calc(9px * var(--tutorial-tabs-scale)) calc(12px * var(--tutorial-tabs-scale));
+    padding: calc(7px * var(--tutorial-tabs-scale)) calc(11px * var(--tutorial-tabs-scale));
     cursor: pointer;
-    transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+    transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
     white-space: nowrap;
     border-radius: 12px;
     flex: 0 0 auto;
     box-sizing: border-box;
+}
+
+.tutorial-progress-step {
+    display: grid;
+    place-items: center;
+    width: calc(18px * var(--tutorial-tabs-scale));
+    height: calc(18px * var(--tutorial-tabs-scale));
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--input-border) 75%, var(--muted));
+    color: var(--muted);
+    font-size: calc(0.62rem * var(--tutorial-tabs-scale));
+    font-weight: 800;
+    background: color-mix(in oklab, var(--panel) 78%, var(--input-bg));
+}
+
+.tutorial-progress-label {
+    letter-spacing: 0.02em;
 }
 
 .tutorial-progress-tabs::before {
@@ -1305,17 +1325,33 @@ body.modal-open {
     border-color: color-mix(in oklab, var(--input-border) 75%, var(--muted));
 }
 
+.tutorial-progress-tab.complete .tutorial-progress-step {
+    color: color-mix(in oklab, var(--ink) 70%, var(--muted));
+    border-color: color-mix(in oklab, var(--input-border) 75%, var(--muted));
+    background: color-mix(in oklab, var(--panel) 70%, var(--input-bg));
+}
+
 .tutorial-progress-tab.active {
     color: var(--ink);
     background: color-mix(in oklab, var(--tutorial-progress-accent) 16%, var(--input-bg));
     border-color: color-mix(in oklab, var(--tutorial-progress-accent) 78%, var(--input-border));
     box-shadow: 0 0 0 2px color-mix(in oklab, var(--tutorial-progress-accent) 28%, transparent);
-    transform: translateY(-1px);
+}
+
+.tutorial-progress-tab.active .tutorial-progress-step {
+    color: var(--ink);
+    border-color: color-mix(in oklab, var(--tutorial-progress-accent) 80%, var(--input-border));
+    background: color-mix(in oklab, var(--tutorial-progress-accent) 22%, var(--panel));
 }
 
 .tutorial-progress-tab:focus-visible {
     outline: 2px solid color-mix(in oklab, var(--tutorial-progress-accent) 60%, white);
     outline-offset: -2px;
+}
+
+.tutorial-progress-tab:hover,
+.tutorial-progress-tab:focus-visible {
+    border-color: color-mix(in oklab, var(--tutorial-progress-accent) 55%, var(--input-border));
 }
 
 .tutorial-progress-row > button {

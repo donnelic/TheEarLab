@@ -989,13 +989,14 @@ const renderChordTutorialTabs = () => {
     if (!chordTutorialTabs) return;
     const tabs = CHORD_TUTORIAL_STEPS.map((step, index) => {
         const label = step.tabLabel || step.title || `Step ${index + 1}`;
-        const classes = ["tutorial-progress-tab", "advanced-trigger"];
+        const classes = ["tutorial-progress-tab"];
         if (index === tutorialState.stepIndex) classes.push("active");
         if (index < tutorialState.stepIndex) classes.push("complete");
         return `
             <button class="${classes.join(" ")}" type="button" data-step-index="${index}"
                 role="tab" aria-selected="${index === tutorialState.stepIndex ? "true" : "false"}">
-                ${label}
+                <span class="tutorial-progress-step">${index + 1}</span>
+                <span class="tutorial-progress-label">${label}</span>
             </button>
         `;
     }).join("");
