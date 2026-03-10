@@ -467,7 +467,7 @@ const TUTORIAL_QUALITIES = [
     { id: "m9", label: "Minor 9", suffix: "m9", intervals: [0, 3, 7, 10, 14], roles: ["R", "b3", "5", "b7", "9"] },
     { id: "six", label: "Major 6", suffix: "6", intervals: [0, 4, 7, 9], roles: ["R", "3", "5", "6"] },
     { id: "m6", label: "Minor 6", suffix: "m6", intervals: [0, 3, 7, 9], roles: ["R", "b3", "5", "6"] },
-    { id: "add9", label: "Add9", suffix: "add9", intervals: [0, 2, 4, 7], roles: ["R", "2", "3", "5"] },
+    { id: "add9", label: "Add9", suffix: "add9", intervals: [0, 4, 7, 14], roles: ["R", "3", "5", "9"] },
     { id: "sus2", label: "Sus2", suffix: "sus2", intervals: [0, 2, 7], roles: ["R", "2", "5"] },
     { id: "sus4", label: "Sus4", suffix: "sus4", intervals: [0, 5, 7], roles: ["R", "4", "5"] },
     { id: "dim", label: "Diminished", suffix: "dim", intervals: [0, 3, 6], roles: ["R", "b3", "b5"] },
