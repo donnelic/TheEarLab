@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-10 10:45:49 +01:00
+Generated: 2026-03-10 10:51:04 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -42,7 +42,7 @@ Generated: 2026-03-10 10:45:49 +01:00
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 47 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1088 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1148 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 540 |
 | tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
@@ -174,24 +174,24 @@ File: index.html (1-544)
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260309103743 | 524 |
-| 2 | vendor/js-synthesizer.min.js?v=20260309103743 | 525 |
-| 3 | js/core.js?v=20260309103743 | 526 |
-| 4 | js/store/reducers.js?v=20260309103743 | 527 |
-| 5 | js/store/actions.js?v=20260309103743 | 528 |
-| 6 | js/store/selectors.js?v=20260309103743 | 529 |
-| 7 | js/store/store.js?v=20260309103743 | 530 |
-| 8 | js/features/round/state-mutations.js?v=20260309103743 | 531 |
-| 9 | js/features/settings/state-mutations.js?v=20260309103743 | 532 |
-| 10 | js/features/chords/index.js?v=20260309103743 | 533 |
-| 11 | js/features/typing/index.js?v=20260309103743 | 534 |
-| 12 | js/features/tutorial/index.js?v=20260309103743 | 535 |
-| 13 | js/features/audio-preview/index.js?v=20260309103743 | 536 |
-| 14 | js/features/input/index.js?v=20260309103743 | 537 |
-| 15 | js/audio.js?v=20260309103743 | 538 |
-| 16 | js/game.js?v=20260309103743 | 539 |
-| 17 | js/settings.js?v=20260309103743 | 540 |
-| 18 | js/events.js?v=20260309103743 | 541 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260310104635 | 524 |
+| 2 | vendor/js-synthesizer.min.js?v=20260310104635 | 525 |
+| 3 | js/core.js?v=20260310104635 | 526 |
+| 4 | js/store/reducers.js?v=20260310104635 | 527 |
+| 5 | js/store/actions.js?v=20260310104635 | 528 |
+| 6 | js/store/selectors.js?v=20260310104635 | 529 |
+| 7 | js/store/store.js?v=20260310104635 | 530 |
+| 8 | js/features/round/state-mutations.js?v=20260310104635 | 531 |
+| 9 | js/features/settings/state-mutations.js?v=20260310104635 | 532 |
+| 10 | js/features/chords/index.js?v=20260310104635 | 533 |
+| 11 | js/features/typing/index.js?v=20260310104635 | 534 |
+| 12 | js/features/tutorial/index.js?v=20260310104635 | 535 |
+| 13 | js/features/audio-preview/index.js?v=20260310104635 | 536 |
+| 14 | js/features/input/index.js?v=20260310104635 | 537 |
+| 15 | js/audio.js?v=20260310104635 | 538 |
+| 16 | js/game.js?v=20260310104635 | 539 |
+| 17 | js/settings.js?v=20260310104635 | 540 |
+| 18 | js/events.js?v=20260310104635 | 541 |
 
 ## styles.css Map
 File: styles.css (1-3001)
@@ -824,8 +824,8 @@ File lines: 1-1955
 | trapModalFocus | 1634-1656 |
 | isTextEditableTarget | 1658-1663 |
 | getActiveModalEl | 1665-1670 |
-| closeGameSettingsModal | 1672-1681 |
-| openGameSettingsModal | 1683-1689 |
+| closeGameSettingsModalUi | 1672-1681 |
+| openGameSettingsModalUi | 1683-1689 |
 | closeActiveModal | 1691-1705 |
 | moveFocusInPanel | 1707-1718 |
 | setRandomBackgroundAngle | 1908-1911 |

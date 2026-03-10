@@ -290,28 +290,28 @@ settingsPanel.addEventListener("click", (event) => {
 if (optionsTrigger) {
     optionsTrigger.addEventListener("click", (event) => {
         event.stopPropagation();
-        openGameSettingsModal(optionsTrigger);
+        openGameSettingsModalUi(optionsTrigger);
     });
 }
 
 if (gameSettingsOpen) {
     gameSettingsOpen.addEventListener("click", (event) => {
         event.preventDefault();
-        openGameSettingsModal(gameSettingsOpen);
+        openGameSettingsModalUi(gameSettingsOpen);
     });
 }
 
 if (gameSettingsBackdrop) {
     gameSettingsBackdrop.addEventListener("click", (event) => {
         event.preventDefault();
-        closeGameSettingsModal();
+        closeGameSettingsModalUi();
     });
 }
 
 if (gameSettingsClose) {
     gameSettingsClose.addEventListener("click", (event) => {
         event.preventDefault();
-        closeGameSettingsModal();
+        closeGameSettingsModalUi();
     });
 }
 
@@ -1669,7 +1669,7 @@ const getActiveModalEl = () => {
     return null;
 };
 
-const closeGameSettingsModal = () => {
+const closeGameSettingsModalUi = () => {
     if (typeof App.settings?.closeGameSettingsModal === "function") {
         App.settings.closeGameSettingsModal({ restoreFocus: false });
     }
@@ -1680,7 +1680,7 @@ const closeGameSettingsModal = () => {
     gameSettingsReturnFocusEl = null;
 };
 
-const openGameSettingsModal = (sourceEl = null) => {
+const openGameSettingsModalUi = (sourceEl = null) => {
     gameSettingsReturnFocusEl = sourceEl ?? document.activeElement;
     if (typeof App.settings?.openGameSettingsModal === "function") {
         App.settings.openGameSettingsModal();
@@ -1694,7 +1694,7 @@ const closeActiveModal = () => {
         return true;
     }
     if (gameSettingsModal && !gameSettingsModal.hidden) {
-        closeGameSettingsModal();
+        closeGameSettingsModalUi();
         return true;
     }
     if (isChordTutorialOpen()) {
