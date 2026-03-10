@@ -368,6 +368,7 @@ const UI_COPY = {
     },
     helpers: {
         title: "Chord helper",
+        revealHint: "Hover or focus to reveal",
         rootNote: "Root note",
         rootHidden: "Hidden",
         chordSize: "Chord size",

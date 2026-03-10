@@ -1038,6 +1038,7 @@ const createDeterministicHelperMask = (label) => {
 const renderChordHelperBox = () => {
     const hints = getChordHelperHints();
     if (!hints.length) return "";
+    const helperHint = HELPER_COPY.revealHint || "Hover or focus to reveal";
     const rows = hints.map((hint) => `
         <div class="helper-item" tabindex="0">
             <div class="helper-label">${escapeHtml(hint.label)}</div>
@@ -1049,7 +1050,10 @@ const renderChordHelperBox = () => {
     `).join("");
     return `
         <div class="helper-card">
-            <div class="helper-title">${escapeHtml(HELPER_COPY.title || "Chord helper")}</div>
+            <div class="helper-head">
+                <div class="helper-title">${escapeHtml(HELPER_COPY.title || "Chord helper")}</div>
+                <div class="helper-meta">${escapeHtml(helperHint)}</div>
+            </div>
             <div class="helper-list">${rows}</div>
         </div>
     `;
