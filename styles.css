@@ -1166,16 +1166,16 @@ body.modal-open {
 }
 
 .tutorial-step.focus-flash {
-    animation: tutorial-focus-flash 0.35s ease;
+    animation: tutorial-focus-flash 0.9s ease;
 }
 
 @keyframes tutorial-focus-flash {
     0% {
-        background: color-mix(in oklab, var(--accent) 10%, var(--status-bg));
+        box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 45%, transparent);
     }
 
     100% {
-        background: var(--status-bg);
+        box-shadow: 0 0 0 14px transparent;
     }
 }
 
