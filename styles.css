@@ -1214,12 +1214,10 @@ body.modal-open {
 }
 
 .tutorial-actions {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: auto auto;
+    display: flex;
     align-items: center;
-    column-gap: 8px;
-    row-gap: 4px;
+    justify-content: center;
+    gap: 8px;
     margin-top: 2px;
     min-width: 0;
 }
@@ -1228,12 +1226,10 @@ body.modal-open {
     display: grid;
     grid-template-rows: auto auto;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     min-width: 0;
     max-width: none;
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    position: relative;
+    width: 100%;
 }
 
 .tutorial-progress {
@@ -1242,6 +1238,14 @@ body.modal-open {
     font-weight: 700;
     position: static;
     text-align: center;
+}
+
+.tutorial-progress-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
 }
 
 .tutorial-progress-tabs {
@@ -1269,7 +1273,7 @@ body.modal-open {
 .tutorial-progress-tab {
     position: relative;
     z-index: 1;
-    border: 1px solid color-mix(in oklab, var(--input-border) 85%, var(--muted));
+    border: 1px solid var(--input-border);
     background: var(--input-bg);
     color: var(--muted);
     font: inherit;
@@ -1297,17 +1301,15 @@ body.modal-open {
 }
 
 .tutorial-progress-tab.complete {
-    color: color-mix(in oklab, var(--ink) 85%, var(--muted));
-    border-color: color-mix(in oklab, var(--input-border) 70%, var(--muted));
+    color: color-mix(in oklab, var(--ink) 78%, var(--muted));
+    border-color: color-mix(in oklab, var(--input-border) 75%, var(--muted));
 }
 
 .tutorial-progress-tab.active {
     color: var(--ink);
-    background: color-mix(in oklab, var(--tutorial-progress-accent) 18%, var(--input-bg));
-    border-color: var(--tutorial-progress-accent);
-    box-shadow:
-        0 0 0 2px var(--tutorial-progress-accent),
-        0 0 0 1px color-mix(in oklab, var(--tutorial-progress-accent) 35%, transparent) inset;
+    background: color-mix(in oklab, var(--tutorial-progress-accent) 16%, var(--input-bg));
+    border-color: color-mix(in oklab, var(--tutorial-progress-accent) 78%, var(--input-border));
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--tutorial-progress-accent) 28%, transparent);
     transform: translateY(-1px);
 }
 
@@ -1316,8 +1318,7 @@ body.modal-open {
     outline-offset: -2px;
 }
 
-.tutorial-actions > button {
-    grid-row: 2;
+.tutorial-progress-row > button {
     align-self: center;
 }
 
