@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-10 12:04:34 +01:00
+Generated: 2026-03-10 12:10:22 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -33,7 +33,7 @@ Generated: 2026-03-10 12:04:34 +01:00
 | File | Kind | Runtime Role | Active | Lines |
 |---|---|---|---|---:|
 | index.html | HTML | Loaded directly | Yes | 577 |
-| styles.css | CSS | Loaded directly | Yes | 3150 |
+| styles.css | CSS | Loaded directly | Yes | 3175 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1529 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1064 |
 | js/events.js | JavaScript | Browser runtime module | Yes | 2071 |
@@ -42,7 +42,7 @@ Generated: 2026-03-10 12:04:34 +01:00
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 47 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1187 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1189 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 540 |
 | tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
@@ -204,7 +204,7 @@ File: index.html (1-577)
 | 18 | js/events.js?v=20260310104635 | 574 |
 
 ## styles.css Map
-File: styles.css (1-3150)
+File: styles.css (1-3175)
 
 ### Top-Level CSS Blocks
 | Selector | Lines |
@@ -359,245 +359,248 @@ File: styles.css (1-3150)
 | .tutorial-actions | 1215-1222 |
 | .tutorial-progress-wrap | 1224-1231 |
 | .tutorial-progress | 1233-1237 |
-| .tutorial-progress-tabs | 1239-1248 |
-| .tutorial-progress-tab | 1250-1264 |
-| .tutorial-progress-tabs::before | 1266-1274 |
-| .tutorial-progress-tab.complete | 1276-1279 |
-| .tutorial-progress-tab.active | 1281-1285 |
-| .tutorial-progress-tab:focus-visible | 1287-1290 |
-| .tutorial-lab | 1292-1301 |
-| .tutorial-current | 1303-1307 |
-| .tutorial-selector-block | 1309-1312 |
-| .tutorial-control-matrix | 1314-1321 |
-| .tutorial-control-row | 1323-1331 |
-| .tutorial-control-row.locked | 1333-1335 |
-| .tutorial-control-row.locked::after | 1337-1344 |
-| .tutorial-control-row.newly-unlocked | 1346-1348 |
-| @keyframes tutorial-unlock | 1350-1358 |
-| .tutorial-selector-title | 1360-1366 |
-| .tutorial-chip-list | 1368-1372 |
-| #chord-tutorial-quality-list | 1374-1377 |
-| .tutorial-quality-table | 1379-1384 |
-| .tutorial-quality-table th, .tutorial-quality-table td | 1387-1391 |
-| .tutorial-quality-table tr:first-child th, .tutorial-quality-table tr:first-child td | 1394-1396 |
-| .tutorial-quality-table th | 1398-1407 |
-| .tutorial-chip-group-list | 1409-1413 |
-| .tutorial-chip | 1415-1427 |
-| .tutorial-chip.unlocked | 1429-1432 |
-| .tutorial-chip.unlocked:hover, .tutorial-chip.unlocked:focus-visible | 1435-1438 |
-| .tutorial-chip[disabled] | 1440-1444 |
-| .tutorial-chip.locked | 1446-1453 |
-| .tutorial-chip:hover, .tutorial-chip:focus-visible | 1456-1459 |
-| .tutorial-chip.active | 1461-1464 |
-| .tutorial-chip.muted | 1466-1469 |
-| .tutorial-chip.muted:hover, .tutorial-chip.muted:focus-visible | 1472-1474 |
-| .tutorial-chip.newly-unlocked | 1476-1479 |
-| .tutorial-chip.locked.newly-unlocked | 1481-1484 |
-| .tutorial-piano-wrap | 1486-1491 |
-| .tutorial-piano-title | 1493-1500 |
-| .tutorial-piano | 1502-1513 |
-| .tutorial-key | 1515-1520 |
-| .tutorial-key.white | 1522-1530 |
-| .tutorial-key.black | 1532-1540 |
-| .tutorial-key.tone | 1542-1544 |
-| .tutorial-key.tone.root | 1546-1548 |
-| .tutorial-key[data-role]::after | 1550-1563 |
-| .helper-card | 1565-1572 |
-| .helper-title | 1574-1579 |
-| .helper-list | 1581-1585 |
-| .helper-item | 1587-1598 |
-| .helper-item::after | 1600-1608 |
-| .helper-item:last-child::after | 1610-1612 |
-| .helper-item:hover, .helper-item:focus-within | 1615-1617 |
-| @media (hover: hover) and (pointer: fine) | 1619-1625 |
-| .app-cursor | 1627-1638 |
-| .app-cursor.visible | 1640-1642 |
-| .app-cursor-ring, .app-cursor-dot | 1645-1652 |
-| .app-cursor-ring | 1654-1662 |
-| .app-cursor-dot | 1664-1668 |
-| .app-cursor.is-interactive .app-cursor-ring | 1670-1675 |
-| .app-cursor.is-interactive .app-cursor-dot | 1677-1679 |
-| .app-cursor.is-text .app-cursor-ring | 1681-1686 |
-| .app-cursor.is-pressed .app-cursor-ring | 1688-1690 |
-| .app-cursor.is-pressed .app-cursor-dot | 1692-1694 |
-| .helper-label | 1696-1702 |
-| .helper-item .helper-value | 1704-1712 |
-| .helper-item .helper-mask | 1714-1722 |
-| .helper-item .helper-real | 1724-1736 |
-| .helper-item:hover .helper-mask, .helper-item:focus-within .helper-mask | 1739-1742 |
-| .helper-item:hover .helper-real, .helper-item:focus-within .helper-real | 1745-1748 |
-| .typing-zone[hidden] | 1750-1752 |
-| .status | 1754-1765 |
-| .status[hidden] | 1767-1769 |
-| .helper-slot[hidden] | 1771-1773 |
-| .status-actions | 1775-1781 |
-| .hint-flag | 1783-1796 |
-| .hint-flag[hidden] | 1798-1800 |
-| .hint-button | 1802-1804 |
-| :is(.settings-toggle, .theme-toggle, .home-toggle) | 1806-1820 |
-| .settings-toggle | 1822-1824 |
-| .theme-toggle | 1826-1828 |
-| .home-toggle | 1830-1832 |
-| :is(.settings-toggle, .theme-toggle, .home-toggle):hover | 1834-1836 |
-| :is(.settings-toggle, .theme-toggle, .home-toggle) svg | 1838-1842 |
-| .settings-toggle svg | 1844-1847 |
-| .settings-panel | 1849-1868 |
-| .settings-panel.open | 1870-1874 |
-| .settings-panel h2 | 1876-1881 |
-| .settings-body | 1883-1887 |
-| .settings-grid | 1889-1892 |
-| .settings-section-title | 1894-1902 |
-| .panel-trigger, .advanced-trigger, .dropdown-trigger, .control select | 1907-1916 |
-| .advanced-trigger | 1918-1922 |
-| .dropdown-trigger | 1924-1932 |
-| .dropdown-trigger svg | 1934-1938 |
-| .panel-trigger | 1940-1945 |
-| :is(.panel-trigger, .advanced-trigger, .dropdown-trigger):hover | 1947-1950 |
-| .panel-trigger:hover | 1952-1954 |
-| :is(.panel-trigger, .advanced-trigger, .dropdown-trigger)[aria-expanded="true"] | 1956-1959 |
-| :is(.panel-trigger, .advanced-trigger, .dropdown-trigger, .control select):focus-v... | 1961-1964 |
-| .control select | 1966-1970 |
-| .options-panel | 1972-1988 |
-| .options-panel.open | 1990-1994 |
-| .options-panel h3 | 1996-2003 |
-| .options-grid | 2005-2008 |
-| .options-panel .control | 2010-2016 |
-| .options-panel .control.compact | 2018-2020 |
-| .options-panel .control>label | 2022-2024 |
-| .options-section-title | 2026-2035 |
-| .options-panel .options-section-title:first-child | 2037-2041 |
-| .advanced-panel | 2043-2062 |
-| .advanced-panel.open | 2064-2068 |
-| .advanced-panel h3 | 2070-2075 |
-| .advanced-grid | 2077-2086 |
-| .advanced-grid::-webkit-scrollbar | 2088-2090 |
-| .advanced-grid::-webkit-scrollbar-track | 2092-2095 |
-| .advanced-grid::-webkit-scrollbar-thumb | 2097-2101 |
-| .inline-value | 2103-2110 |
-| .slider-stack | 2112-2115 |
-| .slider-stack input[type="range"] | 2117-2121 |
-| .slider-ghost | 2123-2137 |
-| .slider-ghost.visible | 2139-2141 |
-| .sf2-browser | 2143-2146 |
-| .sf2-browser input[type="text"] | 2148-2157 |
-| .sf2-preset-list | 2159-2172 |
-| .sf2-browser .piano-desc | 2174-2177 |
-| .sf2-browser .piano-desc.pending, .profile-browser .piano-desc.pending | 2180-2182 |
-| .sf2-group | 2184-2189 |
-| .sf2-group-title | 2191-2200 |
-| .sf2-row | 2202-2210 |
-| .sf2-row:first-child | 2212-2214 |
-| .sf2-row:hover | 2216-2218 |
-| .sf2-row.active | 2220-2223 |
-| .sf2-row-name | 2225-2231 |
-| .sf2-row-program, .sf2-row-bank | 2234-2238 |
-| .sf2-empty | 2240-2244 |
-| .profile-browser | 2246-2249 |
-| .profile-browser input[type="text"] | 2251-2260 |
-| .profile-list | 2262-2275 |
-| .profile-row | 2277-2287 |
-| .profile-row:hover | 2289-2291 |
-| .profile-row.active | 2293-2296 |
-| .profile-row.applied | 2298-2300 |
-| .profile-row-name | 2302-2308 |
-| .profile-row-kind | 2310-2315 |
-| .advanced-footer | 2317-2323 |
-| .piano-preview.wide | 2325-2337 |
-| .piano-preview.wide::before | 2339-2341 |
-| .piano-preview.wide .play-icon | 2343-2349 |
-| .piano-preview.wide .play-label | 2351-2353 |
-| .instrument-browser-panel | 2355-2370 |
-| .instrument-browser-panel.open | 2372-2376 |
-| .instrument-browser-panel h3 | 2378-2383 |
-| .piano-panel | 2385-2400 |
-| .piano-panel.open | 2402-2406 |
-| .piano-panel h3 | 2408-2413 |
-| .piano-options | 2415-2418 |
-| .piano-option | 2420-2432 |
-| .piano-option.active | 2434-2437 |
-| .piano-option:focus-visible | 2439-2441 |
-| .piano-info | 2443-2446 |
-| .piano-name | 2448-2451 |
-| .piano-desc | 2453-2456 |
-| .piano-option.simple .piano-name | 2458-2462 |
-| .piano-option.simple .piano-desc | 2464-2468 |
-| .piano-preview | 2470-2485 |
-| .piano-preview::before | 2487-2495 |
-| .piano-preview:active | 2497-2500 |
-| .piano-preview.main | 2502-2506 |
-| .settings-grid input[type="range"], .game-settings-grid input[type="range"], .adva... | 2511-2515 |
-| .settings-grid input[type="range"]::-webkit-slider-runnable-track, .game-settings-... | 2520-2525 |
-| .settings-grid input[type="range"]::-webkit-slider-thumb, .game-settings-grid inpu... | 2530-2539 |
-| .settings-grid input[type="range"]:focus-visible::-webkit-slider-thumb, .game-sett... | 2544-2547 |
-| .settings-grid input[type="range"]::-moz-range-track, .game-settings-grid input[ty... | 2552-2557 |
-| .settings-grid input[type="range"]::-moz-range-thumb, .game-settings-grid input[ty... | 2562-2569 |
-| .settings-grid input[type="range"]:focus-visible::-moz-range-thumb, .game-settings... | 2574-2577 |
-| .volume-value | 2579-2582 |
-| .status-row | 2584-2589 |
-| .switch | 2591-2600 |
-| .switch input | 2602-2607 |
-| .switch-track | 2609-2615 |
-| .switch-thumb | 2617-2627 |
-| .switch input:checked+.switch-track | 2629-2631 |
-| .switch input:checked+.switch-track .switch-thumb | 2633-2635 |
-| .switch input:focus-visible+.switch-track | 2637-2640 |
-| .control.compact .unit | 2642-2644 |
-| .test-tone | 2646-2658 |
-| .test-tone:hover | 2660-2663 |
-| .test-tone:active | 2665-2667 |
-| .test-tone-icon | 2669-2676 |
-| .test-tone-label | 2678-2682 |
-| .result | 2684-2688 |
-| .reveal | 2690-2699 |
-| .reveal strong | 2701-2703 |
-| .reveal-label | 2705-2712 |
-| .reveal-grid.compact | 2714-2718 |
-| .reveal-cell | 2720-2722 |
-| .keyboard-zone | 2724-2734 |
-| .keyboard-stack | 2736-2746 |
-| .keyboard-wrapper | 2748-2757 |
-| .keyboard | 2759-2766 |
-| .keyboard-wrapper.ends-black | 2768-2770 |
-| .white-keys | 2772-2775 |
-| .black-keys | 2777-2784 |
-| .key | 2786-2797 |
-| .key.white | 2799-2806 |
-| .key.white.has-black | 2808-2810 |
-| .key.black | 2812-2821 |
-| .key span | 2823-2827 |
-| .key.black span | 2829-2833 |
-| .key.active | 2835-2838 |
-| .key.black.active | 2840-2843 |
-| .key.selected | 2845-2849 |
-| .key.typed-preview | 2851-2853 |
-| .key.correct | 2855-2859 |
-| .key.wrong | 2861-2865 |
-| .key.missed | 2867-2873 |
-| .key.black.selected, .key.black.correct, .key.black.wrong | 2877-2879 |
-| .key.black.missed | 2881-2887 |
-| .keyboard.disabled | 2889-2895 |
-| body.tutorial-open .keyboard | 2897-2899 |
-| body.tutorial-open .keyboard.disabled | 2901-2904 |
-| .keyboard.disabled::before | 2906-2918 |
-| body.tutorial-open .keyboard.disabled::before | 2920-2922 |
-| .keyboard.disabled::after | 2924-2958 |
-| body.tutorial-open .keyboard.disabled::after | 2960-2962 |
-| .tips | 2964-2973 |
-| #pedal-tip[hidden] | 2975-2977 |
-| .pedal-box | 2979-2993 |
-| body.landing .pedal-box | 2995-2997 |
-| .pedal-label | 2999-3009 |
-| .pedal-icon | 3011-3018 |
-| .pedal-icon.active | 3020-3023 |
-| .note-pills | 3025-3031 |
-| .note-pill | 3033-3039 |
-| .note-pill.good | 3041-3045 |
-| .note-pill.bad | 3047-3051 |
-| .note-pill.missed | 3053-3057 |
-| .note-pill.neutral | 3059-3063 |
-| @media (max-width: 700px) | 3065-3120 |
-| @media (max-height: 820px) | 3122-3143 |
-| @media (max-height: 700px) | 3145-3150 |
+| .tutorial-progress-tabs | 1239-1252 |
+| .tutorial-progress-tabs::-webkit-scrollbar | 1254-1256 |
+| .tutorial-progress-tab | 1258-1273 |
+| .tutorial-progress-tabs::before | 1275-1283 |
+| .tutorial-progress-tab.complete | 1285-1288 |
+| .tutorial-progress-tab.active | 1290-1294 |
+| .tutorial-progress-tab:focus-visible | 1296-1299 |
+| .tutorial-lab | 1301-1310 |
+| .tutorial-current | 1312-1316 |
+| .tutorial-selector-block | 1318-1321 |
+| .tutorial-control-matrix | 1323-1330 |
+| .tutorial-control-row | 1332-1340 |
+| .tutorial-control-row.locked | 1342-1344 |
+| .tutorial-control-row.locked::after | 1346-1353 |
+| .tutorial-control-row.newly-unlocked | 1355-1357 |
+| @keyframes tutorial-unlock | 1359-1367 |
+| .tutorial-selector-title | 1369-1375 |
+| .tutorial-chip-list | 1377-1381 |
+| #chord-tutorial-quality-list | 1383-1386 |
+| .tutorial-quality-table | 1388-1393 |
+| .tutorial-quality-table th, .tutorial-quality-table td | 1396-1400 |
+| .tutorial-quality-table tr:first-child th, .tutorial-quality-table tr:first-child td | 1403-1405 |
+| .tutorial-quality-table th | 1407-1416 |
+| .tutorial-chip-group-list | 1418-1422 |
+| .tutorial-chip | 1424-1436 |
+| .tutorial-chip.unlocked | 1438-1441 |
+| .tutorial-chip.unlocked:hover, .tutorial-chip.unlocked:focus-visible | 1444-1447 |
+| .tutorial-chip[disabled] | 1449-1453 |
+| .tutorial-chip.locked | 1455-1462 |
+| .tutorial-chip:hover, .tutorial-chip:focus-visible | 1465-1468 |
+| .tutorial-chip.active | 1470-1473 |
+| .tutorial-chip.muted | 1475-1478 |
+| .tutorial-chip.muted:hover, .tutorial-chip.muted:focus-visible | 1481-1483 |
+| .tutorial-chip.newly-unlocked | 1485-1488 |
+| .tutorial-chip.locked.newly-unlocked | 1490-1493 |
+| .tutorial-piano-wrap | 1495-1500 |
+| .tutorial-piano-title | 1502-1509 |
+| .tutorial-piano | 1511-1522 |
+| .tutorial-key | 1524-1529 |
+| .tutorial-key.white | 1531-1539 |
+| .tutorial-key.black | 1541-1549 |
+| .tutorial-key.tone | 1551-1553 |
+| .tutorial-key.tone.root | 1555-1557 |
+| .tutorial-key[data-role]::after | 1559-1572 |
+| .helper-card | 1574-1581 |
+| .helper-title | 1583-1588 |
+| .helper-list | 1590-1594 |
+| .helper-item | 1596-1607 |
+| .helper-item::after | 1609-1617 |
+| .helper-item:last-child::after | 1619-1621 |
+| .helper-item:hover, .helper-item:focus-within | 1624-1626 |
+| @media (hover: hover) and (pointer: fine) | 1628-1634 |
+| .app-cursor | 1636-1647 |
+| .app-cursor.visible | 1649-1651 |
+| .app-cursor-ring, .app-cursor-dot | 1654-1661 |
+| .app-cursor-ring | 1663-1671 |
+| .app-cursor-dot | 1673-1677 |
+| .app-cursor.is-interactive .app-cursor-ring | 1679-1684 |
+| .app-cursor.is-interactive .app-cursor-dot | 1686-1688 |
+| .app-cursor.is-text .app-cursor-ring | 1690-1695 |
+| .app-cursor.is-pressed .app-cursor-ring | 1697-1699 |
+| .app-cursor.is-pressed .app-cursor-dot | 1701-1703 |
+| .helper-label | 1705-1711 |
+| .helper-item .helper-value | 1713-1721 |
+| .helper-item .helper-mask | 1723-1731 |
+| .helper-item .helper-real | 1733-1745 |
+| .helper-item:hover .helper-mask, .helper-item:focus-within .helper-mask | 1748-1751 |
+| .helper-item:hover .helper-real, .helper-item:focus-within .helper-real | 1754-1757 |
+| .typing-zone[hidden] | 1759-1761 |
+| .status | 1763-1774 |
+| .status[hidden] | 1776-1778 |
+| .helper-slot[hidden] | 1780-1782 |
+| .status-actions | 1784-1790 |
+| .hint-flag | 1792-1805 |
+| .hint-flag[hidden] | 1807-1809 |
+| .hint-button | 1811-1813 |
+| :is(.settings-toggle, .theme-toggle, .home-toggle) | 1815-1829 |
+| .settings-toggle | 1831-1833 |
+| .theme-toggle | 1835-1837 |
+| .home-toggle | 1839-1841 |
+| :is(.settings-toggle, .theme-toggle, .home-toggle):hover | 1843-1845 |
+| :is(.settings-toggle, .theme-toggle, .home-toggle) svg | 1847-1851 |
+| .settings-toggle svg | 1853-1856 |
+| .settings-panel | 1858-1877 |
+| .settings-panel.open | 1879-1883 |
+| .settings-panel h2 | 1885-1890 |
+| .settings-body | 1892-1896 |
+| .settings-grid | 1898-1901 |
+| .settings-section-title | 1903-1911 |
+| .panel-trigger, .advanced-trigger, .dropdown-trigger, .control select | 1916-1925 |
+| .advanced-trigger | 1927-1931 |
+| .dropdown-trigger | 1933-1941 |
+| .dropdown-trigger svg | 1943-1947 |
+| .panel-trigger | 1949-1954 |
+| :is(.panel-trigger, .advanced-trigger, .dropdown-trigger):hover | 1956-1959 |
+| .panel-trigger:hover | 1961-1963 |
+| :is(.panel-trigger, .advanced-trigger, .dropdown-trigger)[aria-expanded="true"] | 1965-1968 |
+| :is(.panel-trigger, .advanced-trigger, .dropdown-trigger, .control select):focus-v... | 1970-1973 |
+| .control select | 1975-1979 |
+| .options-panel | 1981-1997 |
+| .options-panel.open | 1999-2003 |
+| .options-panel h3 | 2005-2012 |
+| .options-grid | 2014-2017 |
+| .options-panel .control | 2019-2025 |
+| .options-panel .control.compact | 2027-2029 |
+| .options-panel .control>label | 2031-2033 |
+| .options-section-title | 2035-2044 |
+| .options-panel .options-section-title:first-child | 2046-2050 |
+| .advanced-panel | 2052-2071 |
+| .advanced-panel.open | 2073-2077 |
+| .advanced-panel h3 | 2079-2084 |
+| .advanced-grid | 2086-2095 |
+| .advanced-grid::-webkit-scrollbar | 2097-2099 |
+| .advanced-grid::-webkit-scrollbar-track | 2101-2104 |
+| .advanced-grid::-webkit-scrollbar-thumb | 2106-2110 |
+| .inline-value | 2112-2119 |
+| .slider-stack | 2121-2124 |
+| .slider-stack input[type="range"] | 2126-2130 |
+| .slider-ghost | 2132-2146 |
+| .slider-ghost.visible | 2148-2150 |
+| .sf2-browser | 2152-2155 |
+| .sf2-browser input[type="text"] | 2157-2166 |
+| .sf2-preset-list | 2168-2181 |
+| .sf2-browser .piano-desc | 2183-2186 |
+| .sf2-browser .piano-desc.pending, .profile-browser .piano-desc.pending | 2189-2191 |
+| .sf2-group | 2193-2198 |
+| .sf2-group-title | 2200-2209 |
+| .sf2-row | 2211-2219 |
+| .sf2-row:first-child | 2221-2223 |
+| .sf2-row:hover | 2225-2227 |
+| .sf2-row.active | 2229-2232 |
+| .sf2-row-name | 2234-2240 |
+| .sf2-row-program, .sf2-row-bank | 2243-2247 |
+| .sf2-empty | 2249-2253 |
+| .profile-browser | 2255-2258 |
+| .profile-browser input[type="text"] | 2260-2269 |
+| .profile-list | 2271-2284 |
+| .profile-row | 2286-2296 |
+| .profile-row:hover | 2298-2300 |
+| .profile-row.active | 2302-2305 |
+| .profile-row.applied | 2307-2309 |
+| .profile-row-name | 2311-2317 |
+| .profile-row-kind | 2319-2324 |
+| .advanced-footer | 2326-2332 |
+| .piano-preview.wide | 2334-2346 |
+| .piano-preview.wide::before | 2348-2350 |
+| .piano-preview.wide .play-icon | 2352-2358 |
+| .piano-preview.wide .play-label | 2360-2362 |
+| .instrument-browser-panel | 2364-2379 |
+| .instrument-browser-panel.open | 2381-2385 |
+| .instrument-browser-panel h3 | 2387-2392 |
+| .piano-panel | 2394-2409 |
+| .piano-panel.open | 2411-2415 |
+| .piano-panel h3 | 2417-2422 |
+| .piano-options | 2424-2427 |
+| .piano-option | 2429-2441 |
+| .piano-option.active | 2443-2446 |
+| .piano-option:focus-visible | 2448-2450 |
+| .piano-info | 2452-2455 |
+| .piano-name | 2457-2460 |
+| .piano-desc | 2462-2465 |
+| .piano-option.simple .piano-name | 2467-2471 |
+| .piano-option.simple .piano-desc | 2473-2477 |
+| .piano-preview | 2479-2494 |
+| .piano-preview::before | 2496-2504 |
+| .piano-preview:active | 2506-2509 |
+| .piano-preview.main | 2511-2515 |
+| .settings-grid input[type="range"], .game-settings-grid input[type="range"], .adva... | 2520-2524 |
+| .settings-grid input[type="range"]::-webkit-slider-runnable-track, .game-settings-... | 2529-2534 |
+| .settings-grid input[type="range"]::-webkit-slider-thumb, .game-settings-grid inpu... | 2539-2548 |
+| .settings-grid input[type="range"]:focus-visible::-webkit-slider-thumb, .game-sett... | 2553-2556 |
+| .settings-grid input[type="range"]::-moz-range-track, .game-settings-grid input[ty... | 2561-2566 |
+| .settings-grid input[type="range"]::-moz-range-thumb, .game-settings-grid input[ty... | 2571-2578 |
+| .settings-grid input[type="range"]:focus-visible::-moz-range-thumb, .game-settings... | 2583-2586 |
+| .volume-value | 2588-2591 |
+| .status-row | 2593-2598 |
+| .switch | 2600-2609 |
+| .switch input | 2611-2616 |
+| .switch-track | 2618-2624 |
+| .switch-thumb | 2626-2636 |
+| .switch input:checked+.switch-track | 2638-2640 |
+| .switch input:checked+.switch-track .switch-thumb | 2642-2644 |
+| .switch input:focus-visible+.switch-track | 2646-2649 |
+| .control.compact .unit | 2651-2653 |
+| .test-tone | 2655-2667 |
+| .test-tone:hover | 2669-2672 |
+| .test-tone:active | 2674-2676 |
+| .test-tone-icon | 2678-2685 |
+| .test-tone-label | 2687-2691 |
+| .result | 2693-2697 |
+| .reveal | 2699-2708 |
+| .reveal strong | 2710-2712 |
+| .reveal-label | 2714-2721 |
+| .reveal-grid.compact | 2723-2727 |
+| .reveal-cell | 2729-2731 |
+| .keyboard-zone | 2733-2743 |
+| .keyboard-stack | 2745-2755 |
+| .keyboard-wrapper | 2757-2766 |
+| .keyboard | 2768-2775 |
+| .keyboard-wrapper.ends-black | 2777-2779 |
+| .white-keys | 2781-2784 |
+| .black-keys | 2786-2793 |
+| .key | 2795-2806 |
+| .key.white | 2808-2815 |
+| .key.white.has-black | 2817-2819 |
+| .key.black | 2821-2830 |
+| .key span | 2832-2836 |
+| .key.black span | 2838-2842 |
+| .key.active | 2844-2847 |
+| .key.black.active | 2849-2852 |
+| .key.selected | 2854-2858 |
+| .key.typed-preview | 2860-2862 |
+| .key.correct | 2864-2868 |
+| .key.wrong | 2870-2874 |
+| .key.missed | 2876-2882 |
+| .key.black.selected, .key.black.correct, .key.black.wrong | 2886-2888 |
+| .key.black.missed | 2890-2896 |
+| .keyboard.disabled | 2898-2904 |
+| body.tutorial-open .keyboard | 2906-2908 |
+| body.tutorial-open .keyboard.disabled | 2910-2913 |
+| .keyboard.disabled::before | 2915-2927 |
+| body.tutorial-open .keyboard.disabled::before | 2929-2931 |
+| .keyboard.disabled::after | 2933-2967 |
+| body.tutorial-open .keyboard.disabled::after | 2969-2971 |
+| .tips | 2973-2982 |
+| #pedal-tip[hidden] | 2984-2986 |
+| .pedal-box | 2988-3002 |
+| body.landing .pedal-box | 3004-3006 |
+| .pedal-label | 3008-3018 |
+| .pedal-icon | 3020-3027 |
+| .pedal-icon.active | 3029-3032 |
+| .note-pills | 3034-3040 |
+| .note-pill | 3042-3048 |
+| .note-pill.chord-pill | 3050-3057 |
+| .note-pill.chord-pill .chord-link-bubble | 3059-3064 |
+| .note-pill.good | 3066-3070 |
+| .note-pill.bad | 3072-3076 |
+| .note-pill.missed | 3078-3082 |
+| .note-pill.neutral | 3084-3088 |
+| @media (max-width: 700px) | 3090-3145 |
+| @media (max-height: 820px) | 3147-3168 |
+| @media (max-height: 700px) | 3170-3175 |
 
 ## Documentation + Tooling Maps
 ### README.md

@@ -1239,12 +1239,20 @@ body.modal-open {
 .tutorial-progress-tabs {
     position: relative;
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-wrap: nowrap;
+    gap: 8px;
     align-items: center;
     justify-content: center;
     padding: 4px 6px;
     min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.tutorial-progress-tabs::-webkit-scrollbar {
+    display: none;
 }
 
 .tutorial-progress-tab {
@@ -1261,14 +1269,15 @@ body.modal-open {
     transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
     white-space: nowrap;
     border-radius: 999px;
+    flex: 0 0 auto;
 }
 
 .tutorial-progress-tabs::before {
     content: "";
     position: absolute;
     top: 50%;
-    left: 6px;
-    right: 6px;
+    left: 0;
+    right: 0;
     border-top: 1px dashed color-mix(in oklab, var(--input-border) 65%, var(--accent));
     z-index: 0;
 }
@@ -3036,6 +3045,22 @@ body.landing .pedal-box {
     font-weight: 700;
     font-size: 0.8rem;
     border: 2px solid transparent;
+}
+
+.note-pill.chord-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding-right: 9px;
+}
+
+.note-pill.chord-pill .chord-link-bubble {
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translate(-50%, -2px);
 }
 
 .note-pill.good {

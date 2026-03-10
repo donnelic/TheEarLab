@@ -1610,7 +1610,7 @@ const renderNotePills = (label, notes, toneClass) => {
 
 const renderChordPill = (label, chordLabel, toneClass) => {
     if (!chordLabel) return "";
-    const chordMarkup = renderChordLink(chordLabel, { className: `note-pill ${toneClass}` });
+    const chordMarkup = renderChordLink(chordLabel, { className: `note-pill ${toneClass} chord-pill` });
     return `<div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${chordMarkup}</div>`;
 };
 
