@@ -154,7 +154,6 @@ const getGlobalPinnedHelperLabels = () => helperPinState.globalLabels;
 
 const isHelperPinnedGlobalLabel = (label) => {
     if (!label) return false;
-    if (label === HELPER_LABELS.rootNote && state.chordRootHint) return true;
     return getGlobalPinnedHelperLabels().has(label);
 };
 
@@ -166,7 +165,6 @@ const isHelperPinnedLabel = (label) => (
 
 const toggleHelperPinnedLocalLabel = (label) => {
     if (!label) return false;
-    if (label === HELPER_LABELS.rootNote && state.chordRootHint) return false;
     const labels = getLocalPinnedHelperLabels();
     if (labels.has(label)) {
         labels.delete(label);
@@ -178,7 +176,6 @@ const toggleHelperPinnedLocalLabel = (label) => {
 
 const toggleHelperPinnedGlobalLabel = (label) => {
     if (!label) return false;
-    if (label === HELPER_LABELS.rootNote && state.chordRootHint) return false;
     const labels = getGlobalPinnedHelperLabels();
     if (labels.has(label)) {
         labels.delete(label);
@@ -187,6 +184,37 @@ const toggleHelperPinnedGlobalLabel = (label) => {
     }
     getLocalPinnedHelperLabels().delete(label);
     return true;
+};
+
+const setHelperPinnedGlobalLabel = (label, pinned) => {
+    if (!label) return false;
+    const labels = getGlobalPinnedHelperLabels();
+    const has = labels.has(label);
+    if (pinned) {
+        if (!has) {
+            labels.add(label);
+            getLocalPinnedHelperLabels().delete(label);
+            return true;
+        }
+        return false;
+    }
+    if (has) {
+        labels.delete(label);
+        return true;
+    }
+    return false;
+};
+
+const setRootHelperPinned = (pinned) => setHelperPinnedGlobalLabel(HELPER_LABELS.rootNote, pinned);
+
+const getHelperPinFlags = (label) => {
+    const pinnedGlobal = isHelperPinnedGlobalLabel(label);
+    const pinnedLocal = isHelperPinnedLocalLabel(label);
+    return {
+        pinned: pinnedGlobal || pinnedLocal,
+        pinnedGlobal,
+        pinnedLocal
+    };
 };
 const PRESS_BEHAVIOR = {
     MIN_LENGTH_OR_HELD: "min-length-or-held",
@@ -2171,6 +2199,8 @@ Object.assign(App.game, {
     submitAnswer,
     toggleHelperPinLocal: toggleHelperPinnedLocalLabel,
     toggleHelperPinGlobal: toggleHelperPinnedGlobalLabel,
+    setRootHelperPinned,
+    getHelperPinFlags,
     updateStatus,
     updateKeyStates,
     setKeyboardEnabled,

@@ -193,10 +193,14 @@ if (chordExtraHelpersToggle) {
 
 if (chordRootHintToggle) {
     chordRootHintToggle.addEventListener("change", (event) => {
+        const nextValue = Boolean(event.target.checked);
         patchSettingsState({
-            chordRootHint: Boolean(event.target.checked),
+            chordRootHint: nextValue,
             rootHintSuppressed: false
         }, "events/chord-root-hint");
+        if (typeof App.game?.setRootHelperPinned === "function") {
+            App.game.setRootHelperPinned(nextValue);
+        }
         applySettingMutationEffects("chordRootHint", {
             restartOverride: false
         });
@@ -1239,6 +1243,16 @@ if (chordTutorialNext) {
     });
 }
 
+const syncHelperPinnedUi = (helperItem) => {
+    if (!helperItem) return;
+    const label = helperItem.dataset?.helperLabel;
+    if (!label || typeof App.game?.getHelperPinFlags !== "function") return;
+    const flags = App.game.getHelperPinFlags(label);
+    helperItem.classList.toggle("pinned", Boolean(flags.pinnedGlobal));
+    helperItem.classList.toggle("latched", Boolean(flags.pinnedLocal));
+    helperItem.setAttribute("aria-pressed", flags.pinned ? "true" : "false");
+};
+
 const toggleHelperPinned = (target, { persistent = false } = {}) => {
     const helperItem = target?.closest?.(".helper-item");
     if (!helperItem) return false;
@@ -1247,10 +1261,10 @@ const toggleHelperPinned = (target, { persistent = false } = {}) => {
     const toggleFn = persistent ? App.game?.toggleHelperPinGlobal : App.game?.toggleHelperPinLocal;
     if (typeof toggleFn !== "function") return false;
     const toggled = toggleFn(label);
-    if (toggled && typeof App.game?.updateStatus === "function") {
-        App.game.updateStatus();
+    if (toggled) {
+        syncHelperPinnedUi(helperItem);
     }
-    return true;
+    return toggled;
 };
 
 document.addEventListener("click", (event) => {

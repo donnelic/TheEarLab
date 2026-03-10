@@ -1891,7 +1891,8 @@ body.modal-open {
     opacity: 0.7;
     letter-spacing: 0.04em;
     white-space: pre;
-    transition: filter 0.18s ease 0.34s, opacity 0.18s ease 0.34s;
+    transition: filter 0.24s ease 0.2s, opacity 0.24s ease 0.2s;
+    will-change: filter, opacity;
 }
 
 .helper-item .helper-real {
@@ -1901,7 +1902,8 @@ body.modal-open {
     color: var(--ink);
     opacity: 0;
     filter: blur(3px);
-    transition: filter 0.18s ease 0.34s, opacity 0.18s ease 0.34s;
+    transition: filter 0.24s ease 0.2s, opacity 0.24s ease 0.2s;
+    will-change: filter, opacity;
     white-space: nowrap;
     max-width: min(24ch, 100%);
     overflow: hidden;
