@@ -129,6 +129,39 @@ const HELPER_LABELS = {
     voicing: HELPER_COPY.voicing || "Voicing",
     pitchSpan: HELPER_COPY.pitchSpan || "Pitch span"
 };
+const helperPinState = {
+    round: null,
+    labels: new Set()
+};
+
+const getHelperPinRound = () => (Number.isFinite(state.round) ? state.round : 0);
+
+const getPinnedHelperLabels = () => {
+    const round = getHelperPinRound();
+    if (helperPinState.round !== round) {
+        helperPinState.round = round;
+        helperPinState.labels.clear();
+    }
+    return helperPinState.labels;
+};
+
+const isHelperPinnedLabel = (label) => {
+    if (!label) return false;
+    if (label === HELPER_LABELS.rootNote && state.chordRootHint) return true;
+    return getPinnedHelperLabels().has(label);
+};
+
+const toggleHelperPinnedLabel = (label) => {
+    if (!label) return false;
+    if (label === HELPER_LABELS.rootNote && state.chordRootHint) return false;
+    const labels = getPinnedHelperLabels();
+    if (labels.has(label)) {
+        labels.delete(label);
+    } else {
+        labels.add(label);
+    }
+    return true;
+};
 const PRESS_BEHAVIOR = {
     MIN_LENGTH_OR_HELD: "min-length-or-held",
     HOLD_WHILE_PRESSED: "hold-while-pressed"
@@ -1039,15 +1072,20 @@ const renderChordHelperBox = () => {
     const hints = getChordHelperHints();
     if (!hints.length) return "";
     const helperHint = HELPER_COPY.revealHint || "Hover or focus to reveal";
-    const rows = hints.map((hint) => `
-        <div class="helper-item" tabindex="0">
-            <div class="helper-label">${escapeHtml(hint.label)}</div>
+    const rows = hints.map((hint) => {
+        const label = escapeHtml(hint.label);
+        const pinned = isHelperPinnedLabel(hint.label);
+        return `
+        <div class="helper-item${pinned ? " pinned" : ""}" tabindex="0" role="button"
+            data-helper-label="${label}" aria-pressed="${pinned}">
+            <div class="helper-label">${label}</div>
             <div class="helper-value">
                 <span class="helper-mask" aria-hidden="true">${createDeterministicHelperMask(hint.label)}</span>
                 <span class="helper-real">${escapeHtml(hint.value)}</span>
             </div>
         </div>
-    `).join("");
+    `;
+    }).join("");
     return `
         <div class="helper-card">
             <div class="helper-head">
@@ -2103,6 +2141,7 @@ Object.assign(App.game, {
     submitTypedAnswer,
     updateTypedPreviewFromInput,
     submitAnswer,
+    toggleHelperPin: toggleHelperPinnedLabel,
     updateStatus,
     updateKeyStates,
     setKeyboardEnabled,

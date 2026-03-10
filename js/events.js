@@ -1237,6 +1237,31 @@ if (chordTutorialNext) {
     });
 }
 
+const toggleHelperPinned = (target) => {
+    const helperItem = target?.closest?.(".helper-item");
+    if (!helperItem) return false;
+    const label = helperItem.dataset?.helperLabel;
+    if (!label || typeof App.game?.toggleHelperPin !== "function") return false;
+    const toggled = App.game.toggleHelperPin(label);
+    if (toggled && typeof App.game?.updateStatus === "function") {
+        App.game.updateStatus();
+    }
+    return true;
+};
+
+document.addEventListener("click", (event) => {
+    if (toggleHelperPinned(event.target)) {
+        event.preventDefault();
+    }
+});
+
+document.addEventListener("keydown", (event) => {
+    if (!["Enter", " "].includes(event.key)) return;
+    if (toggleHelperPinned(event.target)) {
+        event.preventDefault();
+    }
+});
+
 if (chordTutorialRootList) {
     chordTutorialRootList.addEventListener("mouseover", (event) => {
         const chip = event.target.closest("[data-root-pc]");
@@ -1392,7 +1417,10 @@ const getCustomCursorMode = (target) => {
     if (target.closest("input[type=\"text\"], input[type=\"search\"], input[type=\"email\"], input[type=\"password\"], textarea, [contenteditable=\"true\"]")) {
         return "text";
     }
-    if (target.closest("button, [role=\"button\"], a[href], input, select, label.switch, .key, .helper-item, .piano-option, .sf2-row, .profile-row, .tutorial-chip, [tabindex]:not([tabindex=\"-1\"])")) {
+    if (target.closest(".helper-item")) {
+        return "helper";
+    }
+    if (target.closest("button, [role=\"button\"], a[href], input, select, label.switch, .key, .piano-option, .sf2-row, .profile-row, .tutorial-chip, [tabindex]:not([tabindex=\"-1\"])")) {
         return "interactive";
     }
     return "default";
@@ -1402,6 +1430,7 @@ const syncCustomCursorState = (target = document.elementFromPoint(customCursorX,
     if (!customCursorEnabled || !customCursorEl) return;
     customCursorEl.classList.toggle("is-interactive", customCursorMode === "interactive");
     customCursorEl.classList.toggle("is-text", customCursorMode === "text");
+    customCursorEl.classList.toggle("is-helper", customCursorMode === "helper");
     customCursorEl.classList.toggle("is-pressed", customCursorPressed);
 };
 const renderCustomCursor = () => {
