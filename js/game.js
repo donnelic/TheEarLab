@@ -202,7 +202,10 @@ const renderChordLink = (label, { className = "" } = {}) => {
     const qualityId = escapeHtml(parsed.quality.id);
     const rootPcAttr = Number.isFinite(parsed.rootPc) ? ` data-root-pc="${parsed.rootPc}"` : "";
     const labelAttr = escapeHtml(parsed.label ?? label);
-    return `<span class="${classAttr}" role="button" tabindex="0" data-quality-id="${qualityId}"${rootPcAttr} data-chord-label="${labelAttr}">${displayLabel}</span>`;
+    return `<span class="${classAttr}" role="button" tabindex="0" data-quality-id="${qualityId}"${rootPcAttr} data-chord-label="${labelAttr}">
+        ${displayLabel}
+        <span class="chord-link-bubble" aria-hidden="true">?</span>
+    </span>`;
 };
 
 CHORD_QUALITIES.forEach((quality) => {
@@ -1878,19 +1881,21 @@ const buildTypingRevealDetail = (parsed) => {
     if (!parsed) {
         return `<div class="reveal-label">${escapeHtml("Your answer could not be parsed.")}</div>`;
     }
+    const targetLabel = state.targetChord.label || `${state.targetChord.rootName}${state.targetChord.quality?.suffix || ""}`;
+    const targetLink = renderChordLink(targetLabel);
     const mismatches = [];
     if (parsed.rootPc !== state.targetChord.rootPc) {
-        mismatches.push(`root should be ${state.targetChord.rootName}`);
+        mismatches.push(`root should be ${escapeHtml(state.targetChord.rootName)}`);
     }
     if (parsed.quality.id !== state.targetChord.quality.id) {
-        mismatches.push(`quality should be ${state.targetChord.quality.suffix || "major"}`);
+        mismatches.push(`quality should be ${escapeHtml(state.targetChord.quality.suffix || "major")}`);
     }
     if (Number.isFinite(parsed.rootMidi) && Number.isFinite(state.targetChord.rootMidi) && parsed.rootMidi !== state.targetChord.rootMidi) {
         const expectedOctave = Math.floor(state.targetChord.rootMidi / 12) - 1;
-        mismatches.push(`root octave should be ${state.targetChord.rootName}${expectedOctave}`);
+        mismatches.push(`root octave should be ${escapeHtml(`${state.targetChord.rootName}${expectedOctave}`)}`);
     }
     if (!mismatches.length) return "";
-    return `<div class="reveal-label">${escapeHtml(REVEAL_COPY.differencePrefix || "Difference")}: ${escapeHtml(mismatches.join(", "))}.</div>`;
+    return `<div class="reveal-label">${escapeHtml(REVEAL_COPY.differencePrefix || "Difference")}: ${targetLink}. ${mismatches.join(", ")}.</div>`;
 };
 
 const submitTypedAnswer = () => {
