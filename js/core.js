@@ -29,6 +29,15 @@ const dom = {
     resetSettingsButton: document.getElementById("reset-settings"),
     keyCountSlider: document.getElementById("key-count"),
     keyCountValue: document.getElementById("key-count-value"),
+    keyCountDown: document.getElementById("key-count-down"),
+    keyCountDownOct: document.getElementById("key-count-down-oct"),
+    keyCountUp: document.getElementById("key-count-up"),
+    keyCountUpOct: document.getElementById("key-count-up-oct"),
+    gameKeyCountValue: document.getElementById("game-key-count-value"),
+    gameKeyCountDown: document.getElementById("game-key-count-down"),
+    gameKeyCountDownOct: document.getElementById("game-key-count-down-oct"),
+    gameKeyCountUp: document.getElementById("game-key-count-up"),
+    gameKeyCountUpOct: document.getElementById("game-key-count-up-oct"),
     startNoteDownButton: document.getElementById("start-note-down"),
     startNoteUpButton: document.getElementById("start-note-up"),
     startNoteDownOctButton: document.getElementById("start-note-down-oct"),
@@ -150,6 +159,15 @@ const {
     resetSettingsButton,
     keyCountSlider,
     keyCountValue,
+    keyCountDown,
+    keyCountDownOct,
+    keyCountUp,
+    keyCountUpOct,
+    gameKeyCountValue,
+    gameKeyCountDown,
+    gameKeyCountDownOct,
+    gameKeyCountUp,
+    gameKeyCountUpOct,
     startNoteDownButton,
     startNoteUpButton,
     startNoteDownOctButton,
@@ -485,6 +503,7 @@ const DEFAULTS = {
     volume: 0.75,
     noteDuration: DEFAULT_NOTE_DURATION,
     keyCount: 24,
+    keyCountPreference: 24,
     startMidi: DEFAULT_START_MIDI,
     blindMode: false,
     niceMode: false,
@@ -518,6 +537,7 @@ const state = {
     volume: DEFAULTS.volume,
     noteDuration: DEFAULTS.noteDuration,
     keyCount: DEFAULTS.keyCount,
+    keyCountPreference: DEFAULTS.keyCount,
     startMidi: DEFAULTS.startMidi,
     hintUsed: false,
     blindMode: DEFAULTS.blindMode,
@@ -646,6 +666,7 @@ const saveSettings = () => {
         volume: state.volume,
         noteDuration: state.noteDuration,
         keyCount: state.keyCount,
+        keyCountPreference: state.keyCountPreference,
         startMidi: state.startMidi,
         blindMode: state.blindMode,
         niceMode: state.niceMode,
@@ -681,6 +702,9 @@ const loadSettings = () => {
         state.volume = Number.isFinite(data.volume) ? data.volume : DEFAULTS.volume;
         state.noteDuration = Number.isFinite(data.noteDuration) ? data.noteDuration : DEFAULTS.noteDuration;
         state.keyCount = Number.isFinite(data.keyCount) ? data.keyCount : DEFAULTS.keyCount;
+        state.keyCountPreference = Number.isFinite(data.keyCountPreference)
+            ? data.keyCountPreference
+            : state.keyCount;
         state.startMidi = Number.isFinite(data.startMidi) ? data.startMidi : DEFAULTS.startMidi;
         state.blindMode = Boolean(data.blindMode);
         state.niceMode = Boolean(data.niceMode);
@@ -733,6 +757,7 @@ const resetAllSettings = () => {
     state.volume = DEFAULTS.volume;
     state.noteDuration = DEFAULTS.noteDuration;
     state.keyCount = DEFAULTS.keyCount;
+    state.keyCountPreference = DEFAULTS.keyCountPreference;
     state.startMidi = DEFAULTS.startMidi;
     state.blindMode = DEFAULTS.blindMode;
     state.niceMode = DEFAULTS.niceMode;

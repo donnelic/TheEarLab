@@ -859,11 +859,16 @@ const updateChordReadout = () => {
     const hasKeyboardSelection = keyboardSelection.length >= 2;
     const hasTypedInput = Boolean(state.typedAnswer?.trim());
     const hideLivePreview = Boolean(state.hideLivePreview) && !state.submitted;
-    const shouldShow = state.active && getIsChordRound() && !hideLivePreview
-        && (hasKeyboardSelection || (isTypingEnabled() && hasTypedInput));
-    chordReadout.hidden = !shouldShow;
-    chordReadout.style.display = shouldShow ? "" : "none";
-    if (!shouldShow) return;
+    const canShowContainer = state.active && getIsChordRound() && !hideLivePreview;
+    const shouldShow = canShowContainer && (hasKeyboardSelection || (isTypingEnabled() && hasTypedInput));
+    chordReadout.hidden = !canShowContainer;
+    chordReadout.style.display = canShowContainer ? "" : "none";
+    if (!canShowContainer) return;
+    chordReadout.classList.toggle("is-ghost", !shouldShow);
+    if (!shouldShow) {
+        chordReadout.innerHTML = "";
+        return;
+    }
 
     if (isTypingOnlyMode()) {
         if (!state.typedAnswer?.trim()) {
@@ -1929,9 +1934,9 @@ const submitTypedAnswer = () => {
         }));
         lastReveal = {
             target: [...state.targetNotes],
-            selected: answerNotes.length ? [...answerNotes] : [...state.targetNotes]
+            selected: []
         };
-        playRevealSequence({ snapshot: lastReveal, isCorrect: true, alwaysPlaySelected: true });
+        playRevealSequence({ snapshot: lastReveal, isCorrect: true, alwaysPlaySelected: false });
         updateStatus();
         updateKeyStates();
         typingAutoNextTimer = setTimeout(() => {

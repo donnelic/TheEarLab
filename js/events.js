@@ -174,6 +174,7 @@ if (chordDifficultySelect) {
                 ? value
                 : DEFAULTS.chordDifficulty)
         }, "events/chord-difficulty");
+        setKeyCount(state.keyCount, { preview: true, source: "system" });
         applySettingMutationEffects("chordDifficulty", {
             refreshKeys: false
         });
@@ -404,6 +405,21 @@ keyCountSlider.addEventListener("change", () => {
 keyCountSlider.addEventListener("pointerup", () => {
     commitCriticalChange();
 });
+
+const adjustKeyCount = (delta) => {
+    const base = Number.isFinite(state.keyCount) ? state.keyCount : DEFAULTS.keyCount;
+    setKeyCount(base + delta);
+};
+
+const bindKeyCountStepper = (down, up, downOct, upOct) => {
+    if (down) down.addEventListener("click", () => adjustKeyCount(-1));
+    if (up) up.addEventListener("click", () => adjustKeyCount(1));
+    if (downOct) downOct.addEventListener("click", () => adjustKeyCount(-12));
+    if (upOct) upOct.addEventListener("click", () => adjustKeyCount(12));
+};
+
+bindKeyCountStepper(keyCountDown, keyCountUp, keyCountDownOct, keyCountUpOct);
+bindKeyCountStepper(gameKeyCountDown, gameKeyCountUp, gameKeyCountDownOct, gameKeyCountUpOct);
 
 hintButton.addEventListener("click", () => {
     playTarget();

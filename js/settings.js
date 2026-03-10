@@ -856,16 +856,72 @@ const playPianoPreview = (presetKey) => {
     });
 };
 
+const KEY_COUNT_GLOBAL_MIN = 12;
+const KEY_COUNT_GLOBAL_MAX = 48;
+const CHORD_KEY_COUNT_MIN_BY_DIFFICULTY = Object.freeze({
+    easy: 12,
+    medium: 12,
+    voiced: 18,
+    hard: 24
+});
+
+const normalizeChordDifficultyId = (value) => {
+    const normalized = String(value ?? "").trim().toLowerCase();
+    if (normalized === "playful") return "voiced";
+    if (["easy", "medium", "voiced", "hard"].includes(normalized)) return normalized;
+    return "easy";
+};
+
+const getKeyCountMinimum = (nextState = state) => {
+    const mode = getEffectivePracticeMode();
+    if (mode !== "chord") return KEY_COUNT_GLOBAL_MIN;
+    const difficultyId = normalizeChordDifficultyId(nextState.chordDifficulty);
+    return CHORD_KEY_COUNT_MIN_BY_DIFFICULTY[difficultyId] ?? KEY_COUNT_GLOBAL_MIN;
+};
+
+const clampKeyCountPreference = (value) => Math.min(
+    Math.max(Math.round(value), KEY_COUNT_GLOBAL_MIN),
+    KEY_COUNT_GLOBAL_MAX
+);
+
+const getKeyCountPreference = () => (
+    Number.isFinite(state.keyCountPreference) ? state.keyCountPreference : state.keyCount
+);
+
+const resolveKeyCountForPreference = (preference, nextState = state) => {
+    const min = getKeyCountMinimum(nextState);
+    const safePreference = Number.isFinite(preference) ? preference : state.keyCount;
+    return Math.min(Math.max(Math.round(safePreference), min), KEY_COUNT_GLOBAL_MAX);
+};
+
+const clampStartMidiForKeyCount = (value, keyCount) => {
+    const maxStart = Math.max(MIN_START_MIDI, MAX_MIDI - keyCount + 1);
+    return clamp(value, MIN_START_MIDI, maxStart);
+};
+
+const updateKeyCountDisplay = (value) => {
+    if (keyCountValue) {
+        keyCountValue.textContent = `${value} keys`;
+    }
+    if (gameKeyCountValue) {
+        gameKeyCountValue.textContent = `${value} keys`;
+    }
+    if (keyCountSlider) {
+        keyCountSlider.value = String(value);
+    }
+};
+
 const setKeyCount = (value, options = {}) => {
-    const { delayOverrideMs = null, preview = false } = options;
-    const clamped = Math.min(Math.max(Math.round(value), 12), 36);
-    const clampedStartMidi = clampStartMidi(state.startMidi);
+    const { delayOverrideMs = null, preview = false, source = "user" } = options;
+    const preferred = source === "user" ? clampKeyCountPreference(value) : getKeyCountPreference();
+    const clamped = resolveKeyCountForPreference(preferred);
+    const clampedStartMidi = clampStartMidiForKeyCount(state.startMidi, clamped);
     applySettingsStatePatch({
         keyCount: clamped,
+        keyCountPreference: preferred,
         startMidi: clampedStartMidi
     }, "settings/key-count");
-    keyCountValue.textContent = `${clamped} keys`;
-    keyCountSlider.value = String(clamped);
+    updateKeyCountDisplay(clamped);
     if (startNoteValue) {
         startNoteValue.textContent = getMidiLabel(state.startMidi);
     }
@@ -888,9 +944,8 @@ const setStartMidi = (value, delayOverrideMs = null) => {
 };
 
 const setKeyCountVisual = (value) => {
-    const clamped = Math.min(Math.max(Math.round(value), 12), 36);
-    keyCountValue.textContent = `${clamped} keys`;
-    keyCountSlider.value = String(clamped);
+    const clamped = clampKeyCountPreference(value);
+    updateKeyCountDisplay(clamped);
 };
 
 const getEffectivePracticeMode = () => SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState
@@ -1000,6 +1055,7 @@ const setPracticeMode = (mode, options = {}) => {
 
     refreshOptionsModeVisibility();
     updateNoteCountMax();
+    setKeyCount(state.keyCount, { preview: true, source: "system" });
     updateStatus();
     updateKeyStates();
 
@@ -1023,8 +1079,8 @@ const applyUiFromState = () => {
     volumeSlider.value = state.volume.toFixed(2);
     lengthSlider.value = state.noteDuration.toFixed(1);
     lengthValue.textContent = `${state.noteDuration.toFixed(1)}s`;
-    keyCountSlider.value = String(state.keyCount);
-    keyCountValue.textContent = `${state.keyCount} keys`;
+    state.keyCountPreference = Number.isFinite(state.keyCountPreference) ? state.keyCountPreference : state.keyCount;
+    setKeyCount(state.keyCountPreference, { preview: true, source: "system" });
     state.startMidi = clampStartMidi(state.startMidi);
     if (startNoteValue) {
         startNoteValue.textContent = getMidiLabel(state.startMidi);

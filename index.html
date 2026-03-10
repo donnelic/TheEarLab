@@ -93,10 +93,19 @@
 
         <div class="settings-section-title">Keyboard Layout</div>
         <div class="control">
-          <label for="key-count">Key count</label>
-          <div class="control-row">
-            <input id="key-count" type="range" min="12" max="36" step="1" value="24" />
-            <span class="volume-value" id="key-count-value">24 keys</span>
+          <label>Key count</label>
+          <div class="control-row start-note-row">
+            <div class="start-note-stepper key-count-stepper">
+              <button id="key-count-down-oct" class="step-btn oct" type="button"
+                aria-label="Lower key range by octave">&lt;&lt;</button>
+              <button id="key-count-down" class="step-btn" type="button" aria-label="Lower key range">&lt;</button>
+              <span id="key-count-value" class="start-note-value">24 keys</span>
+              <button id="key-count-up" class="step-btn" type="button" aria-label="Raise key range">&gt;</button>
+              <button id="key-count-up-oct" class="step-btn oct" type="button"
+                aria-label="Raise key range by octave">&gt;&gt;</button>
+            </div>
+            <input id="key-count" type="range" min="12" max="48" step="1" value="24" class="range-hidden"
+              aria-hidden="true" tabindex="-1" />
           </div>
         </div>
 
@@ -224,11 +233,42 @@
               </div>
             </div>
 
+            <div class="control compact">
+              <label>Key range</label>
+              <div class="control-row start-note-row">
+                <div class="start-note-stepper key-count-stepper">
+                  <button id="game-key-count-down-oct" class="step-btn oct" type="button"
+                    aria-label="Lower key range by octave">&lt;&lt;</button>
+                  <button id="game-key-count-down" class="step-btn" type="button" aria-label="Lower key range">&lt;</button>
+                  <span id="game-key-count-value" class="start-note-value">24 keys</span>
+                  <button id="game-key-count-up" class="step-btn" type="button" aria-label="Raise key range">&gt;</button>
+                  <button id="game-key-count-up-oct" class="step-btn oct" type="button"
+                    aria-label="Raise key range by octave">&gt;&gt;</button>
+                </div>
+              </div>
+              <div class="control-row">
+                <span class="unit">Adjust by note or octave.</span>
+              </div>
+            </div>
+
             <div class="control compact" data-option-group="notes">
               <label for="note-count">Notes per round</label>
               <div class="control-row">
                 <input id="note-count" type="range" min="1" max="6" step="1" value="2" />
                 <span class="volume-value" id="note-count-value">2 notes</span>
+              </div>
+            </div>
+
+            <div class="control compact">
+              <label for="blind-mode">Blind mode</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="blind-mode">
+                  <input id="blind-mode" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Mute key sound while selecting notes (still checks after submit)</span>
               </div>
             </div>
 
@@ -299,32 +339,6 @@
             </div>
 
             <div class="control compact">
-              <label for="chord-extra-helpers">Extra helpers</label>
-              <div class="control-row toggle-row">
-                <label class="switch" for="chord-extra-helpers">
-                  <input id="chord-extra-helpers" type="checkbox" />
-                  <span class="switch-track">
-                    <span class="switch-thumb"></span>
-                  </span>
-                </label>
-                <span class="unit">Show hints like chord size, family and voicing style</span>
-              </div>
-            </div>
-
-            <div class="control compact">
-              <label for="chord-root-hint">Reveal root note</label>
-              <div class="control-row toggle-row">
-                <label class="switch" for="chord-root-hint">
-                  <input id="chord-root-hint" type="checkbox" />
-                  <span class="switch-track">
-                    <span class="switch-thumb"></span>
-                  </span>
-                </label>
-                <span class="unit">Show the target root on the keyboard (green anchor) while keeping full quality hidden</span>
-              </div>
-            </div>
-
-            <div class="control compact">
               <label>Chord tutorial</label>
               <div class="control-row">
                 <button id="chord-tutorial-open-options" class="advanced-trigger" type="button">Open chord guide</button>
@@ -333,24 +347,24 @@
           </div>
         </div>
 
-        <div class="game-settings-group">
+        <div class="game-settings-group" data-option-group="chord">
           <div class="game-settings-group-title">Answer aids</div>
           <div class="game-settings-group-body">
             <div class="control compact">
-              <label for="blind-mode">Blind mode</label>
+              <label for="chord-root-hint">Root anchor</label>
               <div class="control-row toggle-row">
-                <label class="switch" for="blind-mode">
-                  <input id="blind-mode" type="checkbox" />
+                <label class="switch" for="chord-root-hint">
+                  <input id="chord-root-hint" type="checkbox" />
                   <span class="switch-track">
                     <span class="switch-thumb"></span>
                   </span>
                 </label>
-                <span class="unit">Mute key sound while selecting notes</span>
+                <span class="unit">Show the root in green without revealing the full chord quality</span>
               </div>
             </div>
 
             <div class="control compact">
-              <label for="hide-live-preview">Hide live answer preview</label>
+              <label for="hide-live-preview">Reveal after submit</label>
               <div class="control-row toggle-row">
                 <label class="switch" for="hide-live-preview">
                   <input id="hide-live-preview" type="checkbox" />
@@ -358,20 +372,7 @@
                     <span class="switch-thumb"></span>
                   </span>
                 </label>
-                <span class="unit">Hide selected/typed note names until you submit</span>
-              </div>
-            </div>
-
-            <div class="control compact" data-option-group="typing">
-              <label for="typing-show-piano">Keyboard guide</label>
-              <div class="control-row toggle-row">
-                <label class="switch" for="typing-show-piano">
-                  <input id="typing-show-piano" type="checkbox" />
-                  <span class="switch-track">
-                    <span class="switch-thumb"></span>
-                  </span>
-                </label>
-                <span class="unit">In typing-only mode, keep the keyboard visible as a guide</span>
+                <span class="unit">Suppress live note/chord labels until you check your answer</span>
               </div>
             </div>
 
@@ -384,7 +385,33 @@
                     <span class="switch-thumb"></span>
                   </span>
                 </label>
-                <span class="unit">Highlight the notes detected from your typed chord name</span>
+                <span class="unit">Highlight the notes your typed chord would play</span>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="typing">
+              <label for="typing-show-piano">Keyboard guide</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="typing-show-piano">
+                  <input id="typing-show-piano" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Keep the keyboard visible in typing-only mode</span>
+              </div>
+            </div>
+
+            <div class="control compact">
+              <label for="chord-extra-helpers">Chord helper hints</label>
+              <div class="control-row toggle-row">
+                <label class="switch" for="chord-extra-helpers">
+                  <input id="chord-extra-helpers" type="checkbox" />
+                  <span class="switch-track">
+                    <span class="switch-thumb"></span>
+                  </span>
+                </label>
+                <span class="unit">Show chord size, family, and voicing hints in the helper panel</span>
               </div>
             </div>
           </div>

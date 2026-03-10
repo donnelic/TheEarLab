@@ -386,6 +386,10 @@ body:not(.landing) .hero {
     padding: 6px 10px;
 }
 
+.range-hidden {
+    display: none;
+}
+
 .start-note-value {
     min-width: 44px;
     text-align: center;
@@ -639,6 +643,11 @@ body:not(.landing) .quick-start {
     display: none;
 }
 
+.chord-readout.is-ghost {
+    opacity: 0;
+    pointer-events: none;
+}
+
 .typing-zone {
     background:
         linear-gradient(160deg, color-mix(in oklab, var(--panel) 92%, white), color-mix(in oklab, var(--card) 88%, transparent));
@@ -847,6 +856,7 @@ body.modal-open {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 14px;
+    align-items: start;
 }
 
 .game-settings-group {
@@ -856,6 +866,7 @@ body.modal-open {
     padding: 12px;
     display: grid;
     gap: 10px;
+    align-content: start;
 }
 
 .game-settings-group-title {
@@ -2464,6 +2475,7 @@ body.modal-open {
 }
 
 .settings-grid input[type="range"],
+.game-settings-grid input[type="range"],
 .advanced-panel input[type="range"],
 .options-panel input[type="range"] {
     width: 100%;
@@ -2472,6 +2484,7 @@ body.modal-open {
 }
 
 .settings-grid input[type="range"]::-webkit-slider-runnable-track,
+.game-settings-grid input[type="range"]::-webkit-slider-runnable-track,
 .advanced-panel input[type="range"]::-webkit-slider-runnable-track,
 .options-panel input[type="range"]::-webkit-slider-runnable-track {
     height: 8px;
@@ -2481,6 +2494,7 @@ body.modal-open {
 }
 
 .settings-grid input[type="range"]::-webkit-slider-thumb,
+.game-settings-grid input[type="range"]::-webkit-slider-thumb,
 .advanced-panel input[type="range"]::-webkit-slider-thumb,
 .options-panel input[type="range"]::-webkit-slider-thumb {
     appearance: none;
@@ -2494,6 +2508,7 @@ body.modal-open {
 }
 
 .settings-grid input[type="range"]:focus-visible::-webkit-slider-thumb,
+.game-settings-grid input[type="range"]:focus-visible::-webkit-slider-thumb,
 .advanced-panel input[type="range"]:focus-visible::-webkit-slider-thumb,
 .options-panel input[type="range"]:focus-visible::-webkit-slider-thumb {
     outline: 3px solid var(--ring);
@@ -2501,6 +2516,7 @@ body.modal-open {
 }
 
 .settings-grid input[type="range"]::-moz-range-track,
+.game-settings-grid input[type="range"]::-moz-range-track,
 .advanced-panel input[type="range"]::-moz-range-track,
 .options-panel input[type="range"]::-moz-range-track {
     height: 8px;
@@ -2510,6 +2526,7 @@ body.modal-open {
 }
 
 .settings-grid input[type="range"]::-moz-range-thumb,
+.game-settings-grid input[type="range"]::-moz-range-thumb,
 .advanced-panel input[type="range"]::-moz-range-thumb,
 .options-panel input[type="range"]::-moz-range-thumb {
     width: 18px;
@@ -2521,6 +2538,7 @@ body.modal-open {
 }
 
 .settings-grid input[type="range"]:focus-visible::-moz-range-thumb,
+.game-settings-grid input[type="range"]:focus-visible::-moz-range-thumb,
 .advanced-panel input[type="range"]:focus-visible::-moz-range-thumb,
 .options-panel input[type="range"]:focus-visible::-moz-range-thumb {
     outline: 3px solid var(--ring);
