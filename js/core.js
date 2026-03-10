@@ -368,7 +368,7 @@ const UI_COPY = {
     },
     helpers: {
         title: "Chord helper",
-        revealHint: "Hover or focus to reveal",
+        revealHint: "Click to latch, right-click to pin",
         rootNote: "Root note",
         rootHidden: "Hidden",
         chordSize: "Chord size",

@@ -131,35 +131,61 @@ const HELPER_LABELS = {
 };
 const helperPinState = {
     round: null,
-    labels: new Set()
+    localLabels: new Set(),
+    globalLabels: new Set()
 };
 
 const getHelperPinRound = () => (Number.isFinite(state.round) ? state.round : 0);
 
-const getPinnedHelperLabels = () => {
+const syncHelperPinRound = () => {
     const round = getHelperPinRound();
     if (helperPinState.round !== round) {
         helperPinState.round = round;
-        helperPinState.labels.clear();
+        helperPinState.localLabels.clear();
     }
-    return helperPinState.labels;
 };
 
-const isHelperPinnedLabel = (label) => {
+const getLocalPinnedHelperLabels = () => {
+    syncHelperPinRound();
+    return helperPinState.localLabels;
+};
+
+const getGlobalPinnedHelperLabels = () => helperPinState.globalLabels;
+
+const isHelperPinnedGlobalLabel = (label) => {
     if (!label) return false;
     if (label === HELPER_LABELS.rootNote && state.chordRootHint) return true;
-    return getPinnedHelperLabels().has(label);
+    return getGlobalPinnedHelperLabels().has(label);
 };
 
-const toggleHelperPinnedLabel = (label) => {
+const isHelperPinnedLocalLabel = (label) => getLocalPinnedHelperLabels().has(label);
+
+const isHelperPinnedLabel = (label) => (
+    isHelperPinnedGlobalLabel(label) || isHelperPinnedLocalLabel(label)
+);
+
+const toggleHelperPinnedLocalLabel = (label) => {
     if (!label) return false;
     if (label === HELPER_LABELS.rootNote && state.chordRootHint) return false;
-    const labels = getPinnedHelperLabels();
+    const labels = getLocalPinnedHelperLabels();
     if (labels.has(label)) {
         labels.delete(label);
     } else {
         labels.add(label);
     }
+    return true;
+};
+
+const toggleHelperPinnedGlobalLabel = (label) => {
+    if (!label) return false;
+    if (label === HELPER_LABELS.rootNote && state.chordRootHint) return false;
+    const labels = getGlobalPinnedHelperLabels();
+    if (labels.has(label)) {
+        labels.delete(label);
+    } else {
+        labels.add(label);
+    }
+    getLocalPinnedHelperLabels().delete(label);
     return true;
 };
 const PRESS_BEHAVIOR = {
@@ -1075,8 +1101,10 @@ const renderChordHelperBox = () => {
     const rows = hints.map((hint) => {
         const label = escapeHtml(hint.label);
         const pinned = isHelperPinnedLabel(hint.label);
+        const pinnedGlobal = isHelperPinnedGlobalLabel(hint.label);
+        const pinnedLocal = !pinnedGlobal && isHelperPinnedLocalLabel(hint.label);
         return `
-        <div class="helper-item${pinned ? " pinned" : ""}" tabindex="0" role="button"
+        <div class="helper-item${pinnedGlobal ? " pinned" : ""}${pinnedLocal ? " latched" : ""}" tabindex="0" role="button"
             data-helper-label="${label}" aria-pressed="${pinned}">
             <div class="helper-label">${label}</div>
             <div class="helper-value">
@@ -2141,7 +2169,8 @@ Object.assign(App.game, {
     submitTypedAnswer,
     updateTypedPreviewFromInput,
     submitAnswer,
-    toggleHelperPin: toggleHelperPinnedLabel,
+    toggleHelperPinLocal: toggleHelperPinnedLocalLabel,
+    toggleHelperPinGlobal: toggleHelperPinnedGlobalLabel,
     updateStatus,
     updateKeyStates,
     setKeyboardEnabled,

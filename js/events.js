@@ -21,7 +21,7 @@ const ROUND_RESTART_POLICY_BY_SETTING = Object.freeze({
     playbackOrder: () => state.active,
     trainingMode: () => state.active && getEventsChordRound(),
     chordDifficulty: () => state.active && getEventsChordRound(),
-    chordRootHint: () => state.active && getEventsChordRound()
+    chordRootHint: () => false
 });
 
 const shouldRestartRoundForSetting = (settingKey) => {
@@ -197,7 +197,9 @@ if (chordRootHintToggle) {
             chordRootHint: Boolean(event.target.checked),
             rootHintSuppressed: false
         }, "events/chord-root-hint");
-        applySettingMutationEffects("chordRootHint");
+        applySettingMutationEffects("chordRootHint", {
+            restartOverride: false
+        });
     });
 }
 
@@ -1237,12 +1239,14 @@ if (chordTutorialNext) {
     });
 }
 
-const toggleHelperPinned = (target) => {
+const toggleHelperPinned = (target, { persistent = false } = {}) => {
     const helperItem = target?.closest?.(".helper-item");
     if (!helperItem) return false;
     const label = helperItem.dataset?.helperLabel;
-    if (!label || typeof App.game?.toggleHelperPin !== "function") return false;
-    const toggled = App.game.toggleHelperPin(label);
+    if (!label) return false;
+    const toggleFn = persistent ? App.game?.toggleHelperPinGlobal : App.game?.toggleHelperPinLocal;
+    if (typeof toggleFn !== "function") return false;
+    const toggled = toggleFn(label);
     if (toggled && typeof App.game?.updateStatus === "function") {
         App.game.updateStatus();
     }
@@ -1258,6 +1262,12 @@ document.addEventListener("click", (event) => {
 document.addEventListener("keydown", (event) => {
     if (!["Enter", " "].includes(event.key)) return;
     if (toggleHelperPinned(event.target)) {
+        event.preventDefault();
+    }
+});
+
+document.addEventListener("contextmenu", (event) => {
+    if (toggleHelperPinned(event.target, { persistent: true })) {
         event.preventDefault();
     }
 });
