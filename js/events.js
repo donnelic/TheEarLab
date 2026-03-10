@@ -476,6 +476,7 @@ const TUTORIAL_FIXED_ROOT_MIDI = 60; // C4
 const CHORD_TUTORIAL_STEPS = [
     {
         title: "1. Notes and Semitones",
+        tabLabel: "Notes",
         bodyHtml: `
             <p>A semitone is one adjacent key on the piano. Chords are built by stacking semitone distances above a root.</p>
             <p>Start on root <strong>C</strong> and try a few basic chord qualities to hear how one changed note changes the sound.</p>
@@ -485,6 +486,7 @@ const CHORD_TUTORIAL_STEPS = [
     },
     {
         title: "2. Scales and Comparison",
+        tabLabel: "Scales",
         bodyHtml: `
             <p><strong>W</strong> means a whole step (2 keys/semitones). <strong>H</strong> means a half step (1 key/semitone).</p>
             <p>A major scale follows the pattern <strong>W-W-H-W-W-W-H</strong>, which means: move 2, 2, 1, 2, 2, 2, 1 keys.</p>
@@ -496,16 +498,19 @@ const CHORD_TUTORIAL_STEPS = [
     },
     {
         title: "3. Major and Minor Triads",
+        tabLabel: "Triads",
         bodyHtml: `
-            <p>A triad is root + 3rd + 5th.</p>
-            <p><strong>Major</strong>: 0, 4, 7 semitones. <strong>Minor</strong>: 0, 3, 7 semitones.</p>
-            <p>Use the newly enabled roots to compare how the same formula sounds in different keys.</p>
+            <p>A triad is the simplest full chord: root + 3rd + 5th, stacked by skipping one scale tone at a time.</p>
+            <p><strong>Major</strong> uses a major 3rd (4 semitones) + perfect 5th (7). It feels bright and settled.</p>
+            <p><strong>Minor</strong> lowers the 3rd by one semitone (0, 3, 7), giving a darker, more tense color.</p>
+            <p>Use the newly enabled roots to hear how the quality stays the same while the key changes.</p>
         `,
         unlockedRootPcs: [0, 1, 2, 4, 7],
         unlockedQualityIds: ["maj", "min"]
     },
     {
         title: "4. Suspended and Power Chords",
+        tabLabel: "Sus/Power",
         bodyHtml: `
             <p><strong>Sus2</strong> replaces the 3rd with a 2nd: 0, 2, 7.</p>
             <p><strong>Sus4</strong> replaces the 3rd with a 4th: 0, 5, 7.</p>
@@ -516,6 +521,7 @@ const CHORD_TUTORIAL_STEPS = [
     },
     {
         title: "5. Diminished and Augmented",
+        tabLabel: "Dim/Aug",
         bodyHtml: `
             <p><strong>Diminished (dim)</strong>: 0, b3, b5. Example: Cdim = C-Eb-Gb.</p>
             <p><strong>Augmented (aug)</strong>: 0, 4, 8 (R, 3, #5). Example: Caug = C-E-G#.</p>
@@ -526,6 +532,7 @@ const CHORD_TUTORIAL_STEPS = [
     },
     {
         title: "6. 6th and 7th Chords",
+        tabLabel: "6th/7th",
         bodyHtml: `
             <p><strong>6</strong> adds scale degree 6. <strong>maj7</strong>, <strong>m7</strong>, and <strong>7</strong> add different 7ths.</p>
             <p>All root notes are now available so you can transpose every formula across the keyboard.</p>
@@ -535,6 +542,7 @@ const CHORD_TUTORIAL_STEPS = [
     },
     {
         title: "7. Extensions (9th)",
+        tabLabel: "9ths",
         bodyHtml: `
             <p><strong>9</strong> keeps the dominant 7 shell and adds the 9th on top.</p>
             <p>Example: C9 = C-E-G-Bb-D. Try different roots and compare the added color.</p>
@@ -544,6 +552,7 @@ const CHORD_TUTORIAL_STEPS = [
     },
     {
         title: "8. Chord Name Format",
+        tabLabel: "Naming",
         bodyHtml: `
             <p>Write chords as <strong>Root + Quality</strong>.</p>
             <p>Examples: C, Cm, C7, Cmaj7, Csus4, Cdim, Caug, F#m7, Bbmaj7.</p>
@@ -555,6 +564,25 @@ const CHORD_TUTORIAL_STEPS = [
         unlockedQualityIds: [...TUTORIAL_ALL_QUALITY_IDS]
     }
 ];
+
+const TUTORIAL_QUALITY_STEP_INDEX = Object.freeze({
+    maj: 2,
+    min: 2,
+    power5: 3,
+    sus2: 3,
+    sus4: 3,
+    dim: 4,
+    aug: 4,
+    six: 5,
+    m6: 5,
+    maj7: 5,
+    m7: 5,
+    dom7: 5,
+    nine: 6,
+    maj9: 6,
+    m9: 6,
+    add9: 6
+});
 
 const tutorialState = {
     stepIndex: 0,
@@ -932,6 +960,31 @@ const playTutorialChordSpec = (spec = getTutorialActiveSpec()) => {
     }
 };
 
+const getTutorialStepIndexForQuality = (qualityId) => {
+    const mapped = TUTORIAL_QUALITY_STEP_INDEX[qualityId];
+    if (Number.isFinite(mapped)) return mapped;
+    const index = CHORD_TUTORIAL_STEPS.findIndex((step) => Array.isArray(step.unlockedQualityIds)
+        && step.unlockedQualityIds.includes(qualityId));
+    return index >= 0 ? index : 0;
+};
+
+const renderChordTutorialTabs = () => {
+    if (!chordTutorialTabs) return;
+    const tabs = CHORD_TUTORIAL_STEPS.map((step, index) => {
+        const label = step.tabLabel || step.title || `Step ${index + 1}`;
+        const classes = ["tutorial-progress-tab"];
+        if (index === tutorialState.stepIndex) classes.push("active");
+        if (index < tutorialState.stepIndex) classes.push("complete");
+        return `
+            <button class="${classes.join(" ")}" type="button" data-step-index="${index}"
+                role="tab" aria-selected="${index === tutorialState.stepIndex ? "true" : "false"}">
+                ${label}
+            </button>
+        `;
+    }).join("");
+    chordTutorialTabs.innerHTML = tabs;
+};
+
 const renderChordTutorialStep = () => {
     if (!chordTutorialStep || !chordTutorialProgress) return;
     const total = CHORD_TUTORIAL_STEPS.length;
@@ -985,6 +1038,7 @@ const renderChordTutorialStep = () => {
     tutorialState.previousUnlockedRootPcs = new Set(unlockedRoots);
     tutorialState.previousUnlockedQualityIds = new Set(unlockedQualities);
     tutorialState.previousStepIndex = tutorialState.stepIndex;
+    renderChordTutorialTabs();
     refreshTutorialVisuals();
     fitTutorialLayout({ recompute: false });
 };
@@ -1004,13 +1058,23 @@ const closeChordTutorial = () => {
     tutorialReturnFocusEl = null;
 };
 
-const openChordTutorial = (stepIndex = 0, sourceEl = null) => {
+const openChordTutorial = (stepIndex = 0, sourceEl = null, options = {}) => {
     if (!chordTutorialModal) return;
+    const { qualityId = null, rootPc = null } = options;
     tutorialReturnFocusEl = sourceEl && typeof sourceEl.focus === "function" ? sourceEl : null;
     tutorialState.stepIndex = Number.isFinite(stepIndex) ? stepIndex : 0;
     tutorialState.previousStepIndex = tutorialState.stepIndex;
     tutorialState.hoverSpec = null;
-    tutorialState.rootPc = TUTORIAL_FIXED_ROOT_PC;
+    if (Number.isFinite(rootPc)) {
+        tutorialState.rootPc = ((rootPc % 12) + 12) % 12;
+    } else {
+        tutorialState.rootPc = TUTORIAL_FIXED_ROOT_PC;
+    }
+    if (qualityId && TUTORIAL_QUALITY_BY_ID.has(qualityId)) {
+        tutorialState.qualityId = qualityId;
+    } else {
+        tutorialState.qualityId = "maj";
+    }
     tutorialState.previousUnlockedRootPcs = new Set();
     tutorialState.previousUnlockedQualityIds = new Set();
     tutorialState.pendingNewRoots = new Set();
@@ -1040,8 +1104,44 @@ const registerTutorialOpenTrigger = (triggerEl, stepIndex = 0) => {
     });
 };
 
+const openChordTutorialForChordLink = (linkEl) => {
+    if (!linkEl) return;
+    const qualityId = String(linkEl.dataset.qualityId || "");
+    if (!qualityId) return;
+    const rootPc = Number.parseInt(linkEl.dataset.rootPc, 10);
+    const stepIndex = getTutorialStepIndexForQuality(qualityId);
+    openChordTutorial(stepIndex, linkEl, {
+        qualityId,
+        rootPc: Number.isFinite(rootPc) ? rootPc : null
+    });
+};
+
+const handleChordLinkActivation = (event) => {
+    const isKeyboard = event.type === "keydown";
+    if (isKeyboard && !["Enter", " "].includes(event.key)) return;
+    const linkEl = event.target.closest(".chord-link");
+    if (!linkEl) return;
+    event.preventDefault();
+    openChordTutorialForChordLink(linkEl);
+};
+
+document.addEventListener("click", handleChordLinkActivation);
+document.addEventListener("keydown", handleChordLinkActivation);
+
 registerTutorialOpenTrigger(chordTutorialOpenOptions, 0);
 registerTutorialOpenTrigger(typingHelpToggle, 0);
+
+if (chordTutorialTabs) {
+    chordTutorialTabs.addEventListener("click", (event) => {
+        const tab = event.target.closest("[data-step-index]");
+        if (!tab) return;
+        const index = Number.parseInt(tab.dataset.stepIndex, 10);
+        if (!Number.isFinite(index)) return;
+        tutorialState.stepIndex = Math.min(Math.max(index, 0), Math.max(0, CHORD_TUTORIAL_STEPS.length - 1));
+        tutorialState.hoverSpec = null;
+        renderChordTutorialStep();
+    });
+}
 
 if (chordTutorialClose) {
     chordTutorialClose.addEventListener("click", (event) => {

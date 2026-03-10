@@ -585,6 +585,56 @@ body:not(.landing) .quick-start {
     justify-self: start;
 }
 
+.chord-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.chord-link::after {
+    content: "?";
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translate(-50%, -4px);
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid color-mix(in oklab, var(--input-border) 70%, var(--accent));
+    box-shadow: 0 8px 16px color-mix(in oklab, var(--shadow) 50%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 2;
+}
+
+.chord-link:hover::after,
+.chord-link:focus-visible::after,
+.chord-link:focus-within::after {
+    opacity: 1;
+    transform: translate(-50%, -8px);
+}
+
+.chord-link:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--accent) 55%, white);
+    outline-offset: 3px;
+}
+
+.chord-label-suffix,
+.chord-divider {
+    color: var(--muted);
+    font-weight: 600;
+}
+
 .chord-readout[hidden] {
     display: none;
 }
@@ -1152,6 +1202,49 @@ body.modal-open {
     color: var(--muted);
     font-size: 0.82rem;
     font-weight: 700;
+}
+
+.tutorial-progress-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 6px 0 2px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, var(--input-border) 70%, var(--accent));
+    background: color-mix(in oklab, var(--panel) 92%, transparent);
+}
+
+.tutorial-progress-tab {
+    border: none;
+    border-right: 1px solid color-mix(in oklab, var(--input-border) 70%, var(--accent));
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.16s ease, color 0.16s ease;
+    white-space: nowrap;
+}
+
+.tutorial-progress-tab:last-child {
+    border-right: none;
+}
+
+.tutorial-progress-tab.complete {
+    color: color-mix(in oklab, var(--ink) 82%, var(--muted));
+}
+
+.tutorial-progress-tab.active {
+    color: var(--ink);
+    background: color-mix(in oklab, var(--accent) 14%, var(--panel));
+}
+
+.tutorial-progress-tab:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--accent) 65%, white);
+    outline-offset: -2px;
 }
 
 .tutorial-lab {

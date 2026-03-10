@@ -182,6 +182,29 @@ const escapeHtml = (value) => String(value ?? "")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
+const renderChordLink = (label, { className = "" } = {}) => {
+    if (!label) return "";
+    const parsed = parseChordInput(label);
+    const displayLabel = escapeHtml(parsed?.label ?? label);
+    const classes = [];
+    const hasChordMeta = Boolean(parsed?.quality?.id);
+    if (hasChordMeta) {
+        classes.push("chord-link");
+    }
+    if (className) {
+        classes.push(className);
+    }
+    if (!classes.length) return displayLabel;
+    const classAttr = escapeHtml(classes.join(" "));
+    if (!hasChordMeta) {
+        return `<span class="${classAttr}">${displayLabel}</span>`;
+    }
+    const qualityId = escapeHtml(parsed.quality.id);
+    const rootPcAttr = Number.isFinite(parsed.rootPc) ? ` data-root-pc="${parsed.rootPc}"` : "";
+    const labelAttr = escapeHtml(parsed.label ?? label);
+    return `<span class="${classAttr}" role="button" tabindex="0" data-quality-id="${qualityId}"${rootPcAttr} data-chord-label="${labelAttr}">${displayLabel}</span>`;
+};
+
 CHORD_QUALITIES.forEach((quality) => {
     quality.aliases.forEach((alias) => {
         const normalizedAlias = normalizeQualityToken(alias);
@@ -848,9 +871,13 @@ const updateChordReadout = () => {
             return;
         }
         const parsed = parseChordInput(state.typedAnswer);
-        chordReadout.textContent = parsed
-            ? (CHORD_READOUT_COPY.typedPreview?.(parsed.label) ?? `Typed chord: ${parsed.label} (preview)`)
-            : (CHORD_READOUT_COPY.typedUnrecognized || "Typed chord: unrecognized");
+        if (parsed) {
+            const typedHtml = renderChordLink(parsed.label);
+            chordReadout.innerHTML = CHORD_READOUT_COPY.typedPreview?.(typedHtml)
+                ?? `Typed chord: ${typedHtml} (preview)`;
+        } else {
+            chordReadout.textContent = CHORD_READOUT_COPY.typedUnrecognized || "Typed chord: unrecognized";
+        }
         return;
     }
 
@@ -861,16 +888,20 @@ const updateChordReadout = () => {
         const parsed = hasTypedInput ? parseChordInput(state.typedAnswer) : null;
         const typedLabel = hasTypedInput ? (parsed?.label ?? "unrecognized") : "";
         if (state.selectedChordLabel && typedLabel) {
-            chordReadout.textContent = CHORD_READOUT_COPY.selectedAndTyped?.(state.selectedChordLabel, typedLabel)
-                ?? `Selected chord: ${state.selectedChordLabel} | Typed chord: ${typedLabel}`;
+            const selectedHtml = renderChordLink(state.selectedChordLabel);
+            const typedHtml = renderChordLink(typedLabel);
+            chordReadout.innerHTML = CHORD_READOUT_COPY.selectedAndTyped?.(selectedHtml, typedHtml)
+                ?? `Selected chord: ${selectedHtml} | Typed chord: ${typedHtml}`;
             return;
         }
         if (typedLabel) {
-            chordReadout.textContent = CHORD_READOUT_COPY.typed?.(typedLabel) ?? `Typed chord: ${typedLabel}`;
+            const typedHtml = renderChordLink(typedLabel);
+            chordReadout.innerHTML = CHORD_READOUT_COPY.typed?.(typedHtml) ?? `Typed chord: ${typedHtml}`;
             return;
         }
         if (state.selectedChordLabel) {
-            chordReadout.textContent = CHORD_READOUT_COPY.selected?.(state.selectedChordLabel) ?? `Selected chord: ${state.selectedChordLabel}`;
+            const selectedHtml = renderChordLink(state.selectedChordLabel);
+            chordReadout.innerHTML = CHORD_READOUT_COPY.selected?.(selectedHtml) ?? `Selected chord: ${selectedHtml}`;
             return;
         }
         chordReadout.textContent = keyboardSelection.length
@@ -883,9 +914,12 @@ const updateChordReadout = () => {
         chordReadout.textContent = CHORD_READOUT_COPY.selectedNone || "Selected chord: none";
         return;
     }
-    chordReadout.textContent = state.selectedChordLabel
-        ? (CHORD_READOUT_COPY.selected?.(state.selectedChordLabel) ?? `Selected chord: ${state.selectedChordLabel}`)
-        : (CHORD_READOUT_COPY.selectedUnknown || "Selected chord: unknown");
+    if (state.selectedChordLabel) {
+        const selectedHtml = renderChordLink(state.selectedChordLabel);
+        chordReadout.innerHTML = CHORD_READOUT_COPY.selected?.(selectedHtml) ?? `Selected chord: ${selectedHtml}`;
+        return;
+    }
+    chordReadout.textContent = CHORD_READOUT_COPY.selectedUnknown || "Selected chord: unknown";
 };
 
 const updateModeVisibility = () => {
@@ -1076,28 +1110,43 @@ const updateStatus = () => {
         selectedListEl.textContent = "Hidden";
     } else if (typedSubmissionFinal) {
         const parsed = parseChordInput(state.typedAnswer);
-        selectedListEl.textContent = parsed?.label ? `${parsed.label} (typed)` : "Typed answer";
+        if (parsed?.label) {
+            selectedListEl.innerHTML = `${renderChordLink(parsed.label)} <span class="chord-label-suffix">(typed)</span>`;
+        } else {
+            selectedListEl.textContent = "Typed answer";
+        }
     } else if (isTypingOnlyMode()) {
         const parsed = parseChordInput(state.typedAnswer);
-        selectedListEl.textContent = parsed?.label || state.typedAnswer?.trim() || "None";
+        if (parsed?.label) {
+            selectedListEl.innerHTML = renderChordLink(parsed.label);
+        } else {
+            selectedListEl.textContent = state.typedAnswer?.trim() || "None";
+        }
     } else if (state.trainingMode === "both" && chordRound) {
         const selectedChord = detectChordFromNoteIds(keyboardSelection);
         state.selectedChordLabel = selectedChord?.label ?? "";
         const parsed = state.typedAnswer?.trim() ? parseChordInput(state.typedAnswer) : null;
         const typedLabel = state.typedAnswer?.trim() ? (parsed?.label || state.typedAnswer.trim()) : "";
         if (state.selectedChordLabel && typedLabel) {
-            selectedListEl.textContent = `${state.selectedChordLabel} | ${typedLabel} (typed)`;
+            const selectedHtml = renderChordLink(state.selectedChordLabel);
+            const typedHtml = renderChordLink(typedLabel);
+            selectedListEl.innerHTML = `${selectedHtml} <span class="chord-divider">|</span> ${typedHtml} <span class="chord-label-suffix">(typed)</span>`;
         } else if (typedLabel) {
-            selectedListEl.textContent = `${typedLabel} (typed)`;
+            const typedHtml = renderChordLink(typedLabel);
+            selectedListEl.innerHTML = `${typedHtml} <span class="chord-label-suffix">(typed)</span>`;
         } else if (state.selectedChordLabel) {
-            selectedListEl.textContent = state.selectedChordLabel;
+            selectedListEl.innerHTML = renderChordLink(state.selectedChordLabel);
         } else {
             selectedListEl.textContent = keyboardSelection.length ? keyboardSelection.join(", ") : "None";
         }
     } else if (chordRound) {
         const selectedChord = detectChordFromNoteIds(keyboardSelection);
         state.selectedChordLabel = selectedChord?.label ?? "";
-        selectedListEl.textContent = state.selectedChordLabel || (keyboardSelection.length ? keyboardSelection.join(", ") : "None");
+        if (state.selectedChordLabel) {
+            selectedListEl.innerHTML = renderChordLink(state.selectedChordLabel);
+        } else {
+            selectedListEl.textContent = keyboardSelection.length ? keyboardSelection.join(", ") : "None";
+        }
     } else {
         selectedListEl.textContent = state.selectedNotes.length ? state.selectedNotes.join(", ") : "None";
     }
@@ -1553,7 +1602,8 @@ const renderNotePills = (label, notes, toneClass) => {
 
 const renderChordPill = (label, chordLabel, toneClass) => {
     if (!chordLabel) return "";
-    return `<div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills"><span class="note-pill ${toneClass}">${escapeHtml(chordLabel)}</span></div>`;
+    const chordMarkup = renderChordLink(chordLabel, { className: `note-pill ${toneClass}` });
+    return `<div class="reveal-label">${escapeHtml(label)}</div><div class="note-pills">${chordMarkup}</div>`;
 };
 
 const renderTonePills = (items, toneClassOrResolver = "good") => {
