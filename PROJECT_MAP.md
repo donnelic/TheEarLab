@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-10 10:57:18 +01:00
+Generated: 2026-03-10 11:01:09 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.

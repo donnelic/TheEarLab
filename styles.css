@@ -581,9 +581,9 @@ body:not(.landing) .quick-start {
     overflow: visible;
     align-self: start;
     grid-row: 5;
-    width: fit-content;
+    width: 100%;
     border: none;
-    margin-left: var(--surface-pad-x);
+    margin-left: 0;
 }
 
 .chord-readout[hidden] {
