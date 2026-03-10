@@ -1007,18 +1007,22 @@ const fitTutorialProgressTabs = () => {
     if (!chordTutorialTabs) return;
     chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", "1");
     void chordTutorialTabs.offsetWidth;
-    const slack = 8;
-    const available = Math.max(0, chordTutorialTabs.clientWidth - slack);
+    const available = Math.max(0, chordTutorialTabs.clientWidth);
     if (!available) return;
     const baseWidth = chordTutorialTabs.scrollWidth;
     if (!baseWidth || baseWidth <= available) return;
-    const nextScale = Math.max(0.64, Math.min(1, available / baseWidth));
+    let nextScale = Math.max(0.62, Math.min(1, available / baseWidth));
     chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", nextScale.toFixed(3));
     void chordTutorialTabs.offsetWidth;
     const adjustedWidth = chordTutorialTabs.scrollWidth;
-    if (adjustedWidth > available + 1 && nextScale > 0.64) {
-        const secondScale = Math.max(0.64, Math.min(nextScale, available / adjustedWidth));
-        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", secondScale.toFixed(3));
+    if (adjustedWidth > available + 0.5 && nextScale > 0.62) {
+        nextScale = Math.max(0.62, Math.min(nextScale, available / adjustedWidth));
+        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", nextScale.toFixed(3));
+        void chordTutorialTabs.offsetWidth;
+    }
+    if (chordTutorialTabs.scrollWidth > available + 0.5 && nextScale > 0.62) {
+        nextScale = Math.max(0.62, Math.min(nextScale, nextScale * 0.98));
+        chordTutorialTabs.style.setProperty("--tutorial-tabs-scale", nextScale.toFixed(3));
     }
 };
 
