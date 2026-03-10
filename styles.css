@@ -591,13 +591,14 @@ body:not(.landing) .quick-start {
 
 .typing-zone {
     background:
-        linear-gradient(160deg, color-mix(in oklab, var(--panel) 86%, transparent), color-mix(in oklab, var(--status-bg) 92%, transparent));
-    border: 1px solid color-mix(in oklab, var(--control-border) 85%, var(--accent));
+        linear-gradient(160deg, color-mix(in oklab, var(--panel) 92%, white), color-mix(in oklab, var(--card) 88%, transparent));
+    border: 1px solid color-mix(in oklab, var(--control-border) 70%, var(--accent));
+    border-left: 4px solid var(--accent);
     border-radius: var(--surface-radius);
-    padding: var(--surface-pad-y) var(--surface-pad-x) 11px;
+    padding: var(--surface-pad-y) calc(var(--surface-pad-x) - 2px) 11px;
     display: grid;
     gap: 7px;
-    box-shadow: var(--surface-shadow-soft);
+    box-shadow: 0 16px 30px color-mix(in oklab, var(--shadow) 55%, transparent);
     grid-row: 6;
 }
 
@@ -605,6 +606,7 @@ body:not(.landing) .quick-start {
     display: grid;
     gap: 12px;
     justify-items: stretch;
+    grid-row: 5 / span 3;
 }
 
 .typing-zone label {
