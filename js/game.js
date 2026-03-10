@@ -202,11 +202,8 @@ const renderChordLink = (label, { className = "" } = {}) => {
     const qualityId = escapeHtml(parsed.quality.id);
     const rootPcAttr = Number.isFinite(parsed.rootPc) ? ` data-root-pc="${parsed.rootPc}"` : "";
     const labelAttr = escapeHtml(parsed.label ?? label);
-    const aliasMark = shouldShowAliasAsterisk(parsed.quality.id)
-        ? '<span class="chord-alias-asterisk" aria-hidden="true">*</span>'
-        : "";
     return `<span class="${classAttr}" role="button" tabindex="0" data-quality-id="${qualityId}"${rootPcAttr} data-chord-label="${labelAttr}">
-        ${displayLabel}${aliasMark}
+        ${displayLabel}
         <span class="chord-link-bubble" aria-hidden="true">?</span>
     </span>`;
 };
@@ -295,21 +292,9 @@ const getChordDifficultyId = (value = state.chordDifficulty) => {
     return "easy";
 };
 
-const shouldShowAliasAsterisk = (qualityId, difficultyId = state.chordDifficulty) => {
-    if (!qualityId) return false;
-    if (getChordDifficultyId(difficultyId) !== "hard") return false;
-    return qualityId === "add9";
-};
+const getChordDisplayLabel = (label) => label;
 
-const getChordDisplayLabel = (label, qualityId, difficultyId = state.chordDifficulty) => {
-    if (!label) return label;
-    return shouldShowAliasAsterisk(qualityId, difficultyId) ? `${label}*` : label;
-};
-
-const getChordQualityDisplaySuffix = (quality, difficultyId = state.chordDifficulty) => {
-    const suffix = quality?.suffix || "major";
-    return shouldShowAliasAsterisk(quality?.id, difficultyId) ? `${suffix}*` : suffix;
-};
+const getChordQualityDisplaySuffix = (quality) => quality?.suffix || "major";
 
 const getChordDifficultyConfig = (difficulty = state.chordDifficulty) => {
     const id = getChordDifficultyId(difficulty);
@@ -325,8 +310,7 @@ const getAllowedChordQualities = (difficulty = state.chordDifficulty) => {
 
 const getChordQualityHint = (qualityId) => {
     if (!qualityId) return "unknown quality";
-    const base = CHORD_QUALITY_HINTS[qualityId] ?? qualityId;
-    return shouldShowAliasAsterisk(qualityId) ? `${base}*` : base;
+    return CHORD_QUALITY_HINTS[qualityId] ?? qualityId;
 };
 
 const getInteractivePressBehavior = () => (

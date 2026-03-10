@@ -601,11 +601,6 @@ body:not(.landing) .quick-start {
     -webkit-tap-highlight-color: transparent;
 }
 
-.chord-alias-asterisk {
-    margin-left: 2px;
-    font-weight: 800;
-    color: color-mix(in oklab, var(--yellow) 70%, var(--ink));
-}
 
 .chord-link-bubble {
     position: absolute;
