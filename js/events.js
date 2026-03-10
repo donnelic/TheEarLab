@@ -617,6 +617,7 @@ const tutorialState = {
     fitClass: ""
 };
 let tutorialReturnFocusEl = null;
+let suppressChordBubbleTimer = null;
 
 const isChordTutorialOpen = () => Boolean(chordTutorialModal && !chordTutorialModal.hidden);
 const TUTORIAL_FIXED_FIT_CLASS = "tutorial-fit-2";
@@ -1102,7 +1103,30 @@ const closeChordTutorial = () => {
     if (typeof App.settings?.syncModalOpenClass === "function") {
         App.settings.syncModalOpenClass();
     }
-    const fallback = tutorialReturnFocusEl ?? typingHelpToggle ?? chordTutorialOpenOptions;
+    const cameFromChordLink = Boolean(tutorialReturnFocusEl?.classList?.contains("chord-link"));
+    if (cameFromChordLink && typeof document?.body?.classList?.add === "function") {
+        document.body.classList.add("suppress-chord-bubbles");
+        if (suppressChordBubbleTimer) {
+            clearTimeout(suppressChordBubbleTimer);
+        }
+        const clearSuppress = () => {
+            document.body.classList.remove("suppress-chord-bubbles");
+            window.removeEventListener("pointermove", clearSuppress);
+            window.removeEventListener("pointerdown", clearSuppress);
+            window.removeEventListener("keydown", clearSuppress);
+            suppressChordBubbleTimer = null;
+        };
+        suppressChordBubbleTimer = setTimeout(clearSuppress, 400);
+        window.addEventListener("pointermove", clearSuppress, { once: true });
+        window.addEventListener("pointerdown", clearSuppress, { once: true });
+        window.addEventListener("keydown", clearSuppress, { once: true });
+        if (document.activeElement === tutorialReturnFocusEl && typeof document.activeElement.blur === "function") {
+            document.activeElement.blur();
+        }
+    }
+    const fallback = cameFromChordLink
+        ? (typingHelpToggle ?? chordTutorialOpenOptions)
+        : (tutorialReturnFocusEl ?? typingHelpToggle ?? chordTutorialOpenOptions);
     if (fallback && typeof fallback.focus === "function") {
         fallback.focus();
     }

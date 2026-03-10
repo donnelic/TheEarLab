@@ -646,10 +646,14 @@ body:not(.landing) .quick-start {
     border-color: color-mix(in oklab, var(--panel) 90%, white) transparent transparent transparent;
 }
 
-.chord-link:hover .chord-link-bubble,
-.chord-link:focus-visible .chord-link-bubble {
+.chord-link:hover .chord-link-bubble {
     opacity: 1;
     transform: translate(-50%, -6px);
+}
+
+body.suppress-chord-bubbles .chord-link-bubble {
+    opacity: 0 !important;
+    transform: translate(-50%, -2px) !important;
 }
 
 .chord-link:focus-visible {
@@ -3167,9 +3171,9 @@ body.landing .pedal-box {
 
 .note-pill.chord-pill .chord-link-bubble {
     position: absolute;
-    top: -18px;
+    top: -26px;
     left: 50%;
-    transform: translate(-50%, -2px);
+    transform: translate(-50%, -4px);
 }
 
 .note-pill.good {
