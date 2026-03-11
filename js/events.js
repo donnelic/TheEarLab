@@ -1462,10 +1462,9 @@ const blurPointerActivatedControl = () => {
 };
 const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
 const SYSTEM_CURSOR_HIDE_CLASS = "system-cursor-hidden";
-const HELPER_CURSOR_IDLE_MS = 260;
-const HELPER_CURSOR_STILL_MS = 50;
-const HELPER_CURSOR_STILL_PX_PER_MS = 0.03;
-const HELPER_CURSOR_UNBLUR_PX_PER_MS = 0.06;
+const HELPER_CURSOR_UNBLUR_DELAY_MS = 200;
+const HELPER_CURSOR_UNBLUR_DURATION_MS = 240;
+const HELPER_CURSOR_HIDE_MS = Math.round(HELPER_CURSOR_UNBLUR_DELAY_MS + (HELPER_CURSOR_UNBLUR_DURATION_MS * 0.5));
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1478,19 +1477,28 @@ let customCursorPressed = false;
 let customCursorMode = "default";
 let customCursorFrame = null;
 let customCursorMotionFrame = null;
-let helperCursorIdleTimer = null;
+let helperCursorHideTimer = null;
 let helperCursorOver = false;
-let helperCursorLastMoveX = 0;
-let helperCursorLastMoveY = 0;
-let helperCursorLastMoveAt = 0;
-let helperCursorHasMove = false;
+let helperCursorTarget = null;
+let helperIndicatorTarget = null;
 
-const updateHelperCursorMovement = (event) => {
-    if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
-    helperCursorLastMoveX = event.clientX;
-    helperCursorLastMoveY = event.clientY;
-    helperCursorLastMoveAt = performance.now();
-    helperCursorHasMove = true;
+const setHelperIndicatorActive = (helperItem, active) => {
+    if (!helperItem) return;
+    helperItem.style.setProperty("--helper-cursor-opacity", active ? "1" : "0");
+    if (!active) {
+        helperItem.style.removeProperty("--helper-cursor-x");
+        helperItem.style.removeProperty("--helper-cursor-y");
+    }
+};
+
+const updateHelperIndicator = (helperItem, event) => {
+    if (!helperItem || !event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
+    const rect = helperItem.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+    const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top));
+    helperItem.style.setProperty("--helper-cursor-x", `${Math.round(x)}px`);
+    helperItem.style.setProperty("--helper-cursor-y", `${Math.round(y)}px`);
 };
 
 const ensureCustomCursorEl = () => {
@@ -1573,9 +1581,13 @@ const setCustomCursorEnabled = (enabled) => {
     if (customCursorEnabled) {
         document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
         helperCursorOver = false;
-        if (helperCursorIdleTimer) {
-            clearTimeout(helperCursorIdleTimer);
-            helperCursorIdleTimer = null;
+        if (helperCursorHideTimer) {
+            clearTimeout(helperCursorHideTimer);
+            helperCursorHideTimer = null;
+        }
+        if (helperIndicatorTarget) {
+            setHelperIndicatorActive(helperIndicatorTarget, false);
+            helperIndicatorTarget = null;
         }
     }
     if (!customCursorEnabled) {
@@ -1614,20 +1626,20 @@ const updateCustomCursorPosition = (event) => {
     }
 };
 
-const clearHelperCursorIdleTimer = () => {
-    if (!helperCursorIdleTimer) return;
-    clearTimeout(helperCursorIdleTimer);
-    helperCursorIdleTimer = null;
+const clearHelperCursorHideTimer = () => {
+    if (!helperCursorHideTimer) return;
+    clearTimeout(helperCursorHideTimer);
+    helperCursorHideTimer = null;
 };
 
-const scheduleHelperCursorIdleHide = () => {
-    clearHelperCursorIdleTimer();
+const scheduleHelperCursorHide = () => {
+    clearHelperCursorHideTimer();
     if (!helperCursorOver || customCursorEnabled) return;
-    helperCursorIdleTimer = setTimeout(() => {
+    helperCursorHideTimer = setTimeout(() => {
         if (helperCursorOver && !customCursorEnabled) {
             document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
         }
-    }, HELPER_CURSOR_IDLE_MS);
+    }, HELPER_CURSOR_HIDE_MS);
 };
 
 const handleHelperPointerEnter = (event) => {
@@ -1636,26 +1648,16 @@ const handleHelperPointerEnter = (event) => {
     if (!helperItem) return;
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
     helperCursorOver = true;
-    clearHelperCursorIdleTimer();
-    if (!helperCursorHasMove) {
-        updateHelperCursorMovement(event);
-        document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
-        scheduleHelperCursorIdleHide();
-        return;
+    helperCursorTarget = helperItem;
+    clearHelperCursorHideTimer();
+    document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+    if (helperIndicatorTarget && helperIndicatorTarget !== helperItem) {
+        setHelperIndicatorActive(helperIndicatorTarget, false);
     }
-    const now = performance.now();
-    const timeSinceMove = now - helperCursorLastMoveAt;
-    const dx = event.clientX - helperCursorLastMoveX;
-    const dy = event.clientY - helperCursorLastMoveY;
-    const distance = Math.hypot(dx, dy);
-    const speed = timeSinceMove > 0 ? distance / timeSinceMove : Number.POSITIVE_INFINITY;
-    if (speed <= HELPER_CURSOR_UNBLUR_PX_PER_MS
-        && (timeSinceMove >= HELPER_CURSOR_STILL_MS || speed <= HELPER_CURSOR_STILL_PX_PER_MS)) {
-        document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
-    } else {
-        document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
-        scheduleHelperCursorIdleHide();
-    }
+    helperIndicatorTarget = helperItem;
+    setHelperIndicatorActive(helperItem, true);
+    updateHelperIndicator(helperItem, event);
+    scheduleHelperCursorHide();
 };
 
 const handleHelperPointerLeave = (event) => {
@@ -1663,14 +1665,25 @@ const handleHelperPointerLeave = (event) => {
     if (!helperItem) return;
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
     helperCursorOver = false;
-    clearHelperCursorIdleTimer();
+    helperCursorTarget = null;
+    clearHelperCursorHideTimer();
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+    if (helperIndicatorTarget) {
+        setHelperIndicatorActive(helperIndicatorTarget, false);
+        helperIndicatorTarget = null;
+    }
 };
 
-const handleHelperPointerMove = () => {
+const handleHelperPointerMove = (event) => {
     if (customCursorEnabled || !helperCursorOver) return;
-    document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
-    scheduleHelperCursorIdleHide();
+    const helperItem = event?.target?.closest?.(".helper-item");
+    if (!helperItem) return;
+    if (helperIndicatorTarget !== helperItem) {
+        if (helperIndicatorTarget) setHelperIndicatorActive(helperIndicatorTarget, false);
+        helperIndicatorTarget = helperItem;
+        setHelperIndicatorActive(helperItem, true);
+    }
+    updateHelperIndicator(helperItem, event);
 };
 
 const triggerReplayAction = (event) => {
@@ -1941,8 +1954,7 @@ document.addEventListener("click", () => {
 
 const handlePointerUpdate = (event) => {
     if (!customCursorEnabled) {
-        updateHelperCursorMovement(event);
-        handleHelperPointerMove();
+        handleHelperPointerMove(event);
         return;
     }
     const events = typeof event.getCoalescedEvents === "function"

@@ -1729,6 +1729,30 @@ body.modal-open {
     border-radius: 9px;
     cursor: pointer;
     transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    overflow: hidden;
+    --helper-cursor-x: 50%;
+    --helper-cursor-y: 50%;
+    --helper-cursor-opacity: 0;
+}
+
+.helper-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(120px circle at var(--helper-cursor-x) var(--helper-cursor-y),
+            color-mix(in oklab, var(--accent) 35%, transparent) 0%,
+            rgba(255, 255, 255, 0.04) 35%,
+            transparent 70%);
+    opacity: var(--helper-cursor-opacity);
+    transition: opacity 0.18s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.helper-item > * {
+    position: relative;
+    z-index: 1;
 }
 
 .helper-item:hover,
