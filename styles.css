@@ -1359,8 +1359,8 @@ body.modal-open {
     width: calc((100% - (var(--tutorial-progress-gutter) * 2)) * var(--tutorial-progress-fill));
     border-radius: 999px;
     background: linear-gradient(90deg,
-        color-mix(in oklab, var(--tutorial-progress-accent) 85%, white),
-        color-mix(in oklab, var(--tutorial-progress-accent) 55%, var(--ink)));
+            color-mix(in oklab, var(--tutorial-progress-accent) 85%, white),
+            color-mix(in oklab, var(--tutorial-progress-accent) 55%, var(--ink)));
     box-shadow: 0 0 10px color-mix(in oklab, var(--tutorial-progress-accent) 45%, transparent);
     z-index: 0;
     pointer-events: none;
@@ -1399,7 +1399,7 @@ body.modal-open {
     color: var(--ink);
 }
 
-.tutorial-progress-row > button {
+.tutorial-progress-row>button {
     align-self: center;
 }
 
@@ -1683,8 +1683,8 @@ body.modal-open {
     border-radius: 12px;
     padding: 8px 10px;
     background: linear-gradient(145deg,
-        color-mix(in oklab, var(--panel) 86%, transparent),
-        color-mix(in oklab, var(--panel) 68%, var(--input-bg)));
+            color-mix(in oklab, var(--panel) 86%, transparent),
+            color-mix(in oklab, var(--panel) 68%, var(--input-bg)));
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
@@ -1750,7 +1750,7 @@ body.modal-open {
     z-index: 0;
 }
 
-.helper-item > * {
+.helper-item>* {
     position: relative;
     z-index: 1;
 }
@@ -1770,27 +1770,28 @@ body.modal-open {
 
 .helper-item.pinned {
     background: color-mix(in oklab, white 82%, var(--panel));
-    border-color: color-mix(in oklab, var(--accent) 30%, var(--input-border));
+
+    border: 2px solid color-mix(in oklab, var(--accent) 90%, var(--input-border));
     box-shadow:
-        inset 3px 0 0 color-mix(in oklab, var(--accent) 55%, transparent),
+        inset 5px 0 0 color-mix(in oklab, var(--accent) 90%, var(--input-border)),
         0 6px 14px rgba(15, 23, 42, 0.12);
 }
 
 .helper-item.pinned::after {
-    content: "Pinned";
+    content: "";
     position: absolute;
     top: 6px;
     right: 6px;
-    padding: 2px 6px;
-    border-radius: var(--pill-radius);
-    background: var(--badge-bg);
-    color: var(--badge-text);
-    font-weight: 700;
-    font-size: 0.42rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.18);
-    opacity: 0.92;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 30%,
+        color-mix(in oklab, var(--accent) 70%, white),
+        color-mix(in oklab, var(--accent) 90%, var(--panel)));
+    box-shadow:
+        0 0 0 1px color-mix(in oklab, var(--accent) 45%, var(--input-border)),
+        0 3px 6px rgba(15, 23, 42, 0.2);
+    opacity: 0.88;
     pointer-events: none;
     z-index: 2;
 }
