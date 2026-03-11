@@ -1790,8 +1790,15 @@ body.modal-open {
 }
 
 .helper-item.latched {
-    background: color-mix(in oklab, var(--panel) 72%, var(--input-bg));
-    border-color: color-mix(in oklab, var(--accent) 30%, var(--input-border));
+    background: color-mix(in oklab, var(--accent) 8%, var(--panel));
+    border-color: color-mix(in oklab, var(--accent) 55%, var(--input-border));
+    box-shadow:
+        inset 3px 0 0 color-mix(in oklab, var(--accent) 65%, transparent),
+        0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+.helper-item.latched .helper-label {
+    color: color-mix(in oklab, var(--accent) 60%, var(--muted));
 }
 
 @media (hover: hover) and (pointer: fine) {

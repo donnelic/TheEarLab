@@ -1487,7 +1487,6 @@ const helperIndicatorState = {
     observer: null
 };
 let helperZoneActive = false;
-let helperIndicatorZoneActive = false;
 
 const markHelperIndicatorDirty = () => {
     helperIndicatorState.dirty = true;
@@ -1603,7 +1602,6 @@ const handleHelperIndicatorProximity = (event) => {
     if (!cache) {
         if (helperIndicatorState.active) setHelperIndicatorActive(false);
         helperZoneActive = false;
-        helperIndicatorZoneActive = false;
         if (customCursorEnabled) {
             const nextMode = getCustomCursorMode(event.target);
             if (nextMode !== customCursorMode) {
@@ -1618,7 +1616,6 @@ const handleHelperIndicatorProximity = (event) => {
     const insideIndicatorRect = isPointerInsideRect(event, cache.expandedRect);
     const insideCursorRect = isPointerInsideRect(event, cache.cursorHoldRect);
     helperZoneActive = insideCursorRect;
-    helperIndicatorZoneActive = insideIndicatorRect;
     if (customCursorEnabled) {
         if (helperIndicatorState.active) setHelperIndicatorActive(false);
         return;
@@ -2044,6 +2041,11 @@ const handlePointerUpdate = (event) => {
     updateCustomCursorPosition(latest);
     if (event.type !== "pointerrawupdate") {
         handleHelperIndicatorProximity(latest);
+        const nextMode = getCustomCursorMode(latest.target);
+        if (nextMode !== customCursorMode) {
+            customCursorMode = nextMode;
+            scheduleCustomCursorRender();
+        }
     }
 };
 
