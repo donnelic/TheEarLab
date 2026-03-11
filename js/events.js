@@ -1463,6 +1463,7 @@ const blurPointerActivatedControl = () => {
 };
 const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
 const SYSTEM_CURSOR_HIDE_CLASS = "system-cursor-hidden";
+const HELPER_INDICATOR_RADIUS = 60;
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1485,6 +1486,7 @@ const helperIndicatorState = {
     active: false,
     observer: null
 };
+let helperZoneActive = false;
 
 const markHelperIndicatorDirty = () => {
     helperIndicatorState.dirty = true;
@@ -1538,13 +1540,24 @@ const getHelperIndicatorCache = () => {
     const gapValue = Number.parseFloat(listStyle.columnGap || listStyle.gap || listStyle.rowGap || 0);
     const gapMargin = Number.isFinite(gapValue) ? gapValue : 0;
     const rects = items.map((item) => item.getBoundingClientRect());
-    const boundsRect = {
+    const expandedRect = {
+        left: listRect.left - HELPER_INDICATOR_RADIUS,
+        right: listRect.right + HELPER_INDICATOR_RADIUS,
+        top: listRect.top - HELPER_INDICATOR_RADIUS,
+        bottom: listRect.bottom + HELPER_INDICATOR_RADIUS
+    };
+    const cursorHoldRect = {
         left: listRect.left - gapMargin,
         right: listRect.right + gapMargin,
         top: listRect.top - gapMargin,
         bottom: listRect.bottom + gapMargin
     };
-    helperIndicatorState.cache = { items, rects, boundsRect };
+    helperIndicatorState.cache = {
+        items,
+        rects,
+        expandedRect,
+        cursorHoldRect
+    };
     helperIndicatorState.dirty = false;
     return helperIndicatorState.cache;
 };
@@ -1588,20 +1601,35 @@ const handleHelperIndicatorProximity = (event) => {
     const cache = getHelperIndicatorCache();
     if (!cache) {
         if (helperIndicatorState.active) setHelperIndicatorActive(false);
-        return;
-    }
-    const inside = isPointerInsideRect(event, cache.boundsRect);
-    if (inside) {
-        if (!helperIndicatorState.active) setHelperIndicatorActive(true, cache.items);
-        scheduleHelperIndicatorUpdate(cache, event);
-        if (!customCursorEnabled) {
-            document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
+        helperZoneActive = false;
+        if (customCursorEnabled) {
+            const nextMode = getCustomCursorMode(event.target);
+            if (nextMode !== customCursorMode) {
+                customCursorMode = nextMode;
+                scheduleCustomCursorRender();
+            }
+        } else {
+            document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
         }
         return;
     }
-    if (helperIndicatorState.active) setHelperIndicatorActive(false, cache.items);
+    const insideIndicatorRect = isPointerInsideRect(event, cache.expandedRect);
+    const insideCursorRect = isPointerInsideRect(event, cache.cursorHoldRect);
+    helperZoneActive = insideIndicatorRect;
+    if (insideIndicatorRect) {
+        if (!helperIndicatorState.active) setHelperIndicatorActive(true, cache.items);
+        scheduleHelperIndicatorUpdate(cache, event);
+    } else if (helperIndicatorState.active) {
+        setHelperIndicatorActive(false, cache.items);
+    }
     if (!customCursorEnabled) {
-        document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+        document.body.classList.toggle(SYSTEM_CURSOR_HIDE_CLASS, insideCursorRect);
+    } else {
+        const nextMode = getCustomCursorMode(event.target);
+        if (nextMode !== customCursorMode) {
+            customCursorMode = nextMode;
+            scheduleCustomCursorRender();
+        }
     }
 };
 
@@ -1624,12 +1652,10 @@ const ensureCustomCursorEl = () => {
     return cursor;
 };
 const getCustomCursorMode = (target) => {
+    if (helperZoneActive) return "helper";
     if (!(target instanceof Element)) return "default";
     if (target.closest("input[type=\"text\"], input[type=\"search\"], input[type=\"email\"], input[type=\"password\"], textarea, [contenteditable=\"true\"]")) {
         return "text";
-    }
-    if (target.closest(".helper-item")) {
-        return "helper";
     }
     if (target.closest("button, [role=\"button\"], a[href], input, select, label.switch, .key, .piano-option, .sf2-row, .profile-row, .tutorial-chip, [tabindex]:not([tabindex=\"-1\"])")) {
         return "interactive";
