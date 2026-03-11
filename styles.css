@@ -673,8 +673,8 @@ body.suppress-chord-bubbles .chord-link-bubble {
 .typing-zone {
     background:
         linear-gradient(160deg, color-mix(in oklab, var(--panel) 92%, white), color-mix(in oklab, var(--card) 88%, transparent));
-    border: 1px solid color-mix(in oklab, var(--control-border) 70%, var(--accent));
-    border-left: 4px solid var(--accent);
+    border: 1px solid color-mix(in oklab, var(--control-border) 30%, var(--accent));
+    border-left-width: 4px;
     border-radius: var(--surface-radius);
     padding: var(--surface-pad-y) calc(var(--surface-pad-x) - 2px) 11px;
     display: grid;
@@ -1769,30 +1769,52 @@ body.modal-open {
 }
 
 .helper-item.pinned {
-    background: linear-gradient(145deg,
-        color-mix(in oklab, var(--accent) 32%, var(--panel)),
-        color-mix(in oklab, var(--accent) 14%, var(--panel)));
-    border-color: color-mix(in oklab, var(--accent) 50%, var(--input-border));
-    box-shadow:
-        inset 3px 0 0 color-mix(in oklab, var(--accent) 55%, transparent),
-        0 6px 14px rgba(15, 23, 42, 0.12);
+    background: color-mix(in oklab, var(--panel) 82%, var(--input-bg));
+    border-color: color-mix(in oklab, var(--input-border) 70%, transparent);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.1);
 }
 
-.helper-item.pinned .helper-label {
-    color: color-mix(in oklab, var(--accent) 65%, var(--muted));
+.helper-item.pinned::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--accent) 70%, white);
+    box-shadow:
+        0 0 0 1px color-mix(in oklab, var(--accent) 45%, var(--input-border)),
+        0 2px 4px rgba(15, 23, 42, 0.18);
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 2;
 }
 
 
 .helper-item.latched {
     background: color-mix(in oklab, white 82%, var(--panel));
-    border-color: color-mix(in oklab, var(--accent) 50%, var(--input-border));
-    box-shadow:
-        inset 3px 0 0 color-mix(in oklab, var(--accent) 55%, transparent),
-        0 4px 12px rgba(15, 23, 42, 0.1);
+    border-color: color-mix(in oklab, var(--input-border) 70%, transparent);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
 }
 
 .helper-item.latched .helper-label {
     color: color-mix(in oklab, var(--accent) 60%, var(--muted));
+}
+
+.helper-item.latched::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--input-border));
+    background: transparent;
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 2;
 }
 
 @media (hover: hover) and (pointer: fine) {
