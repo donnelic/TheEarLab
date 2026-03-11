@@ -1482,12 +1482,14 @@ let helperCursorOver = false;
 let helperCursorLastMoveX = 0;
 let helperCursorLastMoveY = 0;
 let helperCursorLastMoveAt = 0;
+let helperCursorHasMove = false;
 
 const updateHelperCursorMovement = (event) => {
     if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
     helperCursorLastMoveX = event.clientX;
     helperCursorLastMoveY = event.clientY;
     helperCursorLastMoveAt = performance.now();
+    helperCursorHasMove = true;
 };
 
 const ensureCustomCursorEl = () => {
@@ -1634,6 +1636,12 @@ const handleHelperPointerEnter = (event) => {
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
     helperCursorOver = true;
     clearHelperCursorIdleTimer();
+    if (!helperCursorHasMove) {
+        updateHelperCursorMovement(event);
+        document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+        scheduleHelperCursorIdleHide();
+        return;
+    }
     const now = performance.now();
     const timeSinceMove = now - helperCursorLastMoveAt;
     const dx = event.clientX - helperCursorLastMoveX;
