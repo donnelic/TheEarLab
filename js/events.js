@@ -1463,10 +1463,6 @@ const blurPointerActivatedControl = () => {
 };
 const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
 const SYSTEM_CURSOR_HIDE_CLASS = "system-cursor-hidden";
-const HELPER_CURSOR_UNBLUR_DELAY_MS = 200;
-const HELPER_CURSOR_UNBLUR_DURATION_MS = 240;
-const HELPER_CURSOR_HIDE_MS = Math.round(HELPER_CURSOR_UNBLUR_DELAY_MS + (HELPER_CURSOR_UNBLUR_DURATION_MS * 0.5));
-const HELPER_INDICATOR_RADIUS = 60;
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1479,8 +1475,6 @@ let customCursorPressed = false;
 let customCursorMode = "default";
 let customCursorFrame = null;
 let customCursorMotionFrame = null;
-let helperCursorHideTimer = null;
-let helperCursorOver = false;
 const helperIndicatorState = {
     items: [],
     cache: null,
@@ -1544,19 +1538,13 @@ const getHelperIndicatorCache = () => {
     const gapValue = Number.parseFloat(listStyle.columnGap || listStyle.gap || listStyle.rowGap || 0);
     const gapMargin = Number.isFinite(gapValue) ? gapValue : 0;
     const rects = items.map((item) => item.getBoundingClientRect());
-    const expandedRect = {
-        left: listRect.left - HELPER_INDICATOR_RADIUS,
-        right: listRect.right + HELPER_INDICATOR_RADIUS,
-        top: listRect.top - HELPER_INDICATOR_RADIUS,
-        bottom: listRect.bottom + HELPER_INDICATOR_RADIUS
-    };
-    const cursorHoldRect = {
+    const boundsRect = {
         left: listRect.left - gapMargin,
         right: listRect.right + gapMargin,
         top: listRect.top - gapMargin,
         bottom: listRect.bottom + gapMargin
     };
-    helperIndicatorState.cache = { items, rects, expandedRect, cursorHoldRect };
+    helperIndicatorState.cache = { items, rects, boundsRect };
     helperIndicatorState.dirty = false;
     return helperIndicatorState.cache;
 };
@@ -1596,24 +1584,23 @@ const isPointerInsideRect = (event, rect) => {
 };
 
 const handleHelperIndicatorProximity = (event) => {
-    if (customCursorEnabled) return;
     if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
     const cache = getHelperIndicatorCache();
     if (!cache) {
         if (helperIndicatorState.active) setHelperIndicatorActive(false);
         return;
     }
-    const inside = isPointerInsideRect(event, cache.expandedRect);
+    const inside = isPointerInsideRect(event, cache.boundsRect);
     if (inside) {
         if (!helperIndicatorState.active) setHelperIndicatorActive(true, cache.items);
         scheduleHelperIndicatorUpdate(cache, event);
+        if (!customCursorEnabled) {
+            document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
+        }
         return;
     }
-    if (helperIndicatorState.active) {
-        setHelperIndicatorActive(false, cache.items);
-    }
-    if (!helperCursorOver && document.body.classList.contains(SYSTEM_CURSOR_HIDE_CLASS)
-        && !isPointerInsideRect(event, cache.cursorHoldRect)) {
+    if (helperIndicatorState.active) setHelperIndicatorActive(false, cache.items);
+    if (!customCursorEnabled) {
         document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
     }
 };
@@ -1697,11 +1684,6 @@ const setCustomCursorEnabled = (enabled) => {
     document.body.classList.toggle("custom-cursor-enabled", customCursorEnabled);
     if (customCursorEnabled) {
         document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
-        helperCursorOver = false;
-        if (helperCursorHideTimer) {
-            clearTimeout(helperCursorHideTimer);
-            helperCursorHideTimer = null;
-        }
         if (helperIndicatorState.active) {
             setHelperIndicatorActive(false);
         }
@@ -1742,45 +1724,17 @@ const updateCustomCursorPosition = (event) => {
     }
 };
 
-const clearHelperCursorHideTimer = () => {
-    if (!helperCursorHideTimer) return;
-    clearTimeout(helperCursorHideTimer);
-    helperCursorHideTimer = null;
-};
-
-const scheduleHelperCursorHide = () => {
-    clearHelperCursorHideTimer();
-    if (!helperCursorOver || customCursorEnabled) return;
-    helperCursorHideTimer = setTimeout(() => {
-        if (helperCursorOver && !customCursorEnabled) {
-            document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
-        }
-    }, HELPER_CURSOR_HIDE_MS);
-};
-
 const handleHelperPointerEnter = (event) => {
-    if (customCursorEnabled) return;
     const helperItem = event.target?.closest?.(".helper-item");
     if (!helperItem) return;
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
-    helperCursorOver = true;
-    clearHelperCursorHideTimer();
-    document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
     handleHelperIndicatorProximity(event);
-    scheduleHelperCursorHide();
 };
 
 const handleHelperPointerLeave = (event) => {
     const helperItem = event.target?.closest?.(".helper-item");
     if (!helperItem) return;
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
-    helperCursorOver = false;
-    clearHelperCursorHideTimer();
-    const cache = getHelperIndicatorCache();
-    if (cache && isPointerInsideRect(event, cache.cursorHoldRect)) {
-        return;
-    }
-    document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
     handleHelperIndicatorProximity(event);
 };
 
@@ -2061,6 +2015,9 @@ const handlePointerUpdate = (event) => {
         : null;
     const latest = events && events.length ? events[events.length - 1] : event;
     updateCustomCursorPosition(latest);
+    if (event.type !== "pointerrawupdate") {
+        handleHelperIndicatorProximity(latest);
+    }
 };
 
 if ("onpointerrawupdate" in window) {
