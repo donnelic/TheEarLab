@@ -1459,10 +1459,14 @@ let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
 let customCursorY = -100;
+let customCursorRenderX = -100;
+let customCursorRenderY = -100;
+let customCursorSmoothing = 0.35;
 let customCursorVisible = false;
 let customCursorPressed = false;
 let customCursorMode = "default";
 let customCursorFrame = null;
+let customCursorMotionFrame = null;
 const applyCursorSimpleMode = (cursorEl, enabled = customCursorSimpleMode) => {
     if (!cursorEl) return;
     cursorEl.classList.toggle("simple", Boolean(enabled));
@@ -1520,6 +1524,31 @@ const scheduleCustomCursorRender = () => {
     if (customCursorFrame !== null) return;
     customCursorFrame = requestAnimationFrame(renderCustomCursor);
 };
+
+const scheduleCursorMotion = () => {
+    if (customCursorMotionFrame !== null) return;
+    customCursorMotionFrame = requestAnimationFrame(stepCursorMotion);
+};
+
+const stepCursorMotion = () => {
+    customCursorMotionFrame = null;
+    if (!customCursorEnabled) return;
+    const cursor = ensureCustomCursorEl();
+    const dx = customCursorX - customCursorRenderX;
+    const dy = customCursorY - customCursorRenderY;
+    const ease = Math.min(Math.max(customCursorSmoothing, 0.08), 1);
+    if (ease >= 0.98) {
+        customCursorRenderX = customCursorX;
+        customCursorRenderY = customCursorY;
+    } else {
+        customCursorRenderX += dx * ease;
+        customCursorRenderY += dy * ease;
+    }
+    cursor.style.transform = `translate3d(${customCursorRenderX}px, ${customCursorRenderY}px, 0)`;
+    if (Math.abs(dx) > 0.2 || Math.abs(dy) > 0.2) {
+        scheduleCursorMotion();
+    }
+};
 const setCustomCursorEnabled = (enabled) => {
     customCursorEnabled = Boolean(enabled);
     document.body.classList.toggle("custom-cursor-enabled", customCursorEnabled);
@@ -1527,6 +1556,7 @@ const setCustomCursorEnabled = (enabled) => {
     if (!customCursorEnabled) {
         customCursorVisible = false;
         customCursorPressed = false;
+        customCursorMotionFrame = null;
         if (customCursorEl) {
             customCursorEl.classList.remove("visible", "is-interactive", "is-text", "is-pressed");
         }
@@ -1542,22 +1572,40 @@ const setCursorSimpleMode = (enabled) => {
     logCursorDebug("simple mode =", customCursorSimpleMode);
     return customCursorSimpleMode ? "simple" : "advanced";
 };
+
+const setCursorSmoothing = (value) => {
+    const next = Number.parseFloat(value);
+    if (!Number.isFinite(next)) return customCursorSmoothing;
+    customCursorSmoothing = Math.min(Math.max(next, 0.08), 1);
+    logCursorDebug("smoothing =", customCursorSmoothing);
+    return customCursorSmoothing;
+};
 const updateCustomCursorPosition = (event) => {
     if (!customCursorEnabled) return;
     customCursorX = event.clientX;
     customCursorY = event.clientY;
-    customCursorVisible = true;
-    customCursorMode = getCustomCursorMode(event.target);
     const cursor = ensureCustomCursorEl();
-    cursor.style.transform = `translate3d(${customCursorX}px, ${customCursorY}px, 0)`;
-    if (!cursor.classList.contains("visible")) {
+    if (customCursorSmoothing >= 0.98) {
+        customCursorRenderX = customCursorX;
+        customCursorRenderY = customCursorY;
+        cursor.style.transform = `translate3d(${customCursorRenderX}px, ${customCursorRenderY}px, 0)`;
+    } else {
+        if (!customCursorVisible) {
+            customCursorRenderX = customCursorX;
+            customCursorRenderY = customCursorY;
+            cursor.style.transform = `translate3d(${customCursorRenderX}px, ${customCursorRenderY}px, 0)`;
+        }
+        scheduleCursorMotion();
+    }
+    if (!customCursorVisible) {
+        customCursorVisible = true;
         cursor.classList.add("visible");
+        scheduleCustomCursorRender();
     }
     if (cursorDebugFirstMove) {
         cursorDebugFirstMove = false;
         logCursorDebug("first move", { x: customCursorX, y: customCursorY, mode: customCursorMode });
     }
-    scheduleCustomCursorRender();
 };
 
 const triggerReplayAction = (event) => {
@@ -1901,7 +1949,9 @@ Object.assign(App.debug, {
     enableSimpleCursor: () => setCursorSimpleMode(true),
     enableAdvancedCursor: () => setCursorSimpleMode(false),
     toggleCursorMode: () => setCursorSimpleMode(!customCursorSimpleMode),
-    getCursorMode: () => (customCursorSimpleMode ? "simple" : "advanced")
+    getCursorMode: () => (customCursorSimpleMode ? "simple" : "advanced"),
+    setCursorSmoothing,
+    getCursorSmoothing: () => customCursorSmoothing
 });
 
 keyboardEl.addEventListener("click", (event) => {
