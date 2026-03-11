@@ -350,7 +350,7 @@ window.addEventListener("resize", () => {
         fitTutorialLayout({ recompute: false });
         fitTutorialProgressTabs();
     }
-    refreshHelperIndicatorItems();
+    markHelperIndicatorDirty();
 });
 
 playSelectedButton.addEventListener("click", () => {
@@ -1483,6 +1483,17 @@ let helperCursorHideTimer = null;
 let helperCursorOver = false;
 let helperIndicatorActive = false;
 let helperIndicatorItems = [];
+let helperIndicatorCache = null;
+let helperIndicatorDirty = true;
+let helperIndicatorFrame = null;
+let helperIndicatorLastX = null;
+let helperIndicatorLastY = null;
+let helperIndicatorObserver = null;
+
+const markHelperIndicatorDirty = () => {
+    helperIndicatorDirty = true;
+    helperIndicatorCache = null;
+};
 
 const refreshHelperIndicatorItems = () => {
     if (!helperSlotEl) {
@@ -1490,6 +1501,7 @@ const refreshHelperIndicatorItems = () => {
         return helperIndicatorItems;
     }
     helperIndicatorItems = Array.from(helperSlotEl.querySelectorAll(".helper-item"));
+    markHelperIndicatorDirty();
     return helperIndicatorItems;
 };
 
@@ -1500,50 +1512,79 @@ const setHelperIndicatorsOpacity = (items, opacity) => {
     helperIndicatorActive = opacity !== "0";
 };
 
-const updateHelperIndicatorPositions = (items, event) => {
-    if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
-    items.forEach((item) => {
-        const rect = item.getBoundingClientRect();
-        if (!rect.width || !rect.height) return;
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        item.style.setProperty("--helper-cursor-x", `${Math.round(x)}px`);
-        item.style.setProperty("--helper-cursor-y", `${Math.round(y)}px`);
+const ensureHelperIndicatorObserver = () => {
+    if (helperIndicatorObserver || !helperSlotEl) return;
+    helperIndicatorObserver = new MutationObserver(() => {
+        markHelperIndicatorDirty();
     });
+    helperIndicatorObserver.observe(helperSlotEl, { childList: true, subtree: true });
 };
 
-const getHelperListRect = () => {
-    if (!helperSlotEl) return null;
-    const list = helperSlotEl.querySelector(".helper-list");
-    if (!list) return null;
-    const rect = list.getBoundingClientRect();
-    if (!rect.width || !rect.height) return null;
-    return rect;
-};
-
-const handleHelperIndicatorProximity = (event) => {
-    if (customCursorEnabled) return;
-    if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
-    const listRect = getHelperListRect();
-    if (!listRect) {
-        if (helperIndicatorActive) setHelperIndicatorsOpacity(helperIndicatorItems, "0");
-        return;
+const getHelperIndicatorCache = () => {
+    ensureHelperIndicatorObserver();
+    const items = helperIndicatorItems.length ? helperIndicatorItems : refreshHelperIndicatorItems();
+    if (!items.length) return null;
+    if (!helperIndicatorDirty && helperIndicatorCache && items.every((item) => item?.isConnected)) {
+        return helperIndicatorCache;
     }
+    const list = helperSlotEl?.querySelector(".helper-list");
+    if (!list) return null;
+    const listRect = list.getBoundingClientRect();
+    if (!listRect.width || !listRect.height) return null;
+    const rects = items.map((item) => item.getBoundingClientRect());
     const expandedRect = {
         left: listRect.left - HELPER_INDICATOR_RADIUS,
         right: listRect.right + HELPER_INDICATOR_RADIUS,
         top: listRect.top - HELPER_INDICATOR_RADIUS,
         bottom: listRect.bottom + HELPER_INDICATOR_RADIUS
     };
+    helperIndicatorCache = { items, rects, expandedRect };
+    helperIndicatorDirty = false;
+    return helperIndicatorCache;
+};
+
+const updateHelperIndicatorPositions = (cache, x, y) => {
+    if (!cache) return;
+    cache.items.forEach((item, index) => {
+        const rect = cache.rects[index];
+        if (!rect || !rect.width || !rect.height) return;
+        const localX = x - rect.left;
+        const localY = y - rect.top;
+        item.style.setProperty("--helper-cursor-x", `${Math.round(localX)}px`);
+        item.style.setProperty("--helper-cursor-y", `${Math.round(localY)}px`);
+    });
+};
+
+const scheduleHelperIndicatorUpdate = (cache, event) => {
+    helperIndicatorLastX = event.clientX;
+    helperIndicatorLastY = event.clientY;
+    if (helperIndicatorFrame !== null) return;
+    helperIndicatorFrame = requestAnimationFrame(() => {
+        helperIndicatorFrame = null;
+        if (!helperIndicatorActive) return;
+        const latestCache = getHelperIndicatorCache() || cache;
+        if (!latestCache) return;
+        if (helperIndicatorLastX === null || helperIndicatorLastY === null) return;
+        updateHelperIndicatorPositions(latestCache, helperIndicatorLastX, helperIndicatorLastY);
+    });
+};
+
+const handleHelperIndicatorProximity = (event) => {
+    if (customCursorEnabled) return;
+    if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
+    const cache = getHelperIndicatorCache();
+    if (!cache) {
+        if (helperIndicatorActive) setHelperIndicatorsOpacity(helperIndicatorItems, "0");
+        return;
+    }
+    const expandedRect = cache.expandedRect;
     const inside = event.clientX >= expandedRect.left
         && event.clientX <= expandedRect.right
         && event.clientY >= expandedRect.top
         && event.clientY <= expandedRect.bottom;
     if (inside) {
-        const items = helperIndicatorItems.length ? helperIndicatorItems : refreshHelperIndicatorItems();
-        if (items.length === 0) return;
-        if (!helperIndicatorActive) setHelperIndicatorsOpacity(items, "1");
-        updateHelperIndicatorPositions(items, event);
+        if (!helperIndicatorActive) setHelperIndicatorsOpacity(cache.items, "1");
+        scheduleHelperIndicatorUpdate(cache, event);
         return;
     }
     if (helperIndicatorActive) {
@@ -1981,6 +2022,7 @@ document.addEventListener("click", () => {
 
 const handlePointerUpdate = (event) => {
     if (!customCursorEnabled) {
+        if (event.type === "pointerrawupdate") return;
         handleHelperIndicatorProximity(event);
         return;
     }
