@@ -1263,16 +1263,6 @@ const shouldBlurAfterUnpin = (event) => {
     return ["click", "contextmenu"].includes(event.type);
 };
 
-const isHelperHoveredForEvent = (helperItem, event) => {
-    if (!helperItem || !event) return helperItem?.matches?.(":hover");
-    if (event.type === "keydown") return false;
-    if (typeof event.clientX === "number" && typeof event.clientY === "number") {
-        const target = document.elementFromPoint(event.clientX, event.clientY);
-        return Boolean(target && helperItem.contains(target));
-    }
-    return helperItem.matches(":hover");
-};
-
 const toggleRootHintFromHelper = () => {
     const nextValue = !state.chordRootHint;
     patchSettingsState({
@@ -1286,6 +1276,7 @@ const toggleRootHintFromHelper = () => {
         App.game.setRootHelperPinned();
     }
     applySettingMutationEffects("chordRootHint", {
+        refreshStatus: false,
         restartOverride: false
     });
     return true;
@@ -1308,7 +1299,6 @@ const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {
         const shouldBlur = flags
             && !flags.pinned
             && shouldBlurAfterUnpin(event)
-            && !isHelperHoveredForEvent(helperItem, event)
             && document.activeElement === helperItem;
         if (shouldBlur) {
             helperItem.blur();
