@@ -1487,8 +1487,7 @@ const getCustomCursorMode = (target) => {
     }
     return "default";
 };
-const syncCustomCursorState = (target = document.elementFromPoint(customCursorX, customCursorY)) => {
-    customCursorMode = getCustomCursorMode(target);
+const syncCustomCursorState = () => {
     if (!customCursorEnabled || !customCursorEl) return;
     customCursorEl.classList.toggle("is-interactive", customCursorMode === "interactive");
     customCursorEl.classList.toggle("is-text", customCursorMode === "text");
@@ -1499,8 +1498,6 @@ const renderCustomCursor = () => {
     customCursorFrame = null;
     if (!customCursorEnabled) return;
     const cursor = ensureCustomCursorEl();
-    cursor.style.setProperty("--cursor-x", `${customCursorX}px`);
-    cursor.style.setProperty("--cursor-y", `${customCursorY}px`);
     cursor.classList.toggle("visible", customCursorVisible);
     syncCustomCursorState();
 };
@@ -1528,6 +1525,11 @@ const updateCustomCursorPosition = (event) => {
     customCursorY = event.clientY;
     customCursorVisible = true;
     customCursorMode = getCustomCursorMode(event.target);
+    const cursor = ensureCustomCursorEl();
+    cursor.style.transform = `translate3d(${customCursorX}px, ${customCursorY}px, 0)`;
+    if (!cursor.classList.contains("visible")) {
+        cursor.classList.add("visible");
+    }
     scheduleCustomCursorRender();
 };
 
@@ -1797,9 +1799,20 @@ document.addEventListener("click", () => {
     requestAnimationFrame(blurPointerActivatedControl);
 }, true);
 
-document.addEventListener("pointermove", (event) => {
-    updateCustomCursorPosition(event);
-}, { passive: true, capture: true });
+const handlePointerUpdate = (event) => {
+    if (!customCursorEnabled) return;
+    const events = typeof event.getCoalescedEvents === "function"
+        ? event.getCoalescedEvents()
+        : null;
+    const latest = events && events.length ? events[events.length - 1] : event;
+    updateCustomCursorPosition(latest);
+};
+
+if ("onpointerrawupdate" in window) {
+    document.addEventListener("pointerrawupdate", handlePointerUpdate, { passive: true, capture: true });
+} else {
+    document.addEventListener("pointermove", handlePointerUpdate, { passive: true, capture: true });
+}
 
 document.addEventListener("pointerup", (event) => {
     customCursorPressed = false;
