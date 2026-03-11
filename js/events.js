@@ -1531,6 +1531,9 @@ const getHelperIndicatorCache = () => {
     if (!list) return null;
     const listRect = list.getBoundingClientRect();
     if (!listRect.width || !listRect.height) return null;
+    const listStyle = window.getComputedStyle(list);
+    const gapValue = Number.parseFloat(listStyle.columnGap || listStyle.gap || listStyle.rowGap || 0);
+    const gapMargin = Number.isFinite(gapValue) ? gapValue : 0;
     const rects = items.map((item) => item.getBoundingClientRect());
     const expandedRect = {
         left: listRect.left - HELPER_INDICATOR_RADIUS,
@@ -1538,7 +1541,18 @@ const getHelperIndicatorCache = () => {
         top: listRect.top - HELPER_INDICATOR_RADIUS,
         bottom: listRect.bottom + HELPER_INDICATOR_RADIUS
     };
-    helperIndicatorCache = { items, rects, expandedRect };
+    const cursorHoldRect = {
+        left: listRect.left - gapMargin,
+        right: listRect.right + gapMargin,
+        top: listRect.top - gapMargin,
+        bottom: listRect.bottom + gapMargin
+    };
+    helperIndicatorCache = {
+        items,
+        rects,
+        expandedRect,
+        cursorHoldRect
+    };
     helperIndicatorDirty = false;
     return helperIndicatorCache;
 };
@@ -1569,6 +1583,14 @@ const scheduleHelperIndicatorUpdate = (cache, event) => {
     });
 };
 
+const isPointerInsideRect = (event, rect) => {
+    if (!rect || !event) return false;
+    return event.clientX >= rect.left
+        && event.clientX <= rect.right
+        && event.clientY >= rect.top
+        && event.clientY <= rect.bottom;
+};
+
 const handleHelperIndicatorProximity = (event) => {
     if (customCursorEnabled) return;
     if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
@@ -1577,11 +1599,7 @@ const handleHelperIndicatorProximity = (event) => {
         if (helperIndicatorActive) setHelperIndicatorsOpacity(helperIndicatorItems, "0");
         return;
     }
-    const expandedRect = cache.expandedRect;
-    const inside = event.clientX >= expandedRect.left
-        && event.clientX <= expandedRect.right
-        && event.clientY >= expandedRect.top
-        && event.clientY <= expandedRect.bottom;
+    const inside = isPointerInsideRect(event, cache.expandedRect);
     if (inside) {
         if (!helperIndicatorActive) setHelperIndicatorsOpacity(cache.items, "1");
         scheduleHelperIndicatorUpdate(cache, event);
@@ -1589,6 +1607,10 @@ const handleHelperIndicatorProximity = (event) => {
     }
     if (helperIndicatorActive) {
         setHelperIndicatorsOpacity(helperIndicatorItems, "0");
+    }
+    if (!helperCursorOver && document.body.classList.contains(SYSTEM_CURSOR_HIDE_CLASS)
+        && !isPointerInsideRect(event, cache.cursorHoldRect)) {
+        document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
     }
 };
 
@@ -1750,6 +1772,10 @@ const handleHelperPointerLeave = (event) => {
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
     helperCursorOver = false;
     clearHelperCursorHideTimer();
+    const cache = getHelperIndicatorCache();
+    if (cache && isPointerInsideRect(event, cache.cursorHoldRect)) {
+        return;
+    }
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
     handleHelperIndicatorProximity(event);
 };
