@@ -1043,6 +1043,9 @@ const setPracticeMode = (mode, options = {}) => {
     if (chordRootHintToggle) {
         chordRootHintToggle.checked = state.chordRootHint;
     }
+    if (customCursorToggle) {
+        customCursorToggle.checked = state.customCursorEnabled !== false;
+    }
     if (typingShowPianoToggle) {
         typingShowPianoToggle.checked = state.typingShowPiano;
     }
@@ -1111,6 +1114,9 @@ const applyUiFromState = () => {
     }
     if (chordRootHintToggle) {
         chordRootHintToggle.checked = state.chordRootHint;
+    }
+    if (customCursorToggle) {
+        customCursorToggle.checked = state.customCursorEnabled !== false;
     }
     if (typingShowPianoToggle) {
         typingShowPianoToggle.checked = state.typingShowPiano;

@@ -1778,6 +1778,11 @@ body.modal-open {
     }
 }
 
+body.system-cursor-hidden,
+body.system-cursor-hidden * {
+    cursor: none !important;
+}
+
 .app-cursor {
     position: fixed;
     left: 0;
@@ -1821,23 +1826,6 @@ body.modal-open {
     width: 4px;
     height: 4px;
     background: rgba(15, 23, 42, 0.82);
-}
-
-.app-cursor.simple .app-cursor-ring {
-    width: 20px;
-    height: 20px;
-    border-width: 2px;
-    border-color: color-mix(in oklab, var(--ink) 85%, white);
-    background: color-mix(in oklab, var(--card) 85%, white);
-    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
-    opacity: 0.95;
-}
-
-.app-cursor.simple .app-cursor-dot {
-    width: 6px;
-    height: 6px;
-    background: color-mix(in oklab, var(--ink) 90%, black);
-    opacity: 0.9;
 }
 
 .app-cursor.is-interactive .app-cursor-ring {

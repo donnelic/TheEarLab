@@ -21,7 +21,8 @@ const ROUND_RESTART_POLICY_BY_SETTING = Object.freeze({
     playbackOrder: () => state.active,
     trainingMode: () => state.active && getEventsChordRound(),
     chordDifficulty: () => state.active && getEventsChordRound(),
-    chordRootHint: () => false
+    chordRootHint: () => false,
+    customCursorEnabled: () => false
 });
 
 const shouldRestartRoundForSetting = (settingKey) => {
@@ -206,6 +207,18 @@ if (chordRootHintToggle) {
         applySettingMutationEffects("chordRootHint", {
             restartOverride: false
         });
+    });
+}
+
+if (customCursorToggle) {
+    customCursorToggle.addEventListener("change", (event) => {
+        patchSettingsState({ customCursorEnabled: Boolean(event.target.checked) }, "events/custom-cursor");
+        applySettingMutationEffects("customCursorEnabled", {
+            refreshStatus: false,
+            refreshKeys: false,
+            restartOverride: false
+        });
+        applyCustomCursorMediaState();
     });
 }
 
@@ -1448,13 +1461,8 @@ const blurPointerActivatedControl = () => {
     }
 };
 const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
-let customCursorSimpleMode = true;
-const CURSOR_DEBUG_TAG = "[cursor-debug]";
-let cursorDebugFirstMove = true;
-const logCursorDebug = (...parts) => {
-    if (!window?.console?.log) return;
-    console.log(CURSOR_DEBUG_TAG, ...parts);
-};
+const SYSTEM_CURSOR_HIDE_CLASS = "system-cursor-hidden";
+const HELPER_CURSOR_IDLE_MS = 260;
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1467,10 +1475,8 @@ let customCursorPressed = false;
 let customCursorMode = "default";
 let customCursorFrame = null;
 let customCursorMotionFrame = null;
-const applyCursorSimpleMode = (cursorEl, enabled = customCursorSimpleMode) => {
-    if (!cursorEl) return;
-    cursorEl.classList.toggle("simple", Boolean(enabled));
-};
+let helperCursorIdleTimer = null;
+let helperCursorOver = false;
 
 const ensureCustomCursorEl = () => {
     if (customCursorEl?.isConnected) return customCursorEl;
@@ -1488,9 +1494,6 @@ const ensureCustomCursorEl = () => {
 
     document.body.appendChild(cursor);
     customCursorEl = cursor;
-    applyCursorSimpleMode(cursor);
-    logCursorDebug("simple mode =", customCursorSimpleMode);
-    logCursorDebug("cursor element created");
     return cursor;
 };
 const getCustomCursorMode = (target) => {
@@ -1552,7 +1555,14 @@ const stepCursorMotion = () => {
 const setCustomCursorEnabled = (enabled) => {
     customCursorEnabled = Boolean(enabled);
     document.body.classList.toggle("custom-cursor-enabled", customCursorEnabled);
-    logCursorDebug("enabled =", customCursorEnabled);
+    if (customCursorEnabled) {
+        document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+        helperCursorOver = false;
+        if (helperCursorIdleTimer) {
+            clearTimeout(helperCursorIdleTimer);
+            helperCursorIdleTimer = null;
+        }
+    }
     if (!customCursorEnabled) {
         customCursorVisible = false;
         customCursorPressed = false;
@@ -1564,21 +1574,6 @@ const setCustomCursorEnabled = (enabled) => {
     }
     ensureCustomCursorEl();
     scheduleCustomCursorRender();
-};
-
-const setCursorSimpleMode = (enabled) => {
-    customCursorSimpleMode = Boolean(enabled);
-    applyCursorSimpleMode(customCursorEl, customCursorSimpleMode);
-    logCursorDebug("simple mode =", customCursorSimpleMode);
-    return customCursorSimpleMode ? "simple" : "advanced";
-};
-
-const setCursorSmoothing = (value) => {
-    const next = Number.parseFloat(value);
-    if (!Number.isFinite(next)) return customCursorSmoothing;
-    customCursorSmoothing = Math.min(Math.max(next, 0.08), 1);
-    logCursorDebug("smoothing =", customCursorSmoothing);
-    return customCursorSmoothing;
 };
 const updateCustomCursorPosition = (event) => {
     if (!customCursorEnabled) return;
@@ -1602,10 +1597,47 @@ const updateCustomCursorPosition = (event) => {
         cursor.classList.add("visible");
         scheduleCustomCursorRender();
     }
-    if (cursorDebugFirstMove) {
-        cursorDebugFirstMove = false;
-        logCursorDebug("first move", { x: customCursorX, y: customCursorY, mode: customCursorMode });
-    }
+};
+
+const clearHelperCursorIdleTimer = () => {
+    if (!helperCursorIdleTimer) return;
+    clearTimeout(helperCursorIdleTimer);
+    helperCursorIdleTimer = null;
+};
+
+const scheduleHelperCursorIdleHide = () => {
+    clearHelperCursorIdleTimer();
+    if (!helperCursorOver || customCursorEnabled) return;
+    helperCursorIdleTimer = setTimeout(() => {
+        if (helperCursorOver && !customCursorEnabled) {
+            document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
+        }
+    }, HELPER_CURSOR_IDLE_MS);
+};
+
+const handleHelperPointerEnter = (event) => {
+    if (customCursorEnabled) return;
+    const helperItem = event.target?.closest?.(".helper-item");
+    if (!helperItem) return;
+    if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
+    helperCursorOver = true;
+    clearHelperCursorIdleTimer();
+    document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
+};
+
+const handleHelperPointerLeave = (event) => {
+    const helperItem = event.target?.closest?.(".helper-item");
+    if (!helperItem) return;
+    if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
+    helperCursorOver = false;
+    clearHelperCursorIdleTimer();
+    document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+};
+
+const handleHelperPointerMove = () => {
+    if (customCursorEnabled || !helperCursorOver) return;
+    document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+    scheduleHelperCursorIdleHide();
 };
 
 const triggerReplayAction = (event) => {
@@ -1875,7 +1907,10 @@ document.addEventListener("click", () => {
 }, true);
 
 const handlePointerUpdate = (event) => {
-    if (!customCursorEnabled) return;
+    if (!customCursorEnabled) {
+        handleHelperPointerMove();
+        return;
+    }
     const events = typeof event.getCoalescedEvents === "function"
         ? event.getCoalescedEvents()
         : null;
@@ -1884,10 +1919,8 @@ const handlePointerUpdate = (event) => {
 };
 
 if ("onpointerrawupdate" in window) {
-    logCursorDebug("using pointerrawupdate");
     document.addEventListener("pointerrawupdate", handlePointerUpdate, { passive: true, capture: true });
 }
-logCursorDebug("using pointermove fallback");
 document.addEventListener("pointermove", handlePointerUpdate, { passive: true, capture: true });
 
 document.addEventListener("pointerup", (event) => {
@@ -1915,6 +1948,9 @@ document.addEventListener("pointerout", (event) => {
     }
 }, true);
 
+document.addEventListener("pointerover", handleHelperPointerEnter, true);
+document.addEventListener("pointerout", handleHelperPointerLeave, true);
+
 window.addEventListener("blur", () => {
     customCursorVisible = false;
     customCursorPressed = false;
@@ -1930,7 +1966,8 @@ document.addEventListener("visibilitychange", () => {
 });
 
 const applyCustomCursorMediaState = () => {
-    setCustomCursorEnabled(CUSTOM_CURSOR_QUERY.matches);
+    const allowCustomCursor = CUSTOM_CURSOR_QUERY.matches && state.customCursorEnabled !== false;
+    setCustomCursorEnabled(allowCustomCursor);
 };
 if (typeof CUSTOM_CURSOR_QUERY.addEventListener === "function") {
     CUSTOM_CURSOR_QUERY.addEventListener("change", applyCustomCursorMediaState);
@@ -1938,21 +1975,6 @@ if (typeof CUSTOM_CURSOR_QUERY.addEventListener === "function") {
     CUSTOM_CURSOR_QUERY.addListener(applyCustomCursorMediaState);
 }
 applyCustomCursorMediaState();
-
-App.debug = App.debug || {};
-Object.assign(App.debug, {
-    setCursorMode: (mode = "simple") => {
-        const normalized = String(mode ?? "").toLowerCase();
-        const useSimple = normalized !== "advanced";
-        return setCursorSimpleMode(useSimple);
-    },
-    enableSimpleCursor: () => setCursorSimpleMode(true),
-    enableAdvancedCursor: () => setCursorSimpleMode(false),
-    toggleCursorMode: () => setCursorSimpleMode(!customCursorSimpleMode),
-    getCursorMode: () => (customCursorSimpleMode ? "simple" : "advanced"),
-    setCursorSmoothing,
-    getCursorSmoothing: () => customCursorSmoothing
-});
 
 keyboardEl.addEventListener("click", (event) => {
     event.preventDefault();
@@ -2275,6 +2297,7 @@ const init = async () => {
     updateNoteCountMax();
     renderPianoOptions();
     applyUiFromState();
+    applyCustomCursorMediaState();
     if (typeof App.game?.updateTypedPreviewFromInput === "function") {
         App.game.updateTypedPreviewFromInput();
     }

@@ -82,6 +82,7 @@ const dom = {
     chordDifficultySelect: document.getElementById("chord-difficulty"),
     chordExtraHelpersToggle: document.getElementById("chord-extra-helpers"),
     chordRootHintToggle: document.getElementById("chord-root-hint"),
+    customCursorToggle: document.getElementById("custom-cursor"),
     typingShowPianoToggle: document.getElementById("typing-show-piano"),
     typingShowTypedToggle: document.getElementById("typing-show-typed"),
     typingZone: document.getElementById("typing-zone"),
@@ -212,6 +213,7 @@ const {
     chordDifficultySelect,
     chordExtraHelpersToggle,
     chordRootHintToggle,
+    customCursorToggle,
     typingShowPianoToggle,
     typingShowTypedToggle,
     typingZone,
@@ -520,6 +522,7 @@ const DEFAULTS = {
     chordDifficulty: "easy",
     chordExtraHelpers: false,
     chordRootHint: false,
+    customCursorEnabled: true,
     typingShowPiano: true,
     typingShowTyped: true,
     hideLivePreview: false,
@@ -555,6 +558,7 @@ const state = {
     chordDifficulty: DEFAULTS.chordDifficulty,
     chordExtraHelpers: DEFAULTS.chordExtraHelpers,
     chordRootHint: DEFAULTS.chordRootHint,
+    customCursorEnabled: DEFAULTS.customCursorEnabled,
     typingShowPiano: DEFAULTS.typingShowPiano,
     typingShowTyped: DEFAULTS.typingShowTyped,
     hideLivePreview: DEFAULTS.hideLivePreview,
@@ -682,6 +686,7 @@ const saveSettings = () => {
         chordDifficulty: state.chordDifficulty,
         chordExtraHelpers: state.chordExtraHelpers,
         chordRootHint: state.chordRootHint,
+        customCursorEnabled: state.customCursorEnabled,
         typingShowPiano: state.typingShowPiano,
         typingShowTyped: state.typingShowTyped,
         hideLivePreview: state.hideLivePreview
@@ -729,6 +734,7 @@ const loadSettings = () => {
             : (["easy", "medium", "voiced", "hard"].includes(difficulty) ? difficulty : DEFAULTS.chordDifficulty);
         state.chordExtraHelpers = Boolean(data.chordExtraHelpers);
         state.chordRootHint = Boolean(data.chordRootHint);
+        state.customCursorEnabled = data.customCursorEnabled !== false;
         state.typingShowPiano = data.typingShowPiano !== false;
         state.typingShowTyped = data.typingShowTyped !== false;
         state.hideLivePreview = Boolean(data.hideLivePreview);
@@ -774,6 +780,7 @@ const resetAllSettings = () => {
     state.chordDifficulty = DEFAULTS.chordDifficulty;
     state.chordExtraHelpers = DEFAULTS.chordExtraHelpers;
     state.chordRootHint = DEFAULTS.chordRootHint;
+    state.customCursorEnabled = DEFAULTS.customCursorEnabled;
     state.typingShowPiano = DEFAULTS.typingShowPiano;
     state.typingShowTyped = DEFAULTS.typingShowTyped;
     state.hideLivePreview = DEFAULTS.hideLivePreview;
