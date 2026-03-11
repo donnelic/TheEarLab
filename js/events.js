@@ -1526,10 +1526,11 @@ const updateHelperIndicator = (helperItem, event) => {
     if (!helperItem || !event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
     const rect = helperItem.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
+    const radius = Math.min(HELPER_INDICATOR_RADIUS, rect.width * 0.5, rect.height * 0.5);
     const rawX = event.clientX - rect.left;
     const rawY = event.clientY - rect.top;
-    const x = Math.max(HELPER_INDICATOR_RADIUS, Math.min(rect.width - HELPER_INDICATOR_RADIUS, rawX));
-    const y = Math.max(HELPER_INDICATOR_RADIUS, Math.min(rect.height - HELPER_INDICATOR_RADIUS, rawY));
+    const x = Math.max(radius, Math.min(rect.width - radius, rawX));
+    const y = Math.max(radius, Math.min(rect.height - radius, rawY));
     helperItem.style.setProperty("--helper-cursor-x", `${Math.round(x)}px`);
     helperItem.style.setProperty("--helper-cursor-y", `${Math.round(y)}px`);
 };
