@@ -1270,7 +1270,7 @@ const syncHelperPinnedUi = (helperItem) => {
     return flags;
 };
 
-const shouldBlurAfterUnpin = (event) => {
+const shouldBlurAfterPointer = (event) => {
     if (!event) return false;
     if (event.type === "keydown") return false;
     if (typeof event.clientX === "number" || typeof event.pointerType === "string") return true;
@@ -1309,12 +1309,8 @@ const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {
         toggled = toggleFn(label);
     }
     if (toggled) {
-        const flags = syncHelperPinnedUi(helperItem);
-        const shouldBlur = flags
-            && !flags.pinned
-            && shouldBlurAfterUnpin(event)
-            && document.activeElement === helperItem;
-        if (shouldBlur) {
+        syncHelperPinnedUi(helperItem);
+        if (shouldBlurAfterPointer(event) && document.activeElement === helperItem) {
             helperItem.blur();
         }
     }
