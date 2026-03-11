@@ -1484,6 +1484,17 @@ let helperCursorOver = false;
 let helperCursorTarget = null;
 let helperIndicatorTarget = null;
 let helperIndicatorClearTimer = null;
+let helperItemCache = null;
+
+const getHelperItems = () => {
+    const cached = helperItemCache;
+    if (cached && cached.length && cached.every((item) => item?.isConnected)) {
+        return cached;
+    }
+    const items = Array.from(document.querySelectorAll(".helper-item"));
+    helperItemCache = items;
+    return items;
+};
 
 const setHelperIndicatorActive = (helperItem, active) => {
     if (!helperItem) return;
@@ -1521,6 +1532,46 @@ const updateHelperIndicator = (helperItem, event) => {
     const y = Math.max(HELPER_INDICATOR_RADIUS, Math.min(rect.height - HELPER_INDICATOR_RADIUS, rawY));
     helperItem.style.setProperty("--helper-cursor-x", `${Math.round(x)}px`);
     helperItem.style.setProperty("--helper-cursor-y", `${Math.round(y)}px`);
+};
+
+const getDistanceToRect = (x, y, rect) => {
+    const dx = Math.max(rect.left - x, 0, x - rect.right);
+    const dy = Math.max(rect.top - y, 0, y - rect.bottom);
+    return Math.hypot(dx, dy);
+};
+
+const handleHelperIndicatorProximity = (event) => {
+    if (customCursorEnabled || helperCursorOver) return;
+    if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
+    const helpers = getHelperItems();
+    if (!helpers.length) return;
+    const x = event.clientX;
+    const y = event.clientY;
+    let nearest = null;
+    let nearestDistance = Infinity;
+    for (const helperItem of helpers) {
+        if (!helperItem?.isConnected) continue;
+        const rect = helperItem.getBoundingClientRect();
+        const distance = getDistanceToRect(x, y, rect);
+        if (distance <= HELPER_INDICATOR_RADIUS && distance < nearestDistance) {
+            nearestDistance = distance;
+            nearest = helperItem;
+        }
+    }
+    if (nearest) {
+        clearHelperIndicatorCleanup();
+        if (helperIndicatorTarget && helperIndicatorTarget !== nearest) {
+            setHelperIndicatorActive(helperIndicatorTarget, false);
+        }
+        helperIndicatorTarget = nearest;
+        setHelperIndicatorActive(nearest, true);
+        updateHelperIndicator(nearest, event);
+        return;
+    }
+    if (helperIndicatorTarget) {
+        helperIndicatorTarget.style.setProperty("--helper-cursor-opacity", "0");
+        scheduleHelperIndicatorCleanup(helperIndicatorTarget);
+    }
 };
 
 const ensureCustomCursorEl = () => {
@@ -1978,7 +2029,11 @@ document.addEventListener("click", () => {
 
 const handlePointerUpdate = (event) => {
     if (!customCursorEnabled) {
-        handleHelperPointerMove(event);
+        if (helperCursorOver) {
+            handleHelperPointerMove(event);
+        } else {
+            handleHelperIndicatorProximity(event);
+        }
         return;
     }
     const events = typeof event.getCoalescedEvents === "function"
