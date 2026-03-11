@@ -154,6 +154,7 @@ const getGlobalPinnedHelperLabels = () => helperPinState.globalLabels;
 
 const isHelperPinnedGlobalLabel = (label) => {
     if (!label) return false;
+    if (label === HELPER_LABELS.rootNote) return Boolean(state.chordRootHint);
     return getGlobalPinnedHelperLabels().has(label);
 };
 
@@ -176,6 +177,7 @@ const toggleHelperPinnedLocalLabel = (label) => {
 
 const toggleHelperPinnedGlobalLabel = (label) => {
     if (!label) return false;
+    if (label === HELPER_LABELS.rootNote) return false;
     const labels = getGlobalPinnedHelperLabels();
     if (labels.has(label)) {
         labels.delete(label);

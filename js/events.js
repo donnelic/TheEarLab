@@ -64,6 +64,8 @@ const applySettingMutationEffects = (
     }
 };
 
+const ROOT_HELPER_LABEL = (App.uiCopy?.helpers?.rootNote || "Root note");
+
 noteCountInput.addEventListener("input", (event) => {
     const next = clampNoteCount(event.target.value);
     pendingNoteCount = next;
@@ -1253,6 +1255,23 @@ const syncHelperPinnedUi = (helperItem) => {
     helperItem.setAttribute("aria-pressed", flags.pinned ? "true" : "false");
 };
 
+const toggleRootHintFromHelper = () => {
+    const nextValue = !state.chordRootHint;
+    patchSettingsState({
+        chordRootHint: nextValue,
+        rootHintSuppressed: false
+    }, "events/chord-root-hint-helper");
+    if (chordRootHintToggle) {
+        chordRootHintToggle.checked = nextValue;
+    }
+    if (typeof App.game?.setRootHelperPinned === "function") {
+        App.game.setRootHelperPinned(nextValue);
+    }
+    applySettingMutationEffects("chordRootHint", {
+        restartOverride: false
+    });
+};
+
 const toggleHelperPinned = (target, { persistent = false } = {}) => {
     const helperItem = target?.closest?.(".helper-item");
     if (!helperItem) return false;
@@ -1281,7 +1300,15 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("contextmenu", (event) => {
-    if (toggleHelperPinned(event.target, { persistent: true })) {
+    const helperItem = event.target?.closest?.(".helper-item");
+    if (!helperItem) return;
+    const label = helperItem.dataset?.helperLabel;
+    if (label === ROOT_HELPER_LABEL) {
+        toggleRootHintFromHelper();
+        event.preventDefault();
+        return;
+    }
+    if (toggleHelperPinned(helperItem, { persistent: true })) {
         event.preventDefault();
     }
 });
