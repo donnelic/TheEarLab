@@ -1253,6 +1253,7 @@ const syncHelperPinnedUi = (helperItem) => {
     helperItem.classList.toggle("pinned", Boolean(flags.pinnedGlobal));
     helperItem.classList.toggle("latched", Boolean(flags.pinnedLocal));
     helperItem.setAttribute("aria-pressed", flags.pinned ? "true" : "false");
+    return flags;
 };
 
 const toggleRootHintFromHelper = () => {
@@ -1281,7 +1282,12 @@ const toggleHelperPinned = (target, { persistent = false } = {}) => {
     if (typeof toggleFn !== "function") return false;
     const toggled = toggleFn(label);
     if (toggled) {
-        syncHelperPinnedUi(helperItem);
+        const flags = syncHelperPinnedUi(helperItem);
+        if (flags && !flags.pinned && !helperItem.matches(":hover")) {
+            if (document.activeElement === helperItem) {
+                helperItem.blur();
+            }
+        }
     }
     return toggled;
 };
