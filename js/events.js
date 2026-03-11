@@ -1448,6 +1448,12 @@ const blurPointerActivatedControl = () => {
     }
 };
 const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
+const CURSOR_DEBUG_TAG = "[cursor-debug]";
+let cursorDebugFirstMove = true;
+const logCursorDebug = (...parts) => {
+    if (!window?.console?.log) return;
+    console.log(CURSOR_DEBUG_TAG, ...parts);
+};
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1472,6 +1478,7 @@ const ensureCustomCursorEl = () => {
 
     document.body.appendChild(cursor);
     customCursorEl = cursor;
+    logCursorDebug("cursor element created");
     return cursor;
 };
 const getCustomCursorMode = (target) => {
@@ -1508,6 +1515,7 @@ const scheduleCustomCursorRender = () => {
 const setCustomCursorEnabled = (enabled) => {
     customCursorEnabled = Boolean(enabled);
     document.body.classList.toggle("custom-cursor-enabled", customCursorEnabled);
+    logCursorDebug("enabled =", customCursorEnabled);
     if (!customCursorEnabled) {
         customCursorVisible = false;
         customCursorPressed = false;
@@ -1529,6 +1537,10 @@ const updateCustomCursorPosition = (event) => {
     cursor.style.transform = `translate3d(${customCursorX}px, ${customCursorY}px, 0)`;
     if (!cursor.classList.contains("visible")) {
         cursor.classList.add("visible");
+    }
+    if (cursorDebugFirstMove) {
+        cursorDebugFirstMove = false;
+        logCursorDebug("first move", { x: customCursorX, y: customCursorY, mode: customCursorMode });
     }
     scheduleCustomCursorRender();
 };
@@ -1809,8 +1821,10 @@ const handlePointerUpdate = (event) => {
 };
 
 if ("onpointerrawupdate" in window) {
+    logCursorDebug("using pointerrawupdate");
     document.addEventListener("pointerrawupdate", handlePointerUpdate, { passive: true, capture: true });
 }
+logCursorDebug("using pointermove fallback");
 document.addEventListener("pointermove", handlePointerUpdate, { passive: true, capture: true });
 
 document.addEventListener("pointerup", (event) => {

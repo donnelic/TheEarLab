@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-11 11:34:28 +01:00
+Generated: 2026-03-11 11:37:48 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -36,7 +36,7 @@ Generated: 2026-03-11 11:34:28 +01:00
 | styles.css | CSS | Loaded directly | Yes | 3389 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1529 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1065 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 2219 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 2233 |
 | js/game.js | JavaScript | Browser runtime module | Yes | 2219 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1474 |
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
@@ -823,7 +823,7 @@ File lines: 1-1065
 | rebuildKeyboard | 1053-1064 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-2219
+File lines: 1-2233
 
 | Symbol | Lines |
 |---|---|
@@ -877,30 +877,31 @@ File lines: 1-2219
 | triggerPrimaryAction | 1429-1438 |
 | getButtonLikeTarget | 1441-1441 |
 | blurPointerActivatedControl | 1442-1449 |
-| ensureCustomCursorEl | 1459-1476 |
-| getCustomCursorMode | 1477-1489 |
-| syncCustomCursorState | 1490-1496 |
-| renderCustomCursor | 1497-1503 |
-| scheduleCustomCursorRender | 1504-1507 |
-| setCustomCursorEnabled | 1508-1521 |
-| updateCustomCursorPosition | 1522-1534 |
-| triggerReplayAction | 1536-1542 |
-| bindPianoOptionEvents | 1702-1727 |
-| handlePointerUpdate | 1802-1809 |
-| applyCustomCursorMediaState | 1855-1857 |
-| isElementVisible | 1872-1878 |
-| getFocusableElements | 1880-1884 |
-| focusFirstInModal | 1890-1896 |
-| trapModalFocus | 1898-1920 |
-| isTextEditableTarget | 1922-1927 |
-| getActiveModalEl | 1929-1934 |
-| closeGameSettingsModalUi | 1936-1945 |
-| openGameSettingsModalUi | 1947-1953 |
-| closeActiveModal | 1955-1969 |
-| moveFocusInPanel | 1971-1982 |
-| setRandomBackgroundAngle | 2172-2175 |
-| init | 2177-2213 |
-| runDeferredCatalogLoad | 2197-2206 |
+| logCursorDebug | 1453-1456 |
+| ensureCustomCursorEl | 1465-1483 |
+| getCustomCursorMode | 1484-1496 |
+| syncCustomCursorState | 1497-1503 |
+| renderCustomCursor | 1504-1510 |
+| scheduleCustomCursorRender | 1511-1514 |
+| setCustomCursorEnabled | 1515-1529 |
+| updateCustomCursorPosition | 1530-1546 |
+| triggerReplayAction | 1548-1554 |
+| bindPianoOptionEvents | 1714-1739 |
+| handlePointerUpdate | 1814-1821 |
+| applyCustomCursorMediaState | 1869-1871 |
+| isElementVisible | 1886-1892 |
+| getFocusableElements | 1894-1898 |
+| focusFirstInModal | 1904-1910 |
+| trapModalFocus | 1912-1934 |
+| isTextEditableTarget | 1936-1941 |
+| getActiveModalEl | 1943-1948 |
+| closeGameSettingsModalUi | 1950-1959 |
+| openGameSettingsModalUi | 1961-1967 |
+| closeActiveModal | 1969-1983 |
+| moveFocusInPanel | 1985-1996 |
+| setRandomBackgroundAngle | 2186-2189 |
+| init | 2191-2227 |
+| runDeferredCatalogLoad | 2211-2220 |
 
 Event bindings:
 | Target | Event | Line |
@@ -976,60 +977,60 @@ Event bindings:
 | chordTutorialQualityList | focusin | 1376 |
 | chordTutorialQualityList | focusout | 1383 |
 | chordTutorialQualityList | click | 1386 |
-| volumeSlider | dblclick | 1544 |
-| lengthSlider | dblclick | 1548 |
-| keyCountSlider | dblclick | 1552 |
-| startNoteDownButton | click | 1558 |
-| startNoteUpButton | click | 1561 |
-| startNoteDownOctButton | click | 1567 |
-| startNoteUpOctButton | click | 1570 |
-| noteCountInput | dblclick | 1575 |
-| attackSlider | dblclick | 1583 |
-| decaySlider | dblclick | 1587 |
-| releaseSlider | dblclick | 1591 |
-| sustainSlider | dblclick | 1595 |
-| profileSearch | input | 1600 |
-| profileList | click | 1606 |
-| profileList | dblclick | 1611 |
-| profileList | keydown | 1614 |
-| profileApply | click | 1625 |
-| profileSave | click | 1631 |
-| instrumentPresetSearch | input | 1637 |
-| instrumentPresetList | click | 1643 |
-| instrumentPresetList | dblclick | 1648 |
-| instrumentPresetList | keydown | 1651 |
-| instrumentPresetApply | click | 1662 |
-| advancedTrigger | click | 1667 |
-| advancedPanel | click | 1672 |
-| pianoTrigger | click | 1677 |
-| pianoPanel | click | 1684 |
-| instrumentBrowserTrigger | click | 1690 |
-| instrumentBrowserPanel | click | 1697 |
-| pianoOptionsContainer | click | 1705 |
-| pianoOptionsContainer | keydown | 1719 |
-| pianoPreviewMain | click | 1730 |
-| testEnvelopeButton | click | 1737 |
-| keyboardEl | pointerdown | 1742 |
-| document | pointerup | 1778 |
-| document | pointercancel | 1785 |
-| document | pointerdown | 1792 |
-| document | click | 1798 |
-| document | pointerrawupdate | 1812 |
-| document | pointermove | 1814 |
-| document | pointerup | 1816 |
-| document | pointercancel | 1821 |
-| document | pointerover | 1826 |
-| document | pointerout | 1832 |
-| window | blur | 1841 |
-| document | visibilitychange | 1847 |
-| CUSTOM_CURSOR_QUERY | change | 1859 |
-| keyboardEl | click | 1865 |
-| document | keydown | 1984 |
-| document | keyup | 2120 |
-| pedalBox | pointerdown | 2139 |
-| pedalBox | pointerup | 2148 |
-| pedalBox | pointercancel | 2157 |
-| pedalBox | pointerleave | 2165 |
+| volumeSlider | dblclick | 1556 |
+| lengthSlider | dblclick | 1560 |
+| keyCountSlider | dblclick | 1564 |
+| startNoteDownButton | click | 1570 |
+| startNoteUpButton | click | 1573 |
+| startNoteDownOctButton | click | 1579 |
+| startNoteUpOctButton | click | 1582 |
+| noteCountInput | dblclick | 1587 |
+| attackSlider | dblclick | 1595 |
+| decaySlider | dblclick | 1599 |
+| releaseSlider | dblclick | 1603 |
+| sustainSlider | dblclick | 1607 |
+| profileSearch | input | 1612 |
+| profileList | click | 1618 |
+| profileList | dblclick | 1623 |
+| profileList | keydown | 1626 |
+| profileApply | click | 1637 |
+| profileSave | click | 1643 |
+| instrumentPresetSearch | input | 1649 |
+| instrumentPresetList | click | 1655 |
+| instrumentPresetList | dblclick | 1660 |
+| instrumentPresetList | keydown | 1663 |
+| instrumentPresetApply | click | 1674 |
+| advancedTrigger | click | 1679 |
+| advancedPanel | click | 1684 |
+| pianoTrigger | click | 1689 |
+| pianoPanel | click | 1696 |
+| instrumentBrowserTrigger | click | 1702 |
+| instrumentBrowserPanel | click | 1709 |
+| pianoOptionsContainer | click | 1717 |
+| pianoOptionsContainer | keydown | 1731 |
+| pianoPreviewMain | click | 1742 |
+| testEnvelopeButton | click | 1749 |
+| keyboardEl | pointerdown | 1754 |
+| document | pointerup | 1790 |
+| document | pointercancel | 1797 |
+| document | pointerdown | 1804 |
+| document | click | 1810 |
+| document | pointerrawupdate | 1825 |
+| document | pointermove | 1828 |
+| document | pointerup | 1830 |
+| document | pointercancel | 1835 |
+| document | pointerover | 1840 |
+| document | pointerout | 1846 |
+| window | blur | 1855 |
+| document | visibilitychange | 1861 |
+| CUSTOM_CURSOR_QUERY | change | 1873 |
+| keyboardEl | click | 1879 |
+| document | keydown | 1998 |
+| document | keyup | 2134 |
+| pedalBox | pointerdown | 2153 |
+| pedalBox | pointerup | 2162 |
+| pedalBox | pointercancel | 2171 |
+| pedalBox | pointerleave | 2179 |
 
 ### js/game.js (Active Runtime)
 File lines: 1-2219
