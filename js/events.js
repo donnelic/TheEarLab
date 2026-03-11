@@ -1448,7 +1448,7 @@ const blurPointerActivatedControl = () => {
     }
 };
 const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
-const CUSTOM_CURSOR_SIMPLE_MODE = true;
+let customCursorSimpleMode = true;
 const CURSOR_DEBUG_TAG = "[cursor-debug]";
 let cursorDebugFirstMove = true;
 const logCursorDebug = (...parts) => {
@@ -1463,6 +1463,11 @@ let customCursorVisible = false;
 let customCursorPressed = false;
 let customCursorMode = "default";
 let customCursorFrame = null;
+const applyCursorSimpleMode = (cursorEl, enabled = customCursorSimpleMode) => {
+    if (!cursorEl) return;
+    cursorEl.classList.toggle("simple", Boolean(enabled));
+};
+
 const ensureCustomCursorEl = () => {
     if (customCursorEl?.isConnected) return customCursorEl;
     const cursor = document.createElement("div");
@@ -1479,10 +1484,8 @@ const ensureCustomCursorEl = () => {
 
     document.body.appendChild(cursor);
     customCursorEl = cursor;
-    if (CUSTOM_CURSOR_SIMPLE_MODE) {
-        cursor.classList.add("simple");
-        logCursorDebug("simple mode on");
-    }
+    applyCursorSimpleMode(cursor);
+    logCursorDebug("simple mode =", customCursorSimpleMode);
     logCursorDebug("cursor element created");
     return cursor;
 };
@@ -1531,6 +1534,13 @@ const setCustomCursorEnabled = (enabled) => {
     }
     ensureCustomCursorEl();
     scheduleCustomCursorRender();
+};
+
+const setCursorSimpleMode = (enabled) => {
+    customCursorSimpleMode = Boolean(enabled);
+    applyCursorSimpleMode(customCursorEl, customCursorSimpleMode);
+    logCursorDebug("simple mode =", customCursorSimpleMode);
+    return customCursorSimpleMode ? "simple" : "advanced";
 };
 const updateCustomCursorPosition = (event) => {
     if (!customCursorEnabled) return;
@@ -1880,6 +1890,19 @@ if (typeof CUSTOM_CURSOR_QUERY.addEventListener === "function") {
     CUSTOM_CURSOR_QUERY.addListener(applyCustomCursorMediaState);
 }
 applyCustomCursorMediaState();
+
+App.debug = App.debug || {};
+Object.assign(App.debug, {
+    setCursorMode: (mode = "simple") => {
+        const normalized = String(mode ?? "").toLowerCase();
+        const useSimple = normalized !== "advanced";
+        return setCursorSimpleMode(useSimple);
+    },
+    enableSimpleCursor: () => setCursorSimpleMode(true),
+    enableAdvancedCursor: () => setCursorSimpleMode(false),
+    toggleCursorMode: () => setCursorSimpleMode(!customCursorSimpleMode),
+    getCursorMode: () => (customCursorSimpleMode ? "simple" : "advanced")
+});
 
 keyboardEl.addEventListener("click", (event) => {
     event.preventDefault();
