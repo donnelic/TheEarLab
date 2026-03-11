@@ -1256,7 +1256,14 @@ const syncHelperPinnedUi = (helperItem) => {
     return flags;
 };
 
-const toggleRootHintFromHelper = () => {
+const shouldBlurAfterUnpin = (event) => {
+    if (!event) return false;
+    if (event.type === "keydown") return false;
+    if (typeof event.clientX === "number" || typeof event.pointerType === "string") return true;
+    return ["click", "contextmenu"].includes(event.type);
+};
+
+const toggleRootHintFromHelper = (helperItem, event) => {
     const nextValue = !state.chordRootHint;
     patchSettingsState({
         chordRootHint: nextValue,
@@ -1271,6 +1278,9 @@ const toggleRootHintFromHelper = () => {
     applySettingMutationEffects("chordRootHint", {
         restartOverride: false
     });
+    if (!nextValue && shouldBlurAfterUnpin(event) && document.activeElement === helperItem) {
+        helperItem.blur();
+    }
 };
 
 const toggleHelperPinned = (target, { persistent = false, event = null } = {}) => {
@@ -1283,17 +1293,8 @@ const toggleHelperPinned = (target, { persistent = false, event = null } = {}) =
     const toggled = toggleFn(label);
     if (toggled) {
         const flags = syncHelperPinnedUi(helperItem);
-        if (flags && !flags.pinned) {
-            const hasPointer = Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY);
-            const hoverTarget = hasPointer
-                ? document.elementFromPoint(event.clientX, event.clientY)
-                : null;
-            const isHovered = hasPointer
-                ? helperItem.contains(hoverTarget)
-                : helperItem.matches(":hover");
-            if (!isHovered && document.activeElement === helperItem) {
-                helperItem.blur();
-            }
+        if (flags && !flags.pinned && shouldBlurAfterUnpin(event) && document.activeElement === helperItem) {
+            helperItem.blur();
         }
     }
     return toggled;
@@ -1317,7 +1318,7 @@ document.addEventListener("contextmenu", (event) => {
     if (!helperItem) return;
     const label = helperItem.dataset?.helperLabel;
     if (label === ROOT_HELPER_LABEL) {
-        toggleRootHintFromHelper();
+        toggleRootHintFromHelper(helperItem, event);
         event.preventDefault();
         return;
     }
