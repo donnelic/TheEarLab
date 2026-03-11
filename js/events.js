@@ -1465,6 +1465,7 @@ const SYSTEM_CURSOR_HIDE_CLASS = "system-cursor-hidden";
 const HELPER_CURSOR_IDLE_MS = 260;
 const HELPER_CURSOR_STILL_MS = 50;
 const HELPER_CURSOR_STILL_PX_PER_MS = 0.03;
+const HELPER_CURSOR_UNBLUR_PX_PER_MS = 0.06;
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1648,7 +1649,8 @@ const handleHelperPointerEnter = (event) => {
     const dy = event.clientY - helperCursorLastMoveY;
     const distance = Math.hypot(dx, dy);
     const speed = timeSinceMove > 0 ? distance / timeSinceMove : Number.POSITIVE_INFINITY;
-    if (timeSinceMove >= HELPER_CURSOR_STILL_MS && speed <= HELPER_CURSOR_STILL_PX_PER_MS) {
+    if (speed <= HELPER_CURSOR_UNBLUR_PX_PER_MS
+        && (timeSinceMove >= HELPER_CURSOR_STILL_MS || speed <= HELPER_CURSOR_STILL_PX_PER_MS)) {
         document.body.classList.add(SYSTEM_CURSOR_HIDE_CLASS);
     } else {
         document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
