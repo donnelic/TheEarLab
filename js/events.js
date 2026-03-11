@@ -1619,6 +1619,10 @@ const handleHelperIndicatorProximity = (event) => {
     const insideCursorRect = isPointerInsideRect(event, cache.cursorHoldRect);
     helperZoneActive = insideCursorRect;
     helperIndicatorZoneActive = insideIndicatorRect;
+    if (customCursorEnabled) {
+        if (helperIndicatorState.active) setHelperIndicatorActive(false);
+        return;
+    }
     if (insideIndicatorRect) {
         if (!helperIndicatorState.active) setHelperIndicatorActive(true, cache.items);
         scheduleHelperIndicatorUpdate(cache, event);
@@ -1627,12 +1631,6 @@ const handleHelperIndicatorProximity = (event) => {
     }
     if (!customCursorEnabled) {
         document.body.classList.toggle(SYSTEM_CURSOR_HIDE_CLASS, insideCursorRect);
-    } else {
-        const nextMode = getCustomCursorMode(event.target);
-        if (nextMode !== customCursorMode) {
-            customCursorMode = nextMode;
-            scheduleCustomCursorRender();
-        }
     }
 };
 
