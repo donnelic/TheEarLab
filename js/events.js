@@ -1465,6 +1465,8 @@ const SYSTEM_CURSOR_HIDE_CLASS = "system-cursor-hidden";
 const HELPER_CURSOR_UNBLUR_DELAY_MS = 200;
 const HELPER_CURSOR_UNBLUR_DURATION_MS = 240;
 const HELPER_CURSOR_HIDE_MS = Math.round(HELPER_CURSOR_UNBLUR_DELAY_MS + (HELPER_CURSOR_UNBLUR_DURATION_MS * 0.5));
+const HELPER_INDICATOR_RADIUS = 60;
+const HELPER_INDICATOR_CLEAR_MS = 220;
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1481,6 +1483,7 @@ let helperCursorHideTimer = null;
 let helperCursorOver = false;
 let helperCursorTarget = null;
 let helperIndicatorTarget = null;
+let helperIndicatorClearTimer = null;
 
 const setHelperIndicatorActive = (helperItem, active) => {
     if (!helperItem) return;
@@ -1491,12 +1494,31 @@ const setHelperIndicatorActive = (helperItem, active) => {
     }
 };
 
+const clearHelperIndicatorCleanup = () => {
+    if (!helperIndicatorClearTimer) return;
+    clearTimeout(helperIndicatorClearTimer);
+    helperIndicatorClearTimer = null;
+};
+
+const scheduleHelperIndicatorCleanup = (helperItem) => {
+    clearHelperIndicatorCleanup();
+    if (!helperItem) return;
+    helperIndicatorClearTimer = setTimeout(() => {
+        setHelperIndicatorActive(helperItem, false);
+        if (helperIndicatorTarget === helperItem) {
+            helperIndicatorTarget = null;
+        }
+    }, HELPER_INDICATOR_CLEAR_MS);
+};
+
 const updateHelperIndicator = (helperItem, event) => {
     if (!helperItem || !event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
     const rect = helperItem.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
-    const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top));
+    const rawX = event.clientX - rect.left;
+    const rawY = event.clientY - rect.top;
+    const x = Math.max(HELPER_INDICATOR_RADIUS, Math.min(rect.width - HELPER_INDICATOR_RADIUS, rawX));
+    const y = Math.max(HELPER_INDICATOR_RADIUS, Math.min(rect.height - HELPER_INDICATOR_RADIUS, rawY));
     helperItem.style.setProperty("--helper-cursor-x", `${Math.round(x)}px`);
     helperItem.style.setProperty("--helper-cursor-y", `${Math.round(y)}px`);
 };
@@ -1589,6 +1611,7 @@ const setCustomCursorEnabled = (enabled) => {
             setHelperIndicatorActive(helperIndicatorTarget, false);
             helperIndicatorTarget = null;
         }
+        clearHelperIndicatorCleanup();
     }
     if (!customCursorEnabled) {
         customCursorVisible = false;
@@ -1651,6 +1674,7 @@ const handleHelperPointerEnter = (event) => {
     helperCursorTarget = helperItem;
     clearHelperCursorHideTimer();
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
+    clearHelperIndicatorCleanup();
     if (helperIndicatorTarget && helperIndicatorTarget !== helperItem) {
         setHelperIndicatorActive(helperIndicatorTarget, false);
     }
@@ -1669,8 +1693,8 @@ const handleHelperPointerLeave = (event) => {
     clearHelperCursorHideTimer();
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
     if (helperIndicatorTarget) {
-        setHelperIndicatorActive(helperIndicatorTarget, false);
-        helperIndicatorTarget = null;
+        helperIndicatorTarget.style.setProperty("--helper-cursor-opacity", "0");
+        scheduleHelperIndicatorCleanup(helperIndicatorTarget);
     }
 };
 
