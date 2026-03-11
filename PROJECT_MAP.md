@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-11 14:25:12 +01:00
+Generated: 2026-03-11 14:36:38 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -42,7 +42,7 @@ Generated: 2026-03-11 14:25:12 +01:00
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 47 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1268 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1267 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 540 |
 | tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
@@ -426,8 +426,8 @@ File: styles.css (1-3432)
 | .helper-item > * | 1753-1756 |
 | .helper-item:hover, .helper-item:focus-within | 1759-1764 |
 | .helper-item:focus-visible | 1766-1769 |
-| .helper-item.pinned | 1771-1779 |
-| .helper-item.pinned::after | 1781-1796 |
+| .helper-item.pinned | 1771-1777 |
+| .helper-item.pinned::after | 1779-1796 |
 | .helper-item.latched | 1799-1805 |
 | .helper-item.latched .helper-label | 1807-1809 |
 | @media (hover: hover) and (pointer: fine) | 1811-1817 |
