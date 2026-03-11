@@ -1448,6 +1448,7 @@ const blurPointerActivatedControl = () => {
     }
 };
 const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine)");
+const CUSTOM_CURSOR_SIMPLE_MODE = true;
 const CURSOR_DEBUG_TAG = "[cursor-debug]";
 let cursorDebugFirstMove = true;
 const logCursorDebug = (...parts) => {
@@ -1478,6 +1479,10 @@ const ensureCustomCursorEl = () => {
 
     document.body.appendChild(cursor);
     customCursorEl = cursor;
+    if (CUSTOM_CURSOR_SIMPLE_MODE) {
+        cursor.classList.add("simple");
+        logCursorDebug("simple mode on");
+    }
     logCursorDebug("cursor element created");
     return cursor;
 };
