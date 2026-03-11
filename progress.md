@@ -4,3 +4,6 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-11: Playwright not installed; need approval to install for automated UI check.
 - 2026-03-11: Replaced pinned text badge with a small accent dot (radial gradient + ring) to match site accents while keeping borders intact.
 - 2026-03-11: Removed pinned helper dot per request; pinned style now only uses base card styling.
+
+- 2026-03-11: Reworked helper latched styling to use muted accent tones (removed yellow), kept pinned stronger and blurred frosted.
+- 2026-03-11: Installed Playwright + browsers for the develop-web-game test loop; user requested no Playwright going forward.
