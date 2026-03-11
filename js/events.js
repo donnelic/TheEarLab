@@ -1464,7 +1464,7 @@ const CUSTOM_CURSOR_QUERY = window.matchMedia("(hover: hover) and (pointer: fine
 const SYSTEM_CURSOR_HIDE_CLASS = "system-cursor-hidden";
 const HELPER_CURSOR_IDLE_MS = 260;
 const HELPER_CURSOR_STILL_MS = 50;
-const HELPER_CURSOR_STILL_PX_PER_MS = 0.02;
+const HELPER_CURSOR_STILL_PX_PER_MS = 0.03;
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1657,9 +1657,8 @@ const handleHelperPointerLeave = (event) => {
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
 };
 
-const handleHelperPointerMove = (event) => {
+const handleHelperPointerMove = () => {
     if (customCursorEnabled || !helperCursorOver) return;
-    updateHelperCursorMovement(event);
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
     scheduleHelperCursorIdleHide();
 };
@@ -1933,7 +1932,7 @@ document.addEventListener("click", () => {
 const handlePointerUpdate = (event) => {
     if (!customCursorEnabled) {
         updateHelperCursorMovement(event);
-        handleHelperPointerMove(event);
+        handleHelperPointerMove();
         return;
     }
     const events = typeof event.getCoalescedEvents === "function"
