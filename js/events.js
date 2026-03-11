@@ -350,6 +350,7 @@ window.addEventListener("resize", () => {
         fitTutorialLayout({ recompute: false });
         fitTutorialProgressTabs();
     }
+    markHelperIndicatorDirty();
 });
 
 playSelectedButton.addEventListener("click", () => {
@@ -1466,7 +1467,6 @@ const HELPER_CURSOR_UNBLUR_DELAY_MS = 200;
 const HELPER_CURSOR_UNBLUR_DURATION_MS = 240;
 const HELPER_CURSOR_HIDE_MS = Math.round(HELPER_CURSOR_UNBLUR_DELAY_MS + (HELPER_CURSOR_UNBLUR_DURATION_MS * 0.5));
 const HELPER_INDICATOR_RADIUS = 60;
-const HELPER_INDICATOR_CLEAR_MS = 220;
 let customCursorEnabled = false;
 let customCursorEl = null;
 let customCursorX = -100;
@@ -1481,98 +1481,121 @@ let customCursorFrame = null;
 let customCursorMotionFrame = null;
 let helperCursorHideTimer = null;
 let helperCursorOver = false;
-let helperCursorTarget = null;
-let helperIndicatorTarget = null;
-let helperIndicatorClearTimer = null;
-let helperItemCache = null;
+let helperIndicatorLayer = null;
+let helperIndicatorBounds = null;
+let helperIndicatorActive = false;
+let helperIndicatorDirty = true;
+let helperIndicatorObserver = null;
 
-const getHelperItems = () => {
-    const cached = helperItemCache;
-    if (cached && cached.length && cached.every((item) => item?.isConnected)) {
-        return cached;
-    }
-    const items = Array.from(document.querySelectorAll(".helper-item"));
-    helperItemCache = items;
-    return items;
+const markHelperIndicatorDirty = () => {
+    helperIndicatorDirty = true;
+    helperIndicatorBounds = null;
 };
 
-const setHelperIndicatorActive = (helperItem, active) => {
-    if (!helperItem) return;
-    helperItem.style.setProperty("--helper-cursor-opacity", active ? "1" : "0");
+const ensureHelperIndicatorObserver = () => {
+    if (helperIndicatorObserver || !helperSlotEl) return;
+    helperIndicatorObserver = new MutationObserver(() => {
+        markHelperIndicatorDirty();
+    });
+    helperIndicatorObserver.observe(helperSlotEl, { childList: true, subtree: true });
+};
+
+const getHelperIndicatorElements = () => {
+    if (!helperSlotEl) return null;
+    const card = helperSlotEl.querySelector(".helper-card");
+    if (!card) return null;
+    const list = card.querySelector(".helper-list");
+    const layer = card.querySelector(".helper-indicator-layer");
+    if (!list || !layer) return null;
+    return { card, list, layer };
+};
+
+const refreshHelperIndicatorBounds = () => {
+    ensureHelperIndicatorObserver();
+    const elements = getHelperIndicatorElements();
+    if (!elements) {
+        helperIndicatorLayer = null;
+        helperIndicatorBounds = null;
+        return null;
+    }
+    const { card, list, layer } = elements;
+    const cardRect = card.getBoundingClientRect();
+    const listRect = list.getBoundingClientRect();
+    if (!cardRect.width || !listRect.width || !listRect.height) {
+        helperIndicatorLayer = layer;
+        helperIndicatorBounds = null;
+        return null;
+    }
+    const radius = HELPER_INDICATOR_RADIUS;
+    const expandedRect = {
+        left: listRect.left - radius,
+        top: listRect.top - radius,
+        right: listRect.right + radius,
+        bottom: listRect.bottom + radius
+    };
+    const width = listRect.width + radius * 2;
+    const height = listRect.height + radius * 2;
+    const left = listRect.left - cardRect.left - radius;
+    const top = listRect.top - cardRect.top - radius;
+    layer.style.left = `${Math.round(left)}px`;
+    layer.style.top = `${Math.round(top)}px`;
+    layer.style.width = `${Math.round(width)}px`;
+    layer.style.height = `${Math.round(height)}px`;
+    layer.style.setProperty("--helper-indicator-radius", `${radius}px`);
+    helperIndicatorLayer = layer;
+    helperIndicatorBounds = {
+        expandedRect,
+        width,
+        height
+    };
+    helperIndicatorDirty = false;
+    return helperIndicatorBounds;
+};
+
+const getHelperIndicatorBounds = () => {
+    if (!helperIndicatorDirty && helperIndicatorBounds && helperIndicatorLayer?.isConnected) {
+        return helperIndicatorBounds;
+    }
+    return refreshHelperIndicatorBounds();
+};
+
+const setHelperIndicatorActive = (active) => {
+    if (!helperIndicatorLayer) return;
+    helperIndicatorLayer.style.setProperty("--helper-indicator-opacity", active ? "1" : "0");
+    helperIndicatorActive = active;
     if (!active) {
-        helperItem.style.removeProperty("--helper-cursor-x");
-        helperItem.style.removeProperty("--helper-cursor-y");
+        helperIndicatorLayer.style.removeProperty("--helper-indicator-x");
+        helperIndicatorLayer.style.removeProperty("--helper-indicator-y");
     }
 };
 
-const clearHelperIndicatorCleanup = () => {
-    if (!helperIndicatorClearTimer) return;
-    clearTimeout(helperIndicatorClearTimer);
-    helperIndicatorClearTimer = null;
-};
-
-const scheduleHelperIndicatorCleanup = (helperItem) => {
-    clearHelperIndicatorCleanup();
-    if (!helperItem) return;
-    helperIndicatorClearTimer = setTimeout(() => {
-        setHelperIndicatorActive(helperItem, false);
-        if (helperIndicatorTarget === helperItem) {
-            helperIndicatorTarget = null;
-        }
-    }, HELPER_INDICATOR_CLEAR_MS);
-};
-
-const updateHelperIndicator = (helperItem, event) => {
-    if (!helperItem || !event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
-    const rect = helperItem.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const radius = Math.min(HELPER_INDICATOR_RADIUS, rect.width * 0.5, rect.height * 0.5);
-    const rawX = event.clientX - rect.left;
-    const rawY = event.clientY - rect.top;
-    const x = Math.max(radius, Math.min(rect.width - radius, rawX));
-    const y = Math.max(radius, Math.min(rect.height - radius, rawY));
-    helperItem.style.setProperty("--helper-cursor-x", `${Math.round(x)}px`);
-    helperItem.style.setProperty("--helper-cursor-y", `${Math.round(y)}px`);
-};
-
-const getDistanceToRect = (x, y, rect) => {
-    const dx = Math.max(rect.left - x, 0, x - rect.right);
-    const dy = Math.max(rect.top - y, 0, y - rect.bottom);
-    return Math.hypot(dx, dy);
+const updateHelperIndicatorPosition = (event, bounds) => {
+    if (!helperIndicatorLayer || !event || !bounds) return;
+    const x = event.clientX - bounds.expandedRect.left;
+    const y = event.clientY - bounds.expandedRect.top;
+    helperIndicatorLayer.style.setProperty("--helper-indicator-x", `${Math.round(x)}px`);
+    helperIndicatorLayer.style.setProperty("--helper-indicator-y", `${Math.round(y)}px`);
 };
 
 const handleHelperIndicatorProximity = (event) => {
-    if (customCursorEnabled || helperCursorOver) return;
+    if (customCursorEnabled) return;
     if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
-    const helpers = getHelperItems();
-    if (!helpers.length) return;
-    const x = event.clientX;
-    const y = event.clientY;
-    let nearest = null;
-    let nearestDistance = Infinity;
-    for (const helperItem of helpers) {
-        if (!helperItem?.isConnected) continue;
-        const rect = helperItem.getBoundingClientRect();
-        const distance = getDistanceToRect(x, y, rect);
-        if (distance <= HELPER_INDICATOR_RADIUS && distance < nearestDistance) {
-            nearestDistance = distance;
-            nearest = helperItem;
-        }
-    }
-    if (nearest) {
-        clearHelperIndicatorCleanup();
-        if (helperIndicatorTarget && helperIndicatorTarget !== nearest) {
-            setHelperIndicatorActive(helperIndicatorTarget, false);
-        }
-        helperIndicatorTarget = nearest;
-        setHelperIndicatorActive(nearest, true);
-        updateHelperIndicator(nearest, event);
+    const bounds = getHelperIndicatorBounds();
+    if (!bounds) {
+        if (helperIndicatorActive) setHelperIndicatorActive(false);
         return;
     }
-    if (helperIndicatorTarget) {
-        helperIndicatorTarget.style.setProperty("--helper-cursor-opacity", "0");
-        scheduleHelperIndicatorCleanup(helperIndicatorTarget);
+    const { expandedRect } = bounds;
+    const inside = event.clientX >= expandedRect.left
+        && event.clientX <= expandedRect.right
+        && event.clientY >= expandedRect.top
+        && event.clientY <= expandedRect.bottom;
+    if (inside) {
+        if (!helperIndicatorActive) setHelperIndicatorActive(true);
+        updateHelperIndicatorPosition(event, bounds);
+        return;
     }
+    if (helperIndicatorActive) setHelperIndicatorActive(false);
 };
 
 const ensureCustomCursorEl = () => {
@@ -1659,11 +1682,9 @@ const setCustomCursorEnabled = (enabled) => {
             clearTimeout(helperCursorHideTimer);
             helperCursorHideTimer = null;
         }
-        if (helperIndicatorTarget) {
-            setHelperIndicatorActive(helperIndicatorTarget, false);
-            helperIndicatorTarget = null;
+        if (helperIndicatorActive) {
+            setHelperIndicatorActive(false);
         }
-        clearHelperIndicatorCleanup();
     }
     if (!customCursorEnabled) {
         customCursorVisible = false;
@@ -1723,16 +1744,9 @@ const handleHelperPointerEnter = (event) => {
     if (!helperItem) return;
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
     helperCursorOver = true;
-    helperCursorTarget = helperItem;
     clearHelperCursorHideTimer();
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
-    clearHelperIndicatorCleanup();
-    if (helperIndicatorTarget && helperIndicatorTarget !== helperItem) {
-        setHelperIndicatorActive(helperIndicatorTarget, false);
-    }
-    helperIndicatorTarget = helperItem;
-    setHelperIndicatorActive(helperItem, true);
-    updateHelperIndicator(helperItem, event);
+    handleHelperIndicatorProximity(event);
     scheduleHelperCursorHide();
 };
 
@@ -1741,25 +1755,9 @@ const handleHelperPointerLeave = (event) => {
     if (!helperItem) return;
     if (event.relatedTarget && helperItem.contains(event.relatedTarget)) return;
     helperCursorOver = false;
-    helperCursorTarget = null;
     clearHelperCursorHideTimer();
     document.body.classList.remove(SYSTEM_CURSOR_HIDE_CLASS);
-    if (helperIndicatorTarget) {
-        helperIndicatorTarget.style.setProperty("--helper-cursor-opacity", "0");
-        scheduleHelperIndicatorCleanup(helperIndicatorTarget);
-    }
-};
-
-const handleHelperPointerMove = (event) => {
-    if (customCursorEnabled || !helperCursorOver) return;
-    const helperItem = event?.target?.closest?.(".helper-item");
-    if (!helperItem) return;
-    if (helperIndicatorTarget !== helperItem) {
-        if (helperIndicatorTarget) setHelperIndicatorActive(helperIndicatorTarget, false);
-        helperIndicatorTarget = helperItem;
-        setHelperIndicatorActive(helperItem, true);
-    }
-    updateHelperIndicator(helperItem, event);
+    handleHelperIndicatorProximity(event);
 };
 
 const triggerReplayAction = (event) => {
@@ -2030,11 +2028,7 @@ document.addEventListener("click", () => {
 
 const handlePointerUpdate = (event) => {
     if (!customCursorEnabled) {
-        if (helperCursorOver) {
-            handleHelperPointerMove(event);
-        } else {
-            handleHelperIndicatorProximity(event);
-        }
+        handleHelperIndicatorProximity(event);
         return;
     }
     const events = typeof event.getCoalescedEvents === "function"

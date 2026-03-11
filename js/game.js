@@ -1150,6 +1150,7 @@ const renderChordHelperBox = () => {
     }).join("");
     return `
         <div class="helper-card">
+            <div class="helper-indicator-layer" aria-hidden="true"></div>
             <div class="helper-head">
                 <div class="helper-title">${escapeHtml(HELPER_COPY.title || "Chord helper")}</div>
                 <div class="helper-meta">${escapeHtml(helperHint)}</div>
