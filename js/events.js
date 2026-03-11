@@ -1273,7 +1273,7 @@ const toggleRootHintFromHelper = () => {
     });
 };
 
-const toggleHelperPinned = (target, { persistent = false } = {}) => {
+const toggleHelperPinned = (target, { persistent = false, event = null } = {}) => {
     const helperItem = target?.closest?.(".helper-item");
     if (!helperItem) return false;
     const label = helperItem.dataset?.helperLabel;
@@ -1283,8 +1283,15 @@ const toggleHelperPinned = (target, { persistent = false } = {}) => {
     const toggled = toggleFn(label);
     if (toggled) {
         const flags = syncHelperPinnedUi(helperItem);
-        if (flags && !flags.pinned && !helperItem.matches(":hover")) {
-            if (document.activeElement === helperItem) {
+        if (flags && !flags.pinned) {
+            const hasPointer = Number.isFinite(event?.clientX) && Number.isFinite(event?.clientY);
+            const hoverTarget = hasPointer
+                ? document.elementFromPoint(event.clientX, event.clientY)
+                : null;
+            const isHovered = hasPointer
+                ? helperItem.contains(hoverTarget)
+                : helperItem.matches(":hover");
+            if (!isHovered && document.activeElement === helperItem) {
                 helperItem.blur();
             }
         }
@@ -1293,14 +1300,14 @@ const toggleHelperPinned = (target, { persistent = false } = {}) => {
 };
 
 document.addEventListener("click", (event) => {
-    if (toggleHelperPinned(event.target)) {
+    if (toggleHelperPinned(event.target, { event })) {
         event.preventDefault();
     }
 });
 
 document.addEventListener("keydown", (event) => {
     if (!["Enter", " "].includes(event.key)) return;
-    if (toggleHelperPinned(event.target)) {
+    if (toggleHelperPinned(event.target, { event })) {
         event.preventDefault();
     }
 });
@@ -1314,7 +1321,7 @@ document.addEventListener("contextmenu", (event) => {
         event.preventDefault();
         return;
     }
-    if (toggleHelperPinned(helperItem, { persistent: true })) {
+    if (toggleHelperPinned(helperItem, { persistent: true, event })) {
         event.preventDefault();
     }
 });
