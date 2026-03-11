@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-11 09:29:51 +01:00
+Generated: 2026-03-11 09:34:44 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -37,12 +37,12 @@ Generated: 2026-03-11 09:29:51 +01:00
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1529 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1065 |
 | js/events.js | JavaScript | Browser runtime module | Yes | 2196 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 2215 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 2219 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1474 |
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 47 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1241 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1242 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 540 |
 | tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
@@ -1027,7 +1027,7 @@ Event bindings:
 | pedalBox | pointerleave | 2142 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-2215
+File lines: 1-2219
 
 | Symbol | Lines |
 |---|---|
@@ -1037,98 +1037,98 @@ File lines: 1-2215
 | getGlobalPinnedHelperLabels | 153-153 |
 | isHelperPinnedGlobalLabel | 155-159 |
 | isHelperPinnedLocalLabel | 161-161 |
-| toggleHelperPinnedLocalLabel | 167-176 |
-| toggleHelperPinnedGlobalLabel | 178-189 |
-| setHelperPinnedGlobalLabel | 191-208 |
-| setRootHelperPinned | 210-210 |
-| getHelperPinFlags | 212-220 |
-| applyRoundStatePatch | 226-235 |
-| applySubmissionStatePatch | 237-246 |
-| normalizeQualityToken | 248-265 |
-| renderChordLink | 274-298 |
-| getKeyboardZoneEl | 326-326 |
-| normalizePitchClass | 327-327 |
-| getRootName | 328-328 |
-| getMidiFromNoteId | 329-329 |
-| buildChordLabel | 330-330 |
-| getPitchClassSetFromNoteIds | 332-340 |
-| getRootGuideNoteId | 346-361 |
-| getEffectiveKeyboardSelection | 363-375 |
-| getChordDifficultyId | 377-382 |
-| getChordDisplayLabel | 384-384 |
-| getChordQualityDisplaySuffix | 386-386 |
-| getChordDifficultyConfig | 388-391 |
-| getAllowedChordQualities | 393-398 |
-| getChordQualityHint | 400-403 |
-| getConsistentPreviewDuration | 411-414 |
-| playConsistentPreview | 420-438 |
-| releaseInteractivePressSession | 475-503 |
-| getReplayNoteIds | 505-529 |
-| getVoicingHintLabel | 531-535 |
-| randomSample | 537-544 |
-| getNiceTarget | 546-583 |
-| getQualityPitchClassSet | 585-591 |
-| parseChordInput | 593-632 |
-| detectChordFromNoteIds | 634-670 |
-| normalizeIntervals | 672-674 |
-| fitIntervalsToAvailableRange | 676-696 |
-| buildVoicedIntervals | 698-726 |
-| chooseRootCandidatesForIntervals | 728-737 |
-| buildChordFromRoot | 739-767 |
-| createChordTarget | 769-819 |
-| createNoteTarget | 821-856 |
-| createTarget | 858-865 |
-| clearTypingAutoNext | 867-871 |
-| ensureRoundPlaybackReady | 882-899 |
-| getTypedPreviewNoteIds | 901-935 |
-| updateTypedPreviewFromInput | 937-950 |
-| updateChordReadout | 952-1024 |
-| updateModeVisibility | 1026-1043 |
-| updatePrimaryAction | 1045-1050 |
-| updateReplayAvailability | 1052-1059 |
-| getChordHelperHints | 1061-1079 |
-| createDeterministicHelperMask | 1097-1125 |
-| renderChordHelperBox | 1127-1156 |
-| updateStatus | 1158-1282 |
-| updateKeyStates | 1284-1345 |
-| setKeyboardEnabled | 1347-1350 |
-| updateKeyboardScale | 1352-1363 |
-| lockKeyboardForPlayback | 1365-1378 |
-| setSubmitted | 1380-1387 |
-| goHome | 1389-1441 |
-| refreshTarget | 1443-1469 |
-| startRound | 1471-1547 |
-| ensureRound | 1549-1558 |
-| playTarget | 1560-1574 |
-| startManualNote | 1576-1594 |
-| releaseManualNote | 1596-1604 |
-| releasePedalNotes | 1606-1616 |
-| startPedalHold | 1618-1624 |
-| stopPedalHold | 1626-1633 |
-| toggleSelection | 1635-1679 |
-| isSelectionCorrect | 1681-1698 |
-| getPlaybackSpan | 1700-1705 |
-| renderNotePills | 1707-1713 |
-| renderChordPill | 1715-1719 |
-| renderTonePills | 1721-1729 |
-| renderRevealCell | 1731-1736 |
-| renderChordRevealGrid | 1738-1741 |
-| renderChordDetectionMeta | 1743-1747 |
-| renderPressedPills | 1749-1754 |
-| buildNoteComparison | 1756-1763 |
-| buildAnswerNoteCell | 1765-1774 |
-| buildTargetNoteCell | 1776-1789 |
-| getSubmittedReplaySnapshot | 1813-1827 |
-| playSubmittedReplaySequence | 1829-1842 |
-| playRevealSequence | 1844-1894 |
-| playSelectedChord | 1896-1920 |
-| playTypedInputChord | 1922-1935 |
-| startHeldPlayback | 1937-1963 |
-| releaseHeldPlayback | 1965-1979 |
-| buildTypingRevealDetail | 1981-2001 |
-| submitTypedAnswer | 2003-2077 |
-| submitAnswer | 2079-2142 |
-| sanitizeRoundStateForKeyboardRange | 2144-2184 |
+| toggleHelperPinnedLocalLabel | 167-177 |
+| toggleHelperPinnedGlobalLabel | 179-190 |
+| setHelperPinnedGlobalLabel | 192-210 |
+| setRootHelperPinned | 212-216 |
+| getHelperPinFlags | 218-226 |
+| applyRoundStatePatch | 232-241 |
+| applySubmissionStatePatch | 243-252 |
+| normalizeQualityToken | 254-271 |
+| renderChordLink | 280-304 |
+| getKeyboardZoneEl | 332-332 |
+| normalizePitchClass | 333-333 |
+| getRootName | 334-334 |
+| getMidiFromNoteId | 335-335 |
+| buildChordLabel | 336-336 |
+| getPitchClassSetFromNoteIds | 338-346 |
+| getRootGuideNoteId | 352-367 |
+| getEffectiveKeyboardSelection | 369-381 |
+| getChordDifficultyId | 383-388 |
+| getChordDisplayLabel | 390-390 |
+| getChordQualityDisplaySuffix | 392-392 |
+| getChordDifficultyConfig | 394-397 |
+| getAllowedChordQualities | 399-404 |
+| getChordQualityHint | 406-409 |
+| getConsistentPreviewDuration | 417-420 |
+| playConsistentPreview | 426-444 |
+| releaseInteractivePressSession | 481-509 |
+| getReplayNoteIds | 511-535 |
+| getVoicingHintLabel | 537-541 |
+| randomSample | 543-550 |
+| getNiceTarget | 552-589 |
+| getQualityPitchClassSet | 591-597 |
+| parseChordInput | 599-638 |
+| detectChordFromNoteIds | 640-676 |
+| normalizeIntervals | 678-680 |
+| fitIntervalsToAvailableRange | 682-702 |
+| buildVoicedIntervals | 704-732 |
+| chooseRootCandidatesForIntervals | 734-743 |
+| buildChordFromRoot | 745-773 |
+| createChordTarget | 775-825 |
+| createNoteTarget | 827-862 |
+| createTarget | 864-871 |
+| clearTypingAutoNext | 873-877 |
+| ensureRoundPlaybackReady | 888-905 |
+| getTypedPreviewNoteIds | 907-941 |
+| updateTypedPreviewFromInput | 943-956 |
+| updateChordReadout | 958-1030 |
+| updateModeVisibility | 1032-1049 |
+| updatePrimaryAction | 1051-1056 |
+| updateReplayAvailability | 1058-1065 |
+| getChordHelperHints | 1067-1083 |
+| createDeterministicHelperMask | 1101-1129 |
+| renderChordHelperBox | 1131-1160 |
+| updateStatus | 1162-1286 |
+| updateKeyStates | 1288-1349 |
+| setKeyboardEnabled | 1351-1354 |
+| updateKeyboardScale | 1356-1367 |
+| lockKeyboardForPlayback | 1369-1382 |
+| setSubmitted | 1384-1391 |
+| goHome | 1393-1445 |
+| refreshTarget | 1447-1473 |
+| startRound | 1475-1551 |
+| ensureRound | 1553-1562 |
+| playTarget | 1564-1578 |
+| startManualNote | 1580-1598 |
+| releaseManualNote | 1600-1608 |
+| releasePedalNotes | 1610-1620 |
+| startPedalHold | 1622-1628 |
+| stopPedalHold | 1630-1637 |
+| toggleSelection | 1639-1683 |
+| isSelectionCorrect | 1685-1702 |
+| getPlaybackSpan | 1704-1709 |
+| renderNotePills | 1711-1717 |
+| renderChordPill | 1719-1723 |
+| renderTonePills | 1725-1733 |
+| renderRevealCell | 1735-1740 |
+| renderChordRevealGrid | 1742-1745 |
+| renderChordDetectionMeta | 1747-1751 |
+| renderPressedPills | 1753-1758 |
+| buildNoteComparison | 1760-1767 |
+| buildAnswerNoteCell | 1769-1778 |
+| buildTargetNoteCell | 1780-1793 |
+| getSubmittedReplaySnapshot | 1817-1831 |
+| playSubmittedReplaySequence | 1833-1846 |
+| playRevealSequence | 1848-1898 |
+| playSelectedChord | 1900-1924 |
+| playTypedInputChord | 1926-1939 |
+| startHeldPlayback | 1941-1967 |
+| releaseHeldPlayback | 1969-1983 |
+| buildTypingRevealDetail | 1985-2005 |
+| submitTypedAnswer | 2007-2081 |
+| submitAnswer | 2083-2146 |
+| sanitizeRoundStateForKeyboardRange | 2148-2188 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1474

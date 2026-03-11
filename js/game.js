@@ -166,6 +166,7 @@ const isHelperPinnedLabel = (label) => (
 
 const toggleHelperPinnedLocalLabel = (label) => {
     if (!label) return false;
+    if (isHelperPinnedGlobalLabel(label)) return false;
     const labels = getLocalPinnedHelperLabels();
     if (labels.has(label)) {
         labels.delete(label);
@@ -190,6 +191,7 @@ const toggleHelperPinnedGlobalLabel = (label) => {
 
 const setHelperPinnedGlobalLabel = (label, pinned) => {
     if (!label) return false;
+    if (label === HELPER_LABELS.rootNote) return false;
     const labels = getGlobalPinnedHelperLabels();
     const has = labels.has(label);
     if (pinned) {
@@ -207,11 +209,15 @@ const setHelperPinnedGlobalLabel = (label, pinned) => {
     return false;
 };
 
-const setRootHelperPinned = (pinned) => setHelperPinnedGlobalLabel(HELPER_LABELS.rootNote, pinned);
+const setRootHelperPinned = () => {
+    getGlobalPinnedHelperLabels().delete(HELPER_LABELS.rootNote);
+    getLocalPinnedHelperLabels().delete(HELPER_LABELS.rootNote);
+    return true;
+};
 
 const getHelperPinFlags = (label) => {
     const pinnedGlobal = isHelperPinnedGlobalLabel(label);
-    const pinnedLocal = isHelperPinnedLocalLabel(label);
+    const pinnedLocal = !pinnedGlobal && isHelperPinnedLocalLabel(label);
     return {
         pinned: pinnedGlobal || pinnedLocal,
         pinnedGlobal,
@@ -1063,9 +1069,7 @@ const getChordHelperHints = () => {
     const hints = [];
     hints.push({
         label: HELPER_LABELS.rootNote,
-        value: state.chordRootHint
-            ? state.targetChord.rootName
-            : (HELPER_COPY.rootHidden || "Hidden")
+        value: state.targetChord.rootName
     });
     hints.push(
         { label: HELPER_LABELS.chordSize, value: `${state.targetChord.noteCount} notes` },

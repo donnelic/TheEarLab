@@ -201,7 +201,7 @@ if (chordRootHintToggle) {
             rootHintSuppressed: false
         }, "events/chord-root-hint");
         if (typeof App.game?.setRootHelperPinned === "function") {
-            App.game.setRootHelperPinned(nextValue);
+            App.game.setRootHelperPinned();
         }
         applySettingMutationEffects("chordRootHint", {
             restartOverride: false
@@ -1265,7 +1265,7 @@ const toggleRootHintFromHelper = () => {
         chordRootHintToggle.checked = nextValue;
     }
     if (typeof App.game?.setRootHelperPinned === "function") {
-        App.game.setRootHelperPinned(nextValue);
+        App.game.setRootHelperPinned();
     }
     applySettingMutationEffects("chordRootHint", {
         restartOverride: false
