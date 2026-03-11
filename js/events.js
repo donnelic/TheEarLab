@@ -1263,7 +1263,7 @@ const shouldBlurAfterUnpin = (event) => {
     return ["click", "contextmenu"].includes(event.type);
 };
 
-const toggleRootHintFromHelper = (helperItem, event) => {
+const toggleRootHintFromHelper = () => {
     const nextValue = !state.chordRootHint;
     patchSettingsState({
         chordRootHint: nextValue,
@@ -1278,9 +1278,7 @@ const toggleRootHintFromHelper = (helperItem, event) => {
     applySettingMutationEffects("chordRootHint", {
         restartOverride: false
     });
-    if (!nextValue && shouldBlurAfterUnpin(event) && document.activeElement === helperItem) {
-        helperItem.blur();
-    }
+    return true;
 };
 
 const toggleHelperPinned = (target, { persistent = false, event = null } = {}) => {
@@ -1288,9 +1286,14 @@ const toggleHelperPinned = (target, { persistent = false, event = null } = {}) =
     if (!helperItem) return false;
     const label = helperItem.dataset?.helperLabel;
     if (!label) return false;
-    const toggleFn = persistent ? App.game?.toggleHelperPinGlobal : App.game?.toggleHelperPinLocal;
-    if (typeof toggleFn !== "function") return false;
-    const toggled = toggleFn(label);
+    let toggled = false;
+    if (persistent && label === ROOT_HELPER_LABEL) {
+        toggled = toggleRootHintFromHelper();
+    } else {
+        const toggleFn = persistent ? App.game?.toggleHelperPinGlobal : App.game?.toggleHelperPinLocal;
+        if (typeof toggleFn !== "function") return false;
+        toggled = toggleFn(label);
+    }
     if (toggled) {
         const flags = syncHelperPinnedUi(helperItem);
         if (flags && !flags.pinned && shouldBlurAfterUnpin(event) && document.activeElement === helperItem) {
@@ -1316,12 +1319,6 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("contextmenu", (event) => {
     const helperItem = event.target?.closest?.(".helper-item");
     if (!helperItem) return;
-    const label = helperItem.dataset?.helperLabel;
-    if (label === ROOT_HELPER_LABEL) {
-        toggleRootHintFromHelper(helperItem, event);
-        event.preventDefault();
-        return;
-    }
     if (toggleHelperPinned(helperItem, { persistent: true, event })) {
         event.preventDefault();
     }
