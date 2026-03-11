@@ -1263,6 +1263,16 @@ const shouldBlurAfterUnpin = (event) => {
     return ["click", "contextmenu"].includes(event.type);
 };
 
+const isHelperHoveredForEvent = (helperItem, event) => {
+    if (!helperItem || !event) return helperItem?.matches?.(":hover");
+    if (event.type === "keydown") return false;
+    if (typeof event.clientX === "number" && typeof event.clientY === "number") {
+        const target = document.elementFromPoint(event.clientX, event.clientY);
+        return Boolean(target && helperItem.contains(target));
+    }
+    return helperItem.matches(":hover");
+};
+
 const toggleRootHintFromHelper = () => {
     const nextValue = !state.chordRootHint;
     patchSettingsState({
@@ -1281,8 +1291,7 @@ const toggleRootHintFromHelper = () => {
     return true;
 };
 
-const toggleHelperPinned = (target, { persistent = false, event = null } = {}) => {
-    const helperItem = target?.closest?.(".helper-item");
+const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {}) => {
     if (!helperItem) return false;
     const label = helperItem.dataset?.helperLabel;
     if (!label) return false;
@@ -1296,33 +1305,34 @@ const toggleHelperPinned = (target, { persistent = false, event = null } = {}) =
     }
     if (toggled) {
         const flags = syncHelperPinnedUi(helperItem);
-        if (flags && !flags.pinned && shouldBlurAfterUnpin(event) && document.activeElement === helperItem) {
+        const shouldBlur = flags
+            && !flags.pinned
+            && shouldBlurAfterUnpin(event)
+            && !isHelperHoveredForEvent(helperItem, event)
+            && document.activeElement === helperItem;
+        if (shouldBlur) {
             helperItem.blur();
         }
     }
     return toggled;
 };
 
-document.addEventListener("click", (event) => {
-    if (toggleHelperPinned(event.target, { event })) {
+const handleHelperPinEvent = (event, { persistent = false } = {}) => {
+    const helperItem = event.target?.closest?.(".helper-item");
+    if (!helperItem) return;
+    if (toggleHelperPinned(helperItem, { persistent, event })) {
         event.preventDefault();
     }
-});
+};
+
+document.addEventListener("click", (event) => handleHelperPinEvent(event));
 
 document.addEventListener("keydown", (event) => {
     if (!["Enter", " "].includes(event.key)) return;
-    if (toggleHelperPinned(event.target, { event })) {
-        event.preventDefault();
-    }
+    handleHelperPinEvent(event);
 });
 
-document.addEventListener("contextmenu", (event) => {
-    const helperItem = event.target?.closest?.(".helper-item");
-    if (!helperItem) return;
-    if (toggleHelperPinned(helperItem, { persistent: true, event })) {
-        event.preventDefault();
-    }
-});
+document.addEventListener("contextmenu", (event) => handleHelperPinEvent(event, { persistent: true }));
 
 if (chordTutorialRootList) {
     chordTutorialRootList.addEventListener("mouseover", (event) => {
