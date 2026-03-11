@@ -1481,51 +1481,60 @@ let customCursorFrame = null;
 let customCursorMotionFrame = null;
 let helperCursorHideTimer = null;
 let helperCursorOver = false;
-let helperIndicatorActive = false;
-let helperIndicatorItems = [];
-let helperIndicatorCache = null;
-let helperIndicatorDirty = true;
-let helperIndicatorFrame = null;
-let helperIndicatorLastX = null;
-let helperIndicatorLastY = null;
-let helperIndicatorObserver = null;
+const helperIndicatorState = {
+    items: [],
+    cache: null,
+    dirty: true,
+    frame: null,
+    lastX: null,
+    lastY: null,
+    active: false,
+    observer: null
+};
 
 const markHelperIndicatorDirty = () => {
-    helperIndicatorDirty = true;
-    helperIndicatorCache = null;
+    helperIndicatorState.dirty = true;
+    helperIndicatorState.cache = null;
 };
 
-const refreshHelperIndicatorItems = () => {
+const getHelperIndicatorItems = () => {
     if (!helperSlotEl) {
-        helperIndicatorItems = [];
-        return helperIndicatorItems;
+        helperIndicatorState.items = [];
+        return helperIndicatorState.items;
     }
-    helperIndicatorItems = Array.from(helperSlotEl.querySelectorAll(".helper-item"));
+    const items = helperIndicatorState.items;
+    if (items.length && items.every((item) => item?.isConnected)) {
+        return items;
+    }
+    helperIndicatorState.items = Array.from(helperSlotEl.querySelectorAll(".helper-item"));
     markHelperIndicatorDirty();
-    return helperIndicatorItems;
+    return helperIndicatorState.items;
 };
 
-const setHelperIndicatorsOpacity = (items, opacity) => {
+const setHelperIndicatorActive = (active, items = getHelperIndicatorItems()) => {
+    if (!items.length) {
+        helperIndicatorState.active = false;
+        return;
+    }
+    const opacity = active ? "1" : "0";
     items.forEach((item) => {
         item.style.setProperty("--helper-cursor-opacity", opacity);
     });
-    helperIndicatorActive = opacity !== "0";
+    helperIndicatorState.active = active;
 };
 
 const ensureHelperIndicatorObserver = () => {
-    if (helperIndicatorObserver || !helperSlotEl) return;
-    helperIndicatorObserver = new MutationObserver(() => {
-        markHelperIndicatorDirty();
-    });
-    helperIndicatorObserver.observe(helperSlotEl, { childList: true, subtree: true });
+    if (helperIndicatorState.observer || !helperSlotEl) return;
+    helperIndicatorState.observer = new MutationObserver(markHelperIndicatorDirty);
+    helperIndicatorState.observer.observe(helperSlotEl, { childList: true, subtree: true });
 };
 
 const getHelperIndicatorCache = () => {
     ensureHelperIndicatorObserver();
-    const items = helperIndicatorItems.length ? helperIndicatorItems : refreshHelperIndicatorItems();
+    const items = getHelperIndicatorItems();
     if (!items.length) return null;
-    if (!helperIndicatorDirty && helperIndicatorCache && items.every((item) => item?.isConnected)) {
-        return helperIndicatorCache;
+    if (!helperIndicatorState.dirty && helperIndicatorState.cache) {
+        return helperIndicatorState.cache;
     }
     const list = helperSlotEl?.querySelector(".helper-list");
     if (!list) return null;
@@ -1547,14 +1556,9 @@ const getHelperIndicatorCache = () => {
         top: listRect.top - gapMargin,
         bottom: listRect.bottom + gapMargin
     };
-    helperIndicatorCache = {
-        items,
-        rects,
-        expandedRect,
-        cursorHoldRect
-    };
-    helperIndicatorDirty = false;
-    return helperIndicatorCache;
+    helperIndicatorState.cache = { items, rects, expandedRect, cursorHoldRect };
+    helperIndicatorState.dirty = false;
+    return helperIndicatorState.cache;
 };
 
 const updateHelperIndicatorPositions = (cache, x, y) => {
@@ -1570,16 +1574,16 @@ const updateHelperIndicatorPositions = (cache, x, y) => {
 };
 
 const scheduleHelperIndicatorUpdate = (cache, event) => {
-    helperIndicatorLastX = event.clientX;
-    helperIndicatorLastY = event.clientY;
-    if (helperIndicatorFrame !== null) return;
-    helperIndicatorFrame = requestAnimationFrame(() => {
-        helperIndicatorFrame = null;
-        if (!helperIndicatorActive) return;
+    helperIndicatorState.lastX = event.clientX;
+    helperIndicatorState.lastY = event.clientY;
+    if (helperIndicatorState.frame !== null) return;
+    helperIndicatorState.frame = requestAnimationFrame(() => {
+        helperIndicatorState.frame = null;
+        if (!helperIndicatorState.active) return;
         const latestCache = getHelperIndicatorCache() || cache;
         if (!latestCache) return;
-        if (helperIndicatorLastX === null || helperIndicatorLastY === null) return;
-        updateHelperIndicatorPositions(latestCache, helperIndicatorLastX, helperIndicatorLastY);
+        if (helperIndicatorState.lastX === null || helperIndicatorState.lastY === null) return;
+        updateHelperIndicatorPositions(latestCache, helperIndicatorState.lastX, helperIndicatorState.lastY);
     });
 };
 
@@ -1596,17 +1600,17 @@ const handleHelperIndicatorProximity = (event) => {
     if (!event || typeof event.clientX !== "number" || typeof event.clientY !== "number") return;
     const cache = getHelperIndicatorCache();
     if (!cache) {
-        if (helperIndicatorActive) setHelperIndicatorsOpacity(helperIndicatorItems, "0");
+        if (helperIndicatorState.active) setHelperIndicatorActive(false);
         return;
     }
     const inside = isPointerInsideRect(event, cache.expandedRect);
     if (inside) {
-        if (!helperIndicatorActive) setHelperIndicatorsOpacity(cache.items, "1");
+        if (!helperIndicatorState.active) setHelperIndicatorActive(true, cache.items);
         scheduleHelperIndicatorUpdate(cache, event);
         return;
     }
-    if (helperIndicatorActive) {
-        setHelperIndicatorsOpacity(helperIndicatorItems, "0");
+    if (helperIndicatorState.active) {
+        setHelperIndicatorActive(false, cache.items);
     }
     if (!helperCursorOver && document.body.classList.contains(SYSTEM_CURSOR_HIDE_CLASS)
         && !isPointerInsideRect(event, cache.cursorHoldRect)) {
@@ -1698,8 +1702,8 @@ const setCustomCursorEnabled = (enabled) => {
             clearTimeout(helperCursorHideTimer);
             helperCursorHideTimer = null;
         }
-        if (helperIndicatorActive) {
-            setHelperIndicatorsOpacity(helperIndicatorItems, "0");
+        if (helperIndicatorState.active) {
+            setHelperIndicatorActive(false);
         }
     }
     if (!customCursorEnabled) {
