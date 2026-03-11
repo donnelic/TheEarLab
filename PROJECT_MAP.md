@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-11 11:18:27 +01:00
+Generated: 2026-03-11 11:34:28 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -36,13 +36,13 @@ Generated: 2026-03-11 11:18:27 +01:00
 | styles.css | CSS | Loaded directly | Yes | 3389 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1529 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1065 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 2220 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 2219 |
 | js/game.js | JavaScript | Browser runtime module | Yes | 2219 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1474 |
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 47 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1244 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1247 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 540 |
 | tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
@@ -823,7 +823,7 @@ File lines: 1-1065
 | rebuildKeyboard | 1053-1064 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-2220
+File lines: 1-2219
 
 | Symbol | Lines |
 |---|---|
@@ -887,20 +887,20 @@ File lines: 1-2220
 | triggerReplayAction | 1536-1542 |
 | bindPianoOptionEvents | 1702-1727 |
 | handlePointerUpdate | 1802-1809 |
-| applyCustomCursorMediaState | 1856-1858 |
-| isElementVisible | 1873-1879 |
-| getFocusableElements | 1881-1885 |
-| focusFirstInModal | 1891-1897 |
-| trapModalFocus | 1899-1921 |
-| isTextEditableTarget | 1923-1928 |
-| getActiveModalEl | 1930-1935 |
-| closeGameSettingsModalUi | 1937-1946 |
-| openGameSettingsModalUi | 1948-1954 |
-| closeActiveModal | 1956-1970 |
-| moveFocusInPanel | 1972-1983 |
-| setRandomBackgroundAngle | 2173-2176 |
-| init | 2178-2214 |
-| runDeferredCatalogLoad | 2198-2207 |
+| applyCustomCursorMediaState | 1855-1857 |
+| isElementVisible | 1872-1878 |
+| getFocusableElements | 1880-1884 |
+| focusFirstInModal | 1890-1896 |
+| trapModalFocus | 1898-1920 |
+| isTextEditableTarget | 1922-1927 |
+| getActiveModalEl | 1929-1934 |
+| closeGameSettingsModalUi | 1936-1945 |
+| openGameSettingsModalUi | 1947-1953 |
+| closeActiveModal | 1955-1969 |
+| moveFocusInPanel | 1971-1982 |
+| setRandomBackgroundAngle | 2172-2175 |
+| init | 2177-2213 |
+| runDeferredCatalogLoad | 2197-2206 |
 
 Event bindings:
 | Target | Event | Line |
@@ -1016,20 +1016,20 @@ Event bindings:
 | document | click | 1798 |
 | document | pointerrawupdate | 1812 |
 | document | pointermove | 1814 |
-| document | pointerup | 1817 |
-| document | pointercancel | 1822 |
-| document | pointerover | 1827 |
-| document | pointerout | 1833 |
-| window | blur | 1842 |
-| document | visibilitychange | 1848 |
-| CUSTOM_CURSOR_QUERY | change | 1860 |
-| keyboardEl | click | 1866 |
-| document | keydown | 1985 |
-| document | keyup | 2121 |
-| pedalBox | pointerdown | 2140 |
-| pedalBox | pointerup | 2149 |
-| pedalBox | pointercancel | 2158 |
-| pedalBox | pointerleave | 2166 |
+| document | pointerup | 1816 |
+| document | pointercancel | 1821 |
+| document | pointerover | 1826 |
+| document | pointerout | 1832 |
+| window | blur | 1841 |
+| document | visibilitychange | 1847 |
+| CUSTOM_CURSOR_QUERY | change | 1859 |
+| keyboardEl | click | 1865 |
+| document | keydown | 1984 |
+| document | keyup | 2120 |
+| pedalBox | pointerdown | 2139 |
+| pedalBox | pointerup | 2148 |
+| pedalBox | pointercancel | 2157 |
+| pedalBox | pointerleave | 2165 |
 
 ### js/game.js (Active Runtime)
 File lines: 1-2219

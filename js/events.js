@@ -1810,9 +1810,8 @@ const handlePointerUpdate = (event) => {
 
 if ("onpointerrawupdate" in window) {
     document.addEventListener("pointerrawupdate", handlePointerUpdate, { passive: true, capture: true });
-} else {
-    document.addEventListener("pointermove", handlePointerUpdate, { passive: true, capture: true });
 }
+document.addEventListener("pointermove", handlePointerUpdate, { passive: true, capture: true });
 
 document.addEventListener("pointerup", (event) => {
     customCursorPressed = false;
