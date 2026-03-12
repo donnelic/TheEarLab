@@ -1675,6 +1675,9 @@ const ensureCustomCursorEl = () => {
 };
 const getCustomCursorMode = (target) => {
     if (target instanceof Element) {
+        if (target.closest("#typing-help-toggle, .typing-help-toggle")) {
+            return "interactive";
+        }
         if (target.closest("#chord-answer, .typing-input-wrap")) {
             return "text";
         }

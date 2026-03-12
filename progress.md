@@ -33,3 +33,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Left-click on root helper now turns off root hint and latches; custom cursor text mode now explicitly matches chord typing input wrapper.
 
 - 2026-03-12: Root helper detection now uses data-helper-root; custom cursor mode uses elementFromPoint to resolve text inputs reliably.
+
+- 2026-03-12: Typing help button now forces interactive cursor mode ahead of text mode.
