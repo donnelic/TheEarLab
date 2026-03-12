@@ -1758,9 +1758,25 @@ body.modal-open {
             color-mix(in oklab, var(--accent) 12%, transparent) 62%,
             transparent 80%);
     opacity: var(--helper-cursor-opacity);
-    transition: opacity 0.18s ease;
+    transition: opacity 0.18s ease, background 0.22s ease;
     pointer-events: none;
     z-index: 2;
+}
+
+.helper-item::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    transform: rotate(45deg) scale(0.95);
+    transform-origin: center;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 3;
+    transition: opacity 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .helper-item>* {
@@ -1792,24 +1808,12 @@ body.modal-open {
 }
 
 .helper-item.pinned::after {
-    content: "";
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 10px;
-    height: 10px;
-    border-radius: 4px;
-    transform: rotate(45deg);
-    transform-origin: center;
-    pointer-events: none;
-    z-index: 1;
-    background: linear-gradient(145deg,
-        color-mix(in oklab, var(--accent) 92%, white) 0%,
-        color-mix(in oklab, var(--accent) 70%, var(--panel)) 100%);
+    opacity: 1;
+    background: color-mix(in oklab, var(--accent) 45%, var(--input-border));
     box-shadow:
-        0 0 0 1px color-mix(in oklab, var(--accent) 85%, transparent),
+        0 0 0 1px color-mix(in oklab, var(--accent) 65%, transparent),
         0 3px 6px rgba(15, 23, 42, 0.18);
-    z-index: 3;
+    transform: rotate(45deg) scale(1);
 }
 
 .helper-item.pinned .helper-label {
@@ -1936,6 +1940,7 @@ body.system-cursor-hidden * {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: color 0.18s ease;
 }
 
 .helper-item .helper-value {
@@ -1966,7 +1971,7 @@ body.system-cursor-hidden * {
     color: var(--ink);
     opacity: 0;
     filter: blur(3px);
-    transition: filter 0.24s ease 0.2s, opacity 0.24s ease 0.2s;
+    transition: filter 0.24s ease 0.2s, opacity 0.24s ease 0.2s, color 0.18s ease;
     will-change: filter, opacity;
     white-space: nowrap;
     max-width: min(24ch, 100%);

@@ -25,3 +25,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Reverted helper cursor dot to background gradient (removed overlay span).
 
 - 2026-03-12: Restored helper dot-in-background version (no overlay element, gradient pinned marker).
+
+- 2026-03-12: Restyled pinned marker to a solid color matching latched border and added transitions for marker/label/value colors.
