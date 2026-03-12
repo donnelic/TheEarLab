@@ -41,3 +41,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Pointer-up now blurs pointer-activated buttons to avoid sticky focus; increased custom cursor smoothing to reduce lag.
 
 - 2026-03-12: Tutorial modal now skips return focus when opened by pointer; adds pointer-down tracking to avoid refocusing question mark button.
+
+- 2026-03-12: Game settings modal now skips return focus for pointer-opened triggers and blurs active modal focus on close.

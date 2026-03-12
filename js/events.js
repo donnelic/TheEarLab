@@ -312,14 +312,14 @@ settingsPanel.addEventListener("click", (event) => {
 if (optionsTrigger) {
     optionsTrigger.addEventListener("click", (event) => {
         event.stopPropagation();
-        openGameSettingsModalUi(optionsTrigger);
+        openGameSettingsModalUi(optionsTrigger, { skipReturnFocus: wasPointerActivated(optionsTrigger) });
     });
 }
 
 if (gameSettingsOpen) {
     gameSettingsOpen.addEventListener("click", (event) => {
         event.preventDefault();
-        openGameSettingsModalUi(gameSettingsOpen);
+        openGameSettingsModalUi(gameSettingsOpen, { skipReturnFocus: wasPointerActivated(gameSettingsOpen) });
     });
 }
 
@@ -1185,11 +1185,13 @@ const openChordTutorial = (stepIndex = 0, sourceEl = null, options = {}) => {
     }
 };
 
-const wasPointerActivated = (element) => (
-    element
-    && lastPointerDownTarget === element
-    && (Date.now() - lastPointerDownAt) < 1200
-);
+function wasPointerActivated(element) {
+    return Boolean(
+        element
+        && lastPointerDownTarget === element
+        && (Date.now() - lastPointerDownAt) < 1200
+    );
+}
 
 const registerTutorialOpenTrigger = (triggerEl, stepIndex = 0) => {
     if (!triggerEl) return;
@@ -2171,6 +2173,7 @@ keyboardEl.addEventListener("click", (event) => {
 });
 
 let gameSettingsReturnFocusEl = null;
+let gameSettingsSkipReturnFocus = false;
 const FOCUSABLE_SELECTOR = "button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])";
 
 const isElementVisible = (el) => {
@@ -2238,18 +2241,26 @@ const getActiveModalEl = () => {
 };
 
 const closeGameSettingsModalUi = () => {
+    const active = document.activeElement;
+    if (gameSettingsModal && active && gameSettingsModal.contains(active) && typeof active.blur === "function") {
+        active.blur();
+    }
     if (typeof App.settings?.closeGameSettingsModal === "function") {
         App.settings.closeGameSettingsModal({ restoreFocus: false });
     }
-    const fallback = gameSettingsReturnFocusEl ?? gameSettingsOpen ?? optionsTrigger;
-    if (fallback && typeof fallback.focus === "function") {
-        fallback.focus({ preventScroll: true });
+    if (!gameSettingsSkipReturnFocus) {
+        const fallback = gameSettingsReturnFocusEl ?? gameSettingsOpen ?? optionsTrigger;
+        if (fallback && typeof fallback.focus === "function") {
+            fallback.focus({ preventScroll: true });
+        }
     }
     gameSettingsReturnFocusEl = null;
+    gameSettingsSkipReturnFocus = false;
 };
 
-const openGameSettingsModalUi = (sourceEl = null) => {
-    gameSettingsReturnFocusEl = sourceEl ?? document.activeElement;
+const openGameSettingsModalUi = (sourceEl = null, { skipReturnFocus = false } = {}) => {
+    gameSettingsSkipReturnFocus = Boolean(skipReturnFocus);
+    gameSettingsReturnFocusEl = !gameSettingsSkipReturnFocus ? (sourceEl ?? document.activeElement) : null;
     if (typeof App.settings?.openGameSettingsModal === "function") {
         App.settings.openGameSettingsModal();
     }
