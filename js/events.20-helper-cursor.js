@@ -185,11 +185,11 @@ if (chordTutorialQualityList) {
     });
 }
 
-const EVENTS_MODE_POLICY = App.modePolicy;
+const EVENTS_MODE_POLICY_LOCAL = App.modePolicy;
 const EVENTS_ACTION_COPY = App.uiCopy?.actions || {};
-const isEventsTypingEnabled = () => EVENTS_MODE_POLICY.isTypingEnabledFromState(state);
-const isEventsTypingOnlyMode = () => EVENTS_MODE_POLICY.isTypingOnlyModeFromState(state);
-const getEventsChordRound = () => EVENTS_MODE_POLICY.getIsChordRoundFromState(state);
+const isEventsTypingEnabled = () => EVENTS_MODE_POLICY_LOCAL.isTypingEnabledFromState(state);
+const isEventsTypingOnlyMode = () => EVENTS_MODE_POLICY_LOCAL.isTypingOnlyModeFromState(state);
+const getEventsChordRound = () => EVENTS_MODE_POLICY_LOCAL.getIsChordRoundFromState(state);
 
 const isChordTypingCaptureActive = () => {
     if (!state.active || state.submitted) return false;
