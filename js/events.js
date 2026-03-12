@@ -639,6 +639,7 @@ const tutorialState = {
     fitClass: ""
 };
 let tutorialReturnFocusEl = null;
+let tutorialSkipReturnFocus = false;
 let suppressChordBubbleTimer = null;
 
 const isChordTutorialOpen = () => Boolean(chordTutorialModal && !chordTutorialModal.hidden);
@@ -1132,19 +1133,25 @@ const closeChordTutorial = () => {
             document.activeElement.blur();
         }
     }
-    const fallback = cameFromChordLink
-        ? (typingHelpToggle ?? chordTutorialOpenOptions)
-        : (tutorialReturnFocusEl ?? typingHelpToggle ?? chordTutorialOpenOptions);
-    if (fallback && typeof fallback.focus === "function") {
-        fallback.focus();
+    if (!tutorialSkipReturnFocus) {
+        const fallback = cameFromChordLink
+            ? (typingHelpToggle ?? chordTutorialOpenOptions)
+            : (tutorialReturnFocusEl ?? typingHelpToggle ?? chordTutorialOpenOptions);
+        if (fallback && typeof fallback.focus === "function") {
+            fallback.focus();
+        }
     }
     tutorialReturnFocusEl = null;
+    tutorialSkipReturnFocus = false;
 };
 
 const openChordTutorial = (stepIndex = 0, sourceEl = null, options = {}) => {
     if (!chordTutorialModal) return;
-    const { qualityId = null, rootPc = null } = options;
-    tutorialReturnFocusEl = sourceEl && typeof sourceEl.focus === "function" ? sourceEl : null;
+    const { qualityId = null, rootPc = null, skipReturnFocus = false } = options;
+    tutorialSkipReturnFocus = Boolean(skipReturnFocus);
+    tutorialReturnFocusEl = !tutorialSkipReturnFocus && sourceEl && typeof sourceEl.focus === "function"
+        ? sourceEl
+        : null;
     tutorialState.stepIndex = Number.isFinite(stepIndex) ? stepIndex : 0;
     tutorialState.previousStepIndex = tutorialState.stepIndex;
     tutorialState.hoverSpec = null;
@@ -1178,16 +1185,22 @@ const openChordTutorial = (stepIndex = 0, sourceEl = null, options = {}) => {
     }
 };
 
+const wasPointerActivated = (element) => (
+    element
+    && lastPointerDownTarget === element
+    && (Date.now() - lastPointerDownAt) < 1200
+);
+
 const registerTutorialOpenTrigger = (triggerEl, stepIndex = 0) => {
     if (!triggerEl) return;
     triggerEl.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        openChordTutorial(stepIndex, triggerEl);
+        openChordTutorial(stepIndex, triggerEl, { skipReturnFocus: wasPointerActivated(triggerEl) });
     });
 };
 
-const openChordTutorialForChordLink = (linkEl) => {
+const openChordTutorialForChordLink = (linkEl, { skipReturnFocus = false } = {}) => {
     if (!linkEl) return;
     const qualityId = String(linkEl.dataset.qualityId || "");
     if (!qualityId) return;
@@ -1195,7 +1208,8 @@ const openChordTutorialForChordLink = (linkEl) => {
     const stepIndex = getTutorialStepIndexForQuality(qualityId);
     openChordTutorial(stepIndex, linkEl, {
         qualityId,
-        rootPc: Number.isFinite(rootPc) ? rootPc : null
+        rootPc: Number.isFinite(rootPc) ? rootPc : null,
+        skipReturnFocus
     });
 };
 
@@ -1205,7 +1219,7 @@ const handleChordLinkActivation = (event) => {
     const linkEl = event.target.closest(".chord-link");
     if (!linkEl) return;
     event.preventDefault();
-    openChordTutorialForChordLink(linkEl);
+    openChordTutorialForChordLink(linkEl, { skipReturnFocus: !isKeyboard });
 };
 
 document.addEventListener("click", handleChordLinkActivation);
@@ -1500,6 +1514,8 @@ let customCursorPressed = false;
 let customCursorMode = "default";
 let customCursorFrame = null;
 let customCursorMotionFrame = null;
+let lastPointerDownTarget = null;
+let lastPointerDownAt = 0;
 const helperIndicatorState = {
     items: [],
     cache: null,
@@ -2060,6 +2076,8 @@ document.addEventListener("pointercancel", (event) => {
 
 document.addEventListener("pointerdown", (event) => {
     pointerActivatedControl = getButtonLikeTarget(event.target);
+    lastPointerDownTarget = pointerActivatedControl;
+    lastPointerDownAt = Date.now();
     customCursorPressed = true;
     updateCustomCursorPosition(event);
 }, true);
