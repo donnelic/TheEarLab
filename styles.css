@@ -1746,9 +1746,13 @@ body.modal-open {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(120px circle at var(--helper-cursor-x) var(--helper-cursor-y),
-            color-mix(in oklab, var(--accent) 35%, transparent) 0%,
-            rgba(255, 255, 255, 0.04) 35%,
+        radial-gradient(4px circle at var(--helper-cursor-x) var(--helper-cursor-y),
+            rgba(15, 23, 42, 0.55) 0%,
+            rgba(15, 23, 42, 0.12) 55%,
+            transparent 75%),
+        radial-gradient(80px circle at var(--helper-cursor-x) var(--helper-cursor-y),
+            color-mix(in oklab, var(--accent) 55%, transparent) 0%,
+            color-mix(in oklab, var(--accent) 28%, transparent) 35%,
             transparent 70%);
     opacity: var(--helper-cursor-opacity);
     transition: opacity 0.18s ease;

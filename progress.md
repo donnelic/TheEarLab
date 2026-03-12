@@ -11,3 +11,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-11: Added corner diamond indicators to distinguish pinned (solid) vs latched (outlined) helper states.
 
 - 2026-03-12: Reduced pinned diamond size, removed latched marker and latched accent background per feedback.
+
+- 2026-03-12: Tightened helper hover indicator with a small dark dot and a more concentrated accent halo.
