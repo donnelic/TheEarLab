@@ -1774,9 +1774,14 @@ body.modal-open {
     z-index: 4;
 }
 
-.helper-item>* {
+.helper-item>*:not(.helper-cursor-dot) {
     position: relative;
     z-index: 1;
+}
+
+.helper-item>.helper-cursor-dot {
+    position: absolute;
+    z-index: 5;
 }
 
 .helper-item:hover,
@@ -1797,9 +1802,7 @@ body.modal-open {
         color-mix(in oklab, var(--accent) 18%, var(--panel)) 0%,
         color-mix(in oklab, var(--panel) 88%, var(--input-bg)) 100%);
     border: 1px solid color-mix(in oklab, var(--accent) 92%, var(--input-border));
-    box-shadow:
-        inset 3px 0 0 color-mix(in oklab, var(--accent) 92%, var(--input-border)),
-        0 6px 14px rgba(15, 23, 42, 0.16);
+    background: color-mix(in oklab, var(--accent) 12%, var(--panel));
 }
 
 .helper-item.pinned::after {

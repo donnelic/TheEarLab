@@ -19,3 +19,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Made helper hover dot a solid point (removed blur gradient).
 
 - 2026-03-12: Moved helper hover dot to its own overlay element so it sits above helper content.
+
+- 2026-03-12: Excluded helper cursor dot from generic child stacking rule and forced absolute overlay above content.
