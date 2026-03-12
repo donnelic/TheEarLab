@@ -1684,11 +1684,13 @@ const getCustomCursorMode = (target) => {
         if (target.closest("input[type=\"text\"], input[type=\"search\"], input[type=\"email\"], input[type=\"password\"], textarea, [contenteditable=\"true\"]")) {
             return "text";
         }
+    }
+    if (helperZoneActive) return "helper";
+    if (target instanceof Element) {
         if (target.closest("button, [role=\"button\"], a[href], input, select, label.switch, .key, .piano-option, .sf2-row, .profile-row, .tutorial-chip, [tabindex]:not([tabindex=\"-1\"])")) {
             return "interactive";
         }
     }
-    if (helperZoneActive) return "helper";
     return "default";
 };
 const syncCustomCursorState = () => {
@@ -1701,6 +1703,13 @@ const syncCustomCursorState = () => {
 const renderCustomCursor = () => {
     customCursorFrame = null;
     if (!customCursorEnabled) return;
+    if (customCursorVisible) {
+        const target = document.elementFromPoint(customCursorRenderX, customCursorRenderY);
+        const nextMode = getCustomCursorMode(target);
+        if (nextMode !== customCursorMode) {
+            customCursorMode = nextMode;
+        }
+    }
     const cursor = ensureCustomCursorEl();
     cursor.classList.toggle("visible", customCursorVisible);
     syncCustomCursorState();
