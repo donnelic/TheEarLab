@@ -1746,11 +1746,10 @@ body.modal-open {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(4px circle at var(--helper-cursor-x) var(--helper-cursor-y),
-            rgba(15, 23, 42, 0.55) 0%,
-            rgba(15, 23, 42, 0.12) 55%,
-            transparent 75%),
-        radial-gradient(80px circle at var(--helper-cursor-x) var(--helper-cursor-y),
+        radial-gradient(circle at var(--helper-cursor-x) var(--helper-cursor-y),
+            rgba(15, 23, 42, 0.65) 0 2px,
+            transparent 2px),
+        radial-gradient(30px circle at var(--helper-cursor-x) var(--helper-cursor-y),
             color-mix(in oklab, var(--accent) 82%, transparent) 0%,
             color-mix(in oklab, var(--accent) 68%, transparent) 8%,
             color-mix(in oklab, var(--accent) 52%, transparent) 16%,
