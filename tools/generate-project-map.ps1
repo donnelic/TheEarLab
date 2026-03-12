@@ -191,6 +191,23 @@ function Get-IndexScripts {
     return @($scripts)
 }
 
+function Get-IndexStyles {
+    param([string]$Path)
+
+    $lines = Get-Content -Path $Path
+    $styles = @()
+    for ($i = 0; $i -lt $lines.Count; $i += 1) {
+        $line = $lines[$i]
+        if ($line -match '<link\s+[^>]*rel="stylesheet"[^>]*href="([^"]+)"') {
+            $styles += [pscustomobject]@{
+                Href = $Matches[1]
+                Line = $i + 1
+            }
+        }
+    }
+    return @($styles)
+}
+
 function Get-MarkdownHeadings {
     param([string]$Path)
 
@@ -231,7 +248,8 @@ function Get-PsFunctionStarts {
 
 $rootPath = (Resolve-Path -Path $Root).Path
 $indexPath = Join-Path $rootPath "index.html"
-$stylesPath = Join-Path $rootPath "styles.css"
+$cssDir = Join-Path $rootPath "css"
+$cssFiles = if (Test-Path -Path $cssDir) { Get-ChildItem -Path $cssDir -File -Filter "*.css" | Sort-Object Name } else { @() }
 $jsDir = Join-Path $rootPath "js"
 $vendorDir = Join-Path $rootPath "vendor"
 $readmePath = Join-Path $rootPath "README.md"
@@ -245,6 +263,7 @@ $outputPath = Join-Path $rootPath $Output
 
 $jsFiles = Get-ChildItem -Path $jsDir -File -Filter "*.js" | Sort-Object Name
 $loadedScripts = Get-IndexScripts -Path $indexPath
+$loadedStyles = Get-IndexStyles -Path $indexPath
 $loadedLookup = @{}
 foreach ($script in $loadedScripts) {
     $normalizedSrc = ($script.Src -split "\?")[0].Trim()
@@ -253,10 +272,29 @@ foreach ($script in $loadedScripts) {
     }
 }
 
+$loadedStyleLookup = @{}
+foreach ($style in $loadedStyles) {
+    $normalizedHref = ($style.Href -split "\?")[0].Trim()
+    if ($normalizedHref) {
+        $loadedStyleLookup[$normalizedHref.Replace("/", "\")] = $true
+    }
+}
+
 $inventory = @(
-    [pscustomobject]@{ File = "index.html"; Kind = "HTML"; Runtime = "Loaded directly"; Active = "Yes"; Lines = Get-LineCount -Path $indexPath },
-    [pscustomobject]@{ File = "styles.css"; Kind = "CSS"; Runtime = "Loaded directly"; Active = "Yes"; Lines = Get-LineCount -Path $stylesPath }
+    [pscustomobject]@{ File = "index.html"; Kind = "HTML"; Runtime = "Loaded directly"; Active = "Yes"; Lines = Get-LineCount -Path $indexPath }
 )
+
+foreach ($css in $cssFiles) {
+    $relative = "css/$($css.Name)"
+    $active = if ($loadedStyleLookup[$relative.Replace("/", "\")]) { "Yes" } else { "No (not linked)" }
+    $inventory += [pscustomobject]@{
+        File = $relative
+        Kind = "CSS"
+        Runtime = "Loaded directly"
+        Active = $active
+        Lines = Get-LineCount -Path $css.FullName
+    }
+}
 
 foreach ($js in $jsFiles) {
     $relative = "js/$($js.Name)"
@@ -366,8 +404,8 @@ $doc = New-Object System.Text.StringBuilder
 [void]$doc.AppendLine("## System Flows")
 [void]$doc.AppendLine("### Bootstrap")
 [void]$doc.AppendLine("1. index.html loads CSS, vendor synth dependencies, and runtime scripts (core -> audio -> game -> settings -> events).")
-[void]$doc.AppendLine("2. core.js defines DOM handles, constants, state containers, persistence helpers, note/key builders.")
-[void]$doc.AppendLine("3. events.js:init() hydrates UI from saved settings, binds events, renders keyboard, and sets status.")
+[void]$doc.AppendLine("2. core.*.js defines DOM handles, constants, state containers, persistence helpers, note/key builders.")
+[void]$doc.AppendLine("3. events.*.js:init() hydrates UI from saved settings, binds events, renders keyboard, and sets status.")
 [void]$doc.AppendLine("")
 [void]$doc.AppendLine("### Round Lifecycle")
 [void]$doc.AppendLine("1. startRound(true) creates either note targets or chord targets and optionally plays them.")
@@ -410,21 +448,25 @@ for ($i = 0; $i -lt $loadedScripts.Count; $i += 1) {
 }
 [void]$doc.AppendLine("")
 
-[void]$doc.AppendLine("## styles.css Map")
-[void]$doc.AppendLine("File: styles.css (1-$(Get-LineCount -Path $stylesPath))")
-[void]$doc.AppendLine("")
-[void]$doc.AppendLine("### Top-Level CSS Blocks")
-[void]$doc.AppendLine("| Selector | Lines |")
-[void]$doc.AppendLine("|---|---|")
-$cssBlocks = Get-CssBlocks -Path $stylesPath
-foreach ($block in $cssBlocks) {
-    $selector = $block.Selector.Replace("|", "\|")
-    if ($selector.Length -gt 85) {
-        $selector = $selector.Substring(0, 82) + "..."
+[void]$doc.AppendLine("## CSS Maps")
+foreach ($css in $cssFiles) {
+    $relative = "css/$($css.Name)"
+    [void]$doc.AppendLine("### $relative")
+    [void]$doc.AppendLine("File: $relative (1-$(Get-LineCount -Path $css.FullName))")
+    [void]$doc.AppendLine("")
+    [void]$doc.AppendLine("#### Top-Level CSS Blocks")
+    [void]$doc.AppendLine("| Selector | Lines |")
+    [void]$doc.AppendLine("|---|---|")
+    $cssBlocks = Get-CssBlocks -Path $css.FullName
+    foreach ($block in $cssBlocks) {
+        $selector = $block.Selector.Replace("|", "\|")
+        if ($selector.Length -gt 85) {
+            $selector = $selector.Substring(0, 82) + "..."
+        }
+        [void]$doc.AppendLine("| $selector | $( $block.Start )-$( $block.End ) |")
     }
-    [void]$doc.AppendLine("| $selector | $( $block.Start )-$( $block.End ) |")
+    [void]$doc.AppendLine("")
 }
-[void]$doc.AppendLine("")
 
 [void]$doc.AppendLine("## Documentation + Tooling Maps")
 if (Test-Path $readmePath) {
@@ -532,7 +574,7 @@ if (Test-Path $vendorDir) {
 
 [void]$doc.AppendLine("## Maintenance Notes")
 [void]$doc.AppendLine("- js/app.*.js is an older branch snapshot. Keep it for reference unless explicitly retired.")
-[void]$doc.AppendLine("- Functional edits should target loaded scripts first: core.js, audio.js, game.js, settings.js, events.js.")
+[void]$doc.AppendLine("- Functional edits should target loaded scripts first: core.*.js, audio.*.js, game.*.js, settings.*.js, events.*.js.")
 [void]$doc.AppendLine("- If you intentionally switch runtime scripts, update script tags in index.html and regenerate this file.")
 [void]$doc.AppendLine("- After verification, commit and push the updated files when repository remotes are configured.")
 

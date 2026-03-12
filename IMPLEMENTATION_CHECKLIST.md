@@ -18,7 +18,7 @@ Use this file as the single backlog for bug fixes, architecture cleanup, redesig
 - **P0.2 Structured action logging toggle**
   - Changelog: added `App.store` debug flags with localStorage persistence + runtime toggles for action logging and invariant checks; migrated patch-dispatched actions now log type, timestamp, and selected state deltas only when enabled.
 - **A1 Centralized store + action dispatcher**
-  - Changelog: introduced `js/store/` (`actions`, `reducers`, `selectors`, `store`) and migrated critical round/settings/submission mutation paths in `game.js`, `settings.js`, and `events.js` to dispatched patch actions.
+  - Changelog: introduced `js/store/` (`actions`, `reducers`, `selectors`, `store`) and migrated critical round/settings/submission mutation paths in `game.*.js`, `settings.*.js`, and `events.*.js` to dispatched patch actions.
 - **A2 Monolith split foundation**
   - Changelog: created `js/features/` layout (`round`, `settings`, `chords`, `typing`, `tutorial`, `audio-preview`, `input`) and moved migrated state mutation access behind feature compatibility wrappers.
 - **A3 Dev invariant checks**
@@ -26,7 +26,7 @@ Use this file as the single backlog for bug fixes, architecture cleanup, redesig
 - **S1 Settings information architecture refresh**
   - Changelog: grouped settings panel into clear sections (`Practice`, `Sound & Instrument`, `Articulation`, `Keyboard Layout`) and clarified trigger naming (`Open practice settings`).
 - **S2 Floating panel manager**
-  - Changelog: added a centralized floating-panel controller in `js/settings.js` (shared open/close/toggle/reposition), enforced one active floating panel, and unified click-outside/escape/resize handling in `js/events.js`.
+  - Changelog: added a centralized floating-panel controller in `js/settings.*.js` (shared open/close/toggle/reposition), enforced one active floating panel, and unified click-outside/escape/resize handling in `js/events.*.js`.
 
 ## Phase 0: Safety Net and Baseline
 

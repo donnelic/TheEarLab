@@ -15,7 +15,13 @@ These instructions are mandatory for any AI assistant working in this repository
   - `vendor/libfluidsynth-2.4.6.js`
   - `vendor/js-synthesizer.min.js`
 - Active runtime modules are:
-  - `js/core.js`
+  - `js/core.00-bootstrap.js`
+  - `js/core.10-constants.js`
+  - `js/core.20-envelope.js`
+  - `js/core.30-storage.js`
+  - `js/core.40-runtime.js`
+  - `js/core.50-soundfonts.js`
+  - `js/core.60-keyboard.js`
   - `js/store/reducers.js`
   - `js/store/actions.js`
   - `js/store/selectors.js`
@@ -27,10 +33,24 @@ These instructions are mandatory for any AI assistant working in this repository
   - `js/features/tutorial/index.js`
   - `js/features/audio-preview/index.js`
   - `js/features/input/index.js`
-  - `js/audio.js`
-  - `js/game.js`
-  - `js/settings.js`
-  - `js/events.js`
+  - `js/audio.00-bootstrap.js`
+  - `js/audio.10-soundfont-catalog.js`
+  - `js/audio.20-engine.js`
+  - `js/audio.30-playback.js`
+  - `js/audio.40-preview.js`
+  - `js/game.00-bootstrap.js`
+  - `js/game.10-chord-targets.js`
+  - `js/game.20-round-ui.js`
+  - `js/game.30-round-flow.js`
+  - `js/game.40-reveal-submit.js`
+  - `js/settings.00-profiles.js`
+  - `js/settings.10-dialogs.js`
+  - `js/settings.20-game.js`
+  - `js/settings.30-panels.js`
+  - `js/events.00-settings.js`
+  - `js/events.10-tutorial.js`
+  - `js/events.20-helper-cursor.js`
+  - `js/events.30-bindings.js`
 - `js/app.*.js` files are legacy snapshots and are not loaded by default.
 
 ## Required Update Workflow

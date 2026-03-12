@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $indexPath = Join-Path $root "index.html"
-$corePath = Join-Path $root "js\core.js"
+$corePath = Join-Path $root "js\core.00-bootstrap.js"
 $statePath = Join-Path $PSScriptRoot ".build-version-state.json"
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
@@ -33,7 +33,10 @@ function Get-NormalizedContent {
 function Get-SourceFiles {
     $files = @()
     $files += Get-Item -Path $indexPath
-    $files += Get-Item -Path (Join-Path $root "styles.css")
+    $cssDir = Join-Path $root "css"
+    if (Test-Path -Path $cssDir) {
+        $files += Get-ChildItem -Path $cssDir -Filter *.css -File
+    }
     $files += Get-ChildItem -Path (Join-Path $root "js") -Filter *.js -File
     $files += Get-ChildItem -Path (Join-Path $root "vendor") -Filter *.js -File -ErrorAction SilentlyContinue
     return $files | Sort-Object FullName -Unique

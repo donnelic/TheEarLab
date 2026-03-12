@@ -7,7 +7,13 @@ Browser-based piano ear-training app for note and chord recognition.
 2. Treat `index.html` script order as runtime truth:
    - `vendor/libfluidsynth-2.4.6.js`
    - `vendor/js-synthesizer.min.js`
-   - `js/core.js`
+   - `js/core.00-bootstrap.js`
+   - `js/core.10-constants.js`
+   - `js/core.20-envelope.js`
+   - `js/core.30-storage.js`
+   - `js/core.40-runtime.js`
+   - `js/core.50-soundfonts.js`
+   - `js/core.60-keyboard.js`
    - `js/store/reducers.js`
    - `js/store/actions.js`
    - `js/store/selectors.js`
@@ -19,24 +25,38 @@ Browser-based piano ear-training app for note and chord recognition.
    - `js/features/tutorial/index.js`
    - `js/features/audio-preview/index.js`
    - `js/features/input/index.js`
-   - `js/audio.js`
-   - `js/game.js`
-   - `js/settings.js`
-   - `js/events.js`
+   - `js/audio.00-bootstrap.js`
+   - `js/audio.10-soundfont-catalog.js`
+   - `js/audio.20-engine.js`
+   - `js/audio.30-playback.js`
+   - `js/audio.40-preview.js`
+   - `js/game.00-bootstrap.js`
+   - `js/game.10-chord-targets.js`
+   - `js/game.20-round-ui.js`
+   - `js/game.30-round-flow.js`
+   - `js/game.40-reveal-submit.js`
+   - `js/settings.00-profiles.js`
+   - `js/settings.10-dialogs.js`
+   - `js/settings.20-game.js`
+   - `js/settings.30-panels.js`
+   - `js/events.00-settings.js`
+   - `js/events.10-tutorial.js`
+   - `js/events.20-helper-cursor.js`
+   - `js/events.30-bindings.js`
 3. After edits, regenerate the map:
    - `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\generate-project-map.ps1`
 
 ## Project Layout
 - `index.html`: app structure and script loading.
-- `styles.css`: all visual styling, shared layout/unit tokens in `:root`, responsive rules.
+- `css/`: split stylesheets (theme tokens, base layout, chord/typing, modals, tutorial, helper/cursor, panels/status, keyboard + responsive).
 - `vendor/`: bundled SF2 runtime dependencies (`libfluidsynth` + `js-synthesizer`).
-- `js/core.js`: DOM references, shared runtime constants/copy, mode policy, envelope policy, soundfont catalog state, shared app state, note/key builders.
+- `js/core.*.js`: DOM references, shared runtime constants/copy, mode policy, envelope policy, soundfont catalog state, shared app state, note/key builders.
 - `js/store/`: centralized state dispatcher (`store.js`), action creators (`actions.js`), reducers (`reducers.js`), and shared selectors/invariant helpers (`selectors.js`).
 - `js/features/`: split feature-layer modules (`round`, `settings`, `chords`, `typing`, `tutorial`, `audio-preview`, `input`) with compatibility wrappers for migrated flows.
-- `js/audio.js`: SF2 playback engine + sample-pack compatibility, discovery/loading, preview sequencing.
-- `js/game.js`: round lifecycle, validation, reveal playback, keyboard state behavior.
-- `js/settings.js`: settings mutations, persistence hooks, panel positioning logic.
-- `js/events.js`: all event wiring and startup initialization.
+- `js/audio.*.js`: SF2 playback engine + sample-pack compatibility, discovery/loading, preview sequencing.
+- `js/game.*.js`: round lifecycle, validation, reveal playback, keyboard state behavior.
+- `js/settings.*.js`: settings mutations, persistence hooks, panel positioning logic.
+- `js/events.*.js`: all event wiring and startup initialization.
 - `js/app.*.js`: legacy snapshot modules (not loaded by `index.html`).
 - `soundfonts/`: drop-in `.sf2` files for instrument discovery.
 - `IMPLEMENTATION_CHECKLIST.md`: phased execution checklist for bug fixes, redesign, refactor, and feature rollout.
