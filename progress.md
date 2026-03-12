@@ -17,3 +17,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Adjusted helper hover halo to a steeper (log-like) gradient and raised it above content; kept pinned marker above halo.
 
 - 2026-03-12: Made helper hover dot a solid point (removed blur gradient).
+
+- 2026-03-12: Moved helper hover dot to its own overlay element so it sits above helper content.
