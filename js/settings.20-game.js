@@ -5,7 +5,7 @@ const normalizeChordDifficultyId = (value) => {
     return "easy";
 };
 
-const SETTINGS_MODE_POLICY = App.modePolicy;
+const SETTINGS_MODE_POLICY_LOCAL = App.modePolicy;
 
 const getKeyCountMinimum = (nextState = state) => {
     const mode = getEffectivePracticeMode();
@@ -83,8 +83,8 @@ const setKeyCountVisual = (value) => {
     updateKeyCountDisplay(clamped);
 };
 
-const getEffectivePracticeMode = () => SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState(state);
-const isSettingsTypingEnabled = () => SETTINGS_MODE_POLICY.isTypingEnabledFromState(state);
+const getEffectivePracticeMode = () => SETTINGS_MODE_POLICY_LOCAL.getEffectivePracticeModeFromState(state);
+const isSettingsTypingEnabled = () => SETTINGS_MODE_POLICY_LOCAL.isTypingEnabledFromState(state);
 
 const refreshOptionsModeVisibility = () => {
     const mode = getEffectivePracticeMode();

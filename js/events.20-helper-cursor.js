@@ -10,12 +10,12 @@ const syncHelperPinnedUi = (helperItem) => {
 };
 
 const EVENTS_API = App.events || {};
-const patchSettingsState = typeof EVENTS_API.patchSettingsState === "function"
+const patchSettings = typeof EVENTS_API.patchSettingsState === "function"
     ? EVENTS_API.patchSettingsState
     : (typeof App.settings?.applySettingsStatePatch === "function"
         ? (patch, mutation) => App.settings.applySettingsStatePatch(patch, mutation)
         : (patch) => Object.assign(state, patch || {}));
-const applySettingMutationEffects = typeof EVENTS_API.applySettingMutationEffects === "function"
+const applySettingEffects = typeof EVENTS_API.applySettingMutationEffects === "function"
     ? EVENTS_API.applySettingMutationEffects
     : (() => {});
 const ROOT_HELPER_LABEL = App.game?.helperLabels?.rootNote || (App.uiCopy?.helpers?.rootNote || "Root note");
@@ -29,7 +29,7 @@ const shouldBlurAfterPointer = (event) => {
 
 const toggleRootHintFromHelper = () => {
     const nextValue = !state.chordRootHint;
-    patchSettingsState({
+    patchSettings({
         chordRootHint: nextValue,
         rootHintSuppressed: false
     }, "events/chord-root-hint-helper");
@@ -39,7 +39,7 @@ const toggleRootHintFromHelper = () => {
     if (typeof App.game?.setRootHelperPinned === "function") {
         App.game.setRootHelperPinned();
     }
-    applySettingMutationEffects("chordRootHint", {
+    applySettingEffects("chordRootHint", {
         refreshStatus: false,
         restartOverride: false
     });

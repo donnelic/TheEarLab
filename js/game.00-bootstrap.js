@@ -288,8 +288,6 @@ const applySubmissionStatePatch = (patch, mutation = "submission/patch") => {
 };
 
 const normalizeChordSymbols = (value) => String(value ?? "")
-    .replace(/???/g, "#")
-    .replace(/???/g, "b")
     .replace(/\u266f/g, "#")
     .replace(/\u266d/g, "b")
     .replace(/\u266F/g, "#")

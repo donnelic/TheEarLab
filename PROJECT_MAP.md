@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-13 00:09:54 +01:00
+Generated: 2026-03-13 00:15:56 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -57,7 +57,7 @@ Generated: 2026-03-13 00:09:54 +01:00
 | js/events.10-tutorial.js | JavaScript | Browser runtime module | Yes | 633 |
 | js/events.20-helper-cursor.js | JavaScript | Browser runtime module | Yes | 818 |
 | js/events.30-bindings.js | JavaScript | Browser runtime module | Yes | 434 |
-| js/game.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 456 |
+| js/game.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 454 |
 | js/game.10-chord-targets.js | JavaScript | Browser runtime module | Yes | 451 |
 | js/game.20-round-ui.js | JavaScript | Browser runtime module | Yes | 512 |
 | js/game.30-round-flow.js | JavaScript | Browser runtime module | Yes | 327 |
@@ -69,7 +69,7 @@ Generated: 2026-03-13 00:09:54 +01:00
 | README.md | Markdown | Human + AI onboarding | Yes | 155 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 67 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1503 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1501 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 582 |
 | tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
@@ -1238,7 +1238,7 @@ Event bindings:
 | pedalBox | pointerleave | 379 |
 
 ### js/game.00-bootstrap.js (Active Runtime)
-File lines: 1-456
+File lines: 1-454
 
 | Symbol | Lines |
 |---|---|
@@ -1255,26 +1255,26 @@ File lines: 1-456
 | getHelperPinFlags | 254-262 |
 | applyRoundStatePatch | 268-277 |
 | applySubmissionStatePatch | 279-288 |
-| normalizeQualityToken | 298-309 |
-| renderChordLink | 318-342 |
-| isTypingEnabled | 368-368 |
-| isTypingOnlyMode | 369-369 |
-| getIsChordRound | 370-370 |
-| getEffectiveBlindMode | 371-371 |
-| getKeyboardZoneEl | 372-372 |
-| normalizePitchClass | 373-373 |
-| getRootName | 374-374 |
-| getMidiFromNoteId | 375-375 |
-| buildChordLabel | 376-376 |
-| getPitchClassSetFromNoteIds | 378-386 |
-| getRootGuideNoteId | 392-407 |
-| getEffectiveKeyboardSelection | 409-421 |
-| getChordDifficultyId | 423-428 |
-| getChordDisplayLabel | 430-430 |
-| getChordQualityDisplaySuffix | 432-432 |
-| getChordDifficultyConfig | 434-437 |
-| getAllowedChordQualities | 439-444 |
-| getChordQualityHint | 446-449 |
+| normalizeQualityToken | 296-307 |
+| renderChordLink | 316-340 |
+| isTypingEnabled | 366-366 |
+| isTypingOnlyMode | 367-367 |
+| getIsChordRound | 368-368 |
+| getEffectiveBlindMode | 369-369 |
+| getKeyboardZoneEl | 370-370 |
+| normalizePitchClass | 371-371 |
+| getRootName | 372-372 |
+| getMidiFromNoteId | 373-373 |
+| buildChordLabel | 374-374 |
+| getPitchClassSetFromNoteIds | 376-384 |
+| getRootGuideNoteId | 390-405 |
+| getEffectiveKeyboardSelection | 407-419 |
+| getChordDifficultyId | 421-426 |
+| getChordDisplayLabel | 428-428 |
+| getChordQualityDisplaySuffix | 430-430 |
+| getChordDifficultyConfig | 432-435 |
+| getAllowedChordQualities | 437-442 |
+| getChordQualityHint | 444-447 |
 
 ### js/game.10-chord-targets.js (Active Runtime)
 File lines: 1-451
