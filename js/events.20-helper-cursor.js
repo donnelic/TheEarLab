@@ -9,6 +9,17 @@ const syncHelperPinnedUi = (helperItem) => {
     return flags;
 };
 
+const EVENTS_API = App.events || {};
+const patchSettingsState = typeof EVENTS_API.patchSettingsState === "function"
+    ? EVENTS_API.patchSettingsState
+    : (typeof App.settings?.applySettingsStatePatch === "function"
+        ? (patch, mutation) => App.settings.applySettingsStatePatch(patch, mutation)
+        : (patch) => Object.assign(state, patch || {}));
+const applySettingMutationEffects = typeof EVENTS_API.applySettingMutationEffects === "function"
+    ? EVENTS_API.applySettingMutationEffects
+    : (() => {});
+const ROOT_HELPER_LABEL = App.game?.helperLabels?.rootNote || (App.uiCopy?.helpers?.rootNote || "Root note");
+
 const shouldBlurAfterPointer = (event) => {
     if (!event) return false;
     if (event.type === "keydown") return false;
@@ -174,17 +185,11 @@ if (chordTutorialQualityList) {
     });
 }
 
-const EVENTS_MODE_POLICY = App.modePolicy || {};
+const EVENTS_MODE_POLICY = App.modePolicy;
 const EVENTS_ACTION_COPY = App.uiCopy?.actions || {};
-const isEventsTypingEnabled = () => EVENTS_MODE_POLICY.isTypingEnabledFromState
-    ? EVENTS_MODE_POLICY.isTypingEnabledFromState(state)
-    : (state.trainingMode === "type" || state.trainingMode === "both");
-const isEventsTypingOnlyMode = () => EVENTS_MODE_POLICY.isTypingOnlyModeFromState
-    ? EVENTS_MODE_POLICY.isTypingOnlyModeFromState(state)
-    : state.trainingMode === "type";
-const getEventsChordRound = () => EVENTS_MODE_POLICY.getIsChordRoundFromState
-    ? EVENTS_MODE_POLICY.getIsChordRoundFromState(state)
-    : (isEventsTypingEnabled() || state.chordMode);
+const isEventsTypingEnabled = () => EVENTS_MODE_POLICY.isTypingEnabledFromState(state);
+const isEventsTypingOnlyMode = () => EVENTS_MODE_POLICY.isTypingOnlyModeFromState(state);
+const getEventsChordRound = () => EVENTS_MODE_POLICY.getIsChordRoundFromState(state);
 
 const isChordTypingCaptureActive = () => {
     if (!state.active || state.submitted) return false;
@@ -505,6 +510,18 @@ const setCustomCursorEnabled = (enabled) => {
     ensureCustomCursorEl();
     scheduleCustomCursorRender();
 };
+const applyCustomCursorMediaState = () => {
+    const allowCustomCursor = CUSTOM_CURSOR_QUERY.matches && state.customCursorEnabled !== false;
+    setCustomCursorEnabled(allowCustomCursor);
+};
+if (typeof CUSTOM_CURSOR_QUERY.addEventListener === "function") {
+    CUSTOM_CURSOR_QUERY.addEventListener("change", applyCustomCursorMediaState);
+} else if (typeof CUSTOM_CURSOR_QUERY.addListener === "function") {
+    CUSTOM_CURSOR_QUERY.addListener(applyCustomCursorMediaState);
+}
+applyCustomCursorMediaState();
+Object.assign(App.events, { applyCustomCursorMediaState });
+
 const updateCustomCursorPosition = (event) => {
     if (!customCursorEnabled) return;
     customCursorX = event.clientX;
@@ -551,18 +568,30 @@ const triggerReplayAction = (event) => {
     }
 };
 
-volumeSlider.addEventListener("dblclick", () => {
-    setVolume(DEFAULTS.volume);
-});
+const bindDoubleClickReset = (target, handler) => {
+    if (!target || typeof target.addEventListener !== "function") return;
+    target.addEventListener("dblclick", handler);
+};
 
-lengthSlider.addEventListener("dblclick", () => {
-    setNoteLength(DEFAULTS.noteDuration);
-});
-
-keyCountSlider.addEventListener("dblclick", () => {
-    pendingKeyCount = null;
-    setKeyCount(DEFAULTS.keyCount);
-});
+[
+    [volumeSlider, () => setVolume(DEFAULTS.volume)],
+    [lengthSlider, () => setNoteLength(DEFAULTS.noteDuration)],
+    [keyCountSlider, () => {
+        pendingKeyCount = null;
+        setKeyCount(DEFAULTS.keyCount);
+    }],
+    [noteCountInput, () => {
+        state.noteCount = DEFAULTS.noteCount;
+        noteCountInput.value = String(DEFAULTS.noteCount);
+        noteCountValue.textContent = `${DEFAULTS.noteCount} notes`;
+        handleCriticalSettingChange();
+        saveSettings();
+    }],
+    [attackSlider, () => setAdsrTrim("attack", 0)],
+    [decaySlider, () => setAdsrTrim("decay", 0)],
+    [releaseSlider, () => setAdsrTrim("release", 0)],
+    [sustainSlider, () => setAdsrTrim("length", 0)]
+].forEach(([target, handler]) => bindDoubleClickReset(target, handler));
 
 if (startNoteDownButton && startNoteUpButton && startNoteValue) {
     startNoteDownButton.addEventListener("click", () => {
@@ -581,30 +610,6 @@ if (startNoteDownOctButton && startNoteUpOctButton) {
         setStartMidi(state.startMidi + 12);
     });
 }
-
-noteCountInput.addEventListener("dblclick", () => {
-    state.noteCount = DEFAULTS.noteCount;
-    noteCountInput.value = String(DEFAULTS.noteCount);
-    noteCountValue.textContent = `${DEFAULTS.noteCount} notes`;
-    handleCriticalSettingChange();
-    saveSettings();
-});
-
-attackSlider.addEventListener("dblclick", () => {
-    setAdsrTrim("attack", 0);
-});
-
-decaySlider.addEventListener("dblclick", () => {
-    setAdsrTrim("decay", 0);
-});
-
-releaseSlider.addEventListener("dblclick", () => {
-    setAdsrTrim("release", 0);
-});
-
-sustainSlider.addEventListener("dblclick", () => {
-    setAdsrTrim("length", 0);
-});
 
 if (profileSearch) {
     profileSearch.addEventListener("input", () => {

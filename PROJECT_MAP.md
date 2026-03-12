@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-12 17:50:17 +01:00
+Generated: 2026-03-13 00:09:54 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -32,44 +32,44 @@ Generated: 2026-03-12 17:50:17 +01:00
 ## File Inventory
 | File | Kind | Runtime Role | Active | Lines |
 |---|---|---|---|---:|
-| index.html | HTML | Loaded directly | Yes | 620 |
-| css/00-theme.css | CSS | Loaded directly | Yes | 214 |
+| index.html | HTML | Loaded directly | Yes | 594 |
+| css/00-theme.css | CSS | Loaded directly | Yes | 226 |
 | css/01-base.css | CSS | Loaded directly | Yes | 356 |
 | css/02-chord-typing.css | CSS | Loaded directly | Yes | 225 |
 | css/03-modals.css | CSS | Loaded directly | Yes | 346 |
 | css/04-tutorial.css | CSS | Loaded directly | Yes | 537 |
 | css/05-helper-cursor.css | CSS | Loaded directly | Yes | 333 |
-| css/06-panels-status.css | CSS | Loaded directly | Yes | 990 |
+| css/06-panels-status.css | CSS | Loaded directly | Yes | 972 |
 | css/07-keyboard.css | CSS | Loaded directly | Yes | 463 |
 | js/audio.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 192 |
 | js/audio.10-soundfont-catalog.js | JavaScript | Browser runtime module | Yes | 423 |
 | js/audio.20-engine.js | JavaScript | Browser runtime module | Yes | 473 |
 | js/audio.30-playback.js | JavaScript | Browser runtime module | Yes | 277 |
 | js/audio.40-preview.js | JavaScript | Browser runtime module | Yes | 164 |
-| js/core.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 288 |
+| js/core.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 284 |
 | js/core.10-constants.js | JavaScript | Browser runtime module | Yes | 295 |
 | js/core.20-envelope.js | JavaScript | Browser runtime module | Yes | 80 |
 | js/core.30-storage.js | JavaScript | Browser runtime module | Yes | 133 |
-| js/core.40-runtime.js | JavaScript | Browser runtime module | Yes | 125 |
+| js/core.40-runtime.js | JavaScript | Browser runtime module | Yes | 127 |
 | js/core.50-soundfonts.js | JavaScript | Browser runtime module | Yes | 91 |
 | js/core.60-keyboard.js | JavaScript | Browser runtime module | Yes | 60 |
-| js/events.00-settings.js | JavaScript | Browser runtime module | Yes | 644 |
+| js/events.00-settings.js | JavaScript | Browser runtime module | Yes | 636 |
 | js/events.10-tutorial.js | JavaScript | Browser runtime module | Yes | 633 |
-| js/events.20-helper-cursor.js | JavaScript | Browser runtime module | Yes | 813 |
-| js/events.30-bindings.js | JavaScript | Browser runtime module | Yes | 445 |
-| js/game.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 416 |
-| js/game.10-chord-targets.js | JavaScript | Browser runtime module | Yes | 456 |
+| js/events.20-helper-cursor.js | JavaScript | Browser runtime module | Yes | 818 |
+| js/events.30-bindings.js | JavaScript | Browser runtime module | Yes | 434 |
+| js/game.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 456 |
+| js/game.10-chord-targets.js | JavaScript | Browser runtime module | Yes | 451 |
 | js/game.20-round-ui.js | JavaScript | Browser runtime module | Yes | 512 |
 | js/game.30-round-flow.js | JavaScript | Browser runtime module | Yes | 327 |
 | js/game.40-reveal-submit.js | JavaScript | Browser runtime module | Yes | 509 |
 | js/settings.00-profiles.js | JavaScript | Browser runtime module | Yes | 543 |
 | js/settings.10-dialogs.js | JavaScript | Browser runtime module | Yes | 324 |
-| js/settings.20-game.js | JavaScript | Browser runtime module | Yes | 313 |
+| js/settings.20-game.js | JavaScript | Browser runtime module | Yes | 298 |
 | js/settings.30-panels.js | JavaScript | Browser runtime module | Yes | 300 |
 | README.md | Markdown | Human + AI onboarding | Yes | 155 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 67 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1274 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1503 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 582 |
 | tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
@@ -77,7 +77,7 @@ Generated: 2026-03-12 17:50:17 +01:00
 | soundfonts/README.md | Markdown | Soundfont asset | Yes | 39 |
 
 ## index.html Map
-File: index.html (1-620)
+File: index.html (1-594)
 
 ### ID Anchors
 | ID | Element | Line |
@@ -152,114 +152,112 @@ File: index.html (1-620)
 | note-count | <input> | 278 |
 | note-count-value | <span> | 279 |
 | blind-mode | <input> | 287 |
-| nice-notes | <input> | 300 |
-| chord-rounds | <input> | 313 |
-| training-mode | <select> | 338 |
-| chord-difficulty | <select> | 353 |
-| chord-tutorial-open-options | <button> | 365 |
-| chord-root-hint | <input> | 378 |
-| hide-live-preview | <input> | 391 |
-| typing-show-typed | <input> | 404 |
-| typing-show-piano | <input> | 417 |
-| chord-extra-helpers | <input> | 430 |
-| primary-action | <button> | 452 |
-| play-selected | <button> | 453 |
-| quick-start | <section> | 456 |
-| keyboard | <div> | 474 |
-| white-keys | <div> | 475 |
-| black-keys | <div> | 476 |
-| pedal-icon | <div> | 481 |
-| chord-readout | <section> | 486 |
-| typing-zone | <section> | 487 |
-| chord-answer | <input> | 491 |
-| typing-help-toggle | <button> | 492 |
-| status-panel | <section> | 498 |
-| round-count | <span> | 500 |
-| selected-list | <span> | 501 |
-| goal-count | <span> | 502 |
-| mode-label | <span> | 503 |
-| game-settings-open | <button> | 506 |
-| hint-button | <button> | 507 |
-| result | <div> | 509 |
-| helper-slot | <div> | 510 |
-| reveal | <div> | 511 |
-| hint-flag | <div> | 512 |
-| pedal-tip | <span> | 518 |
-| chord-tutorial-modal | <section> | 522 |
-| chord-tutorial-backdrop | <button> | 523 |
-| chord-tutorial-title | <h4> | 526 |
-| chord-tutorial-close | <button> | 527 |
-| chord-tutorial-step | <div> | 529 |
-| chord-tutorial-current | <div> | 531 |
-| chord-tutorial-piano | <div> | 534 |
-| tutorial-row-root | <div> | 537 |
-| chord-tutorial-root-list | <div> | 539 |
-| tutorial-row-quality | <div> | 541 |
-| chord-tutorial-quality-list | <div> | 543 |
-| chord-tutorial-progress | <span> | 549 |
-| chord-tutorial-prev | <button> | 551 |
-| chord-tutorial-tabs | <div> | 552 |
-| chord-tutorial-next | <button> | 554 |
-| app-dialog | <section> | 561 |
-| app-dialog-backdrop | <button> | 562 |
-| app-dialog-title | <h4> | 565 |
-| app-dialog-close | <button> | 566 |
-| app-dialog-body | <div> | 568 |
-| app-dialog-input | <input> | 571 |
-| app-dialog-cancel | <button> | 574 |
-| app-dialog-confirm | <button> | 575 |
+| training-mode | <select> | 312 |
+| chord-difficulty | <select> | 327 |
+| chord-tutorial-open-options | <button> | 339 |
+| chord-root-hint | <input> | 352 |
+| hide-live-preview | <input> | 365 |
+| typing-show-typed | <input> | 378 |
+| typing-show-piano | <input> | 391 |
+| chord-extra-helpers | <input> | 404 |
+| primary-action | <button> | 426 |
+| play-selected | <button> | 427 |
+| quick-start | <section> | 430 |
+| keyboard | <div> | 448 |
+| white-keys | <div> | 449 |
+| black-keys | <div> | 450 |
+| pedal-icon | <div> | 455 |
+| chord-readout | <section> | 460 |
+| typing-zone | <section> | 461 |
+| chord-answer | <input> | 465 |
+| typing-help-toggle | <button> | 466 |
+| status-panel | <section> | 472 |
+| round-count | <span> | 474 |
+| selected-list | <span> | 475 |
+| goal-count | <span> | 476 |
+| mode-label | <span> | 477 |
+| game-settings-open | <button> | 480 |
+| hint-button | <button> | 481 |
+| result | <div> | 483 |
+| helper-slot | <div> | 484 |
+| reveal | <div> | 485 |
+| hint-flag | <div> | 486 |
+| pedal-tip | <span> | 492 |
+| chord-tutorial-modal | <section> | 496 |
+| chord-tutorial-backdrop | <button> | 497 |
+| chord-tutorial-title | <h4> | 500 |
+| chord-tutorial-close | <button> | 501 |
+| chord-tutorial-step | <div> | 503 |
+| chord-tutorial-current | <div> | 505 |
+| chord-tutorial-piano | <div> | 508 |
+| tutorial-row-root | <div> | 511 |
+| chord-tutorial-root-list | <div> | 513 |
+| tutorial-row-quality | <div> | 515 |
+| chord-tutorial-quality-list | <div> | 517 |
+| chord-tutorial-progress | <span> | 523 |
+| chord-tutorial-prev | <button> | 525 |
+| chord-tutorial-tabs | <div> | 526 |
+| chord-tutorial-next | <button> | 528 |
+| app-dialog | <section> | 535 |
+| app-dialog-backdrop | <button> | 536 |
+| app-dialog-title | <h4> | 539 |
+| app-dialog-close | <button> | 540 |
+| app-dialog-body | <div> | 542 |
+| app-dialog-input | <input> | 545 |
+| app-dialog-cancel | <button> | 548 |
+| app-dialog-confirm | <button> | 549 |
 
 ### Script Load Order
 | Order | Script | Line |
 |---:|---|---:|
-| 1 | vendor/libfluidsynth-2.4.6.js?v=20260312174927 | 580 |
-| 2 | vendor/js-synthesizer.min.js?v=20260312174927 | 581 |
-| 3 | js/core.00-bootstrap.js?v=20260312174927 | 582 |
-| 4 | js/core.10-constants.js?v=20260312174927 | 583 |
-| 5 | js/core.20-envelope.js?v=20260312174927 | 584 |
-| 6 | js/core.30-storage.js?v=20260312174927 | 585 |
-| 7 | js/core.40-runtime.js?v=20260312174927 | 586 |
-| 8 | js/core.50-soundfonts.js?v=20260312174927 | 587 |
-| 9 | js/core.60-keyboard.js?v=20260312174927 | 588 |
-| 10 | js/store/reducers.js?v=20260312174927 | 589 |
-| 11 | js/store/actions.js?v=20260312174927 | 590 |
-| 12 | js/store/selectors.js?v=20260312174927 | 591 |
-| 13 | js/store/store.js?v=20260312174927 | 592 |
-| 14 | js/features/round/state-mutations.js?v=20260312174927 | 593 |
-| 15 | js/features/settings/state-mutations.js?v=20260312174927 | 594 |
-| 16 | js/features/chords/index.js?v=20260312174927 | 595 |
-| 17 | js/features/typing/index.js?v=20260312174927 | 596 |
-| 18 | js/features/tutorial/index.js?v=20260312174927 | 597 |
-| 19 | js/features/audio-preview/index.js?v=20260312174927 | 598 |
-| 20 | js/features/input/index.js?v=20260312174927 | 599 |
-| 21 | js/audio.00-bootstrap.js?v=20260312174927 | 600 |
-| 22 | js/audio.10-soundfont-catalog.js?v=20260312174927 | 601 |
-| 23 | js/audio.20-engine.js?v=20260312174927 | 602 |
-| 24 | js/audio.30-playback.js?v=20260312174927 | 603 |
-| 25 | js/audio.40-preview.js?v=20260312174927 | 604 |
-| 26 | js/game.00-bootstrap.js?v=20260312174927 | 605 |
-| 27 | js/game.10-chord-targets.js?v=20260312174927 | 606 |
-| 28 | js/game.20-round-ui.js?v=20260312174927 | 607 |
-| 29 | js/game.30-round-flow.js?v=20260312174927 | 608 |
-| 30 | js/game.40-reveal-submit.js?v=20260312174927 | 609 |
-| 31 | js/settings.00-profiles.js?v=20260312174927 | 610 |
-| 32 | js/settings.10-dialogs.js?v=20260312174927 | 611 |
-| 33 | js/settings.20-game.js?v=20260312174927 | 612 |
-| 34 | js/settings.30-panels.js?v=20260312174927 | 613 |
-| 35 | js/events.00-settings.js?v=20260312174927 | 614 |
-| 36 | js/events.10-tutorial.js?v=20260312174927 | 615 |
-| 37 | js/events.20-helper-cursor.js?v=20260312174927 | 616 |
-| 38 | js/events.30-bindings.js?v=20260312174927 | 617 |
+| 1 | vendor/libfluidsynth-2.4.6.js?v=20260312174927 | 554 |
+| 2 | vendor/js-synthesizer.min.js?v=20260312174927 | 555 |
+| 3 | js/core.00-bootstrap.js?v=20260312174927 | 556 |
+| 4 | js/core.10-constants.js?v=20260312174927 | 557 |
+| 5 | js/core.20-envelope.js?v=20260312174927 | 558 |
+| 6 | js/core.30-storage.js?v=20260312174927 | 559 |
+| 7 | js/core.40-runtime.js?v=20260312174927 | 560 |
+| 8 | js/core.50-soundfonts.js?v=20260312174927 | 561 |
+| 9 | js/core.60-keyboard.js?v=20260312174927 | 562 |
+| 10 | js/store/reducers.js?v=20260312174927 | 563 |
+| 11 | js/store/actions.js?v=20260312174927 | 564 |
+| 12 | js/store/selectors.js?v=20260312174927 | 565 |
+| 13 | js/store/store.js?v=20260312174927 | 566 |
+| 14 | js/features/round/state-mutations.js?v=20260312174927 | 567 |
+| 15 | js/features/settings/state-mutations.js?v=20260312174927 | 568 |
+| 16 | js/features/chords/index.js?v=20260312174927 | 569 |
+| 17 | js/features/typing/index.js?v=20260312174927 | 570 |
+| 18 | js/features/tutorial/index.js?v=20260312174927 | 571 |
+| 19 | js/features/audio-preview/index.js?v=20260312174927 | 572 |
+| 20 | js/features/input/index.js?v=20260312174927 | 573 |
+| 21 | js/audio.00-bootstrap.js?v=20260312174927 | 574 |
+| 22 | js/audio.10-soundfont-catalog.js?v=20260312174927 | 575 |
+| 23 | js/audio.20-engine.js?v=20260312174927 | 576 |
+| 24 | js/audio.30-playback.js?v=20260312174927 | 577 |
+| 25 | js/audio.40-preview.js?v=20260312174927 | 578 |
+| 26 | js/game.00-bootstrap.js?v=20260312174927 | 579 |
+| 27 | js/game.10-chord-targets.js?v=20260312174927 | 580 |
+| 28 | js/game.20-round-ui.js?v=20260312174927 | 581 |
+| 29 | js/game.30-round-flow.js?v=20260312174927 | 582 |
+| 30 | js/game.40-reveal-submit.js?v=20260312174927 | 583 |
+| 31 | js/settings.00-profiles.js?v=20260312174927 | 584 |
+| 32 | js/settings.10-dialogs.js?v=20260312174927 | 585 |
+| 33 | js/settings.20-game.js?v=20260312174927 | 586 |
+| 34 | js/settings.30-panels.js?v=20260312174927 | 587 |
+| 35 | js/events.00-settings.js?v=20260312174927 | 588 |
+| 36 | js/events.10-tutorial.js?v=20260312174927 | 589 |
+| 37 | js/events.20-helper-cursor.js?v=20260312174927 | 590 |
+| 38 | js/events.30-bindings.js?v=20260312174927 | 591 |
 
 ## CSS Maps
 ### css/00-theme.css
-File: css/00-theme.css (1-214)
+File: css/00-theme.css (1-226)
 
 #### Top-Level CSS Blocks
 | Selector | Lines |
 |---|---|
-| :root | 3-123 |
-| body.theme-dark | 125-213 |
+| :root | 3-129 |
+| body.theme-dark | 131-225 |
 
 ### css/01-base.css
 File: css/01-base.css (1-356)
@@ -541,7 +539,7 @@ File: css/05-helper-cursor.css (1-333)
 | .typing-zone[hidden] | 330-332 |
 
 ### css/06-panels-status.css
-File: css/06-panels-status.css (1-990)
+File: css/06-panels-status.css (1-972)
 
 #### Top-Level CSS Blocks
 | Selector | Lines |
@@ -645,37 +643,37 @@ File: css/06-panels-status.css (1-990)
 | .piano-preview:active | 744-747 |
 | .piano-preview.main | 749-753 |
 | .settings-grid input[type="range"], .game-settings-grid input[type="range"], .adva... | 758-762 |
-| .settings-grid input[type="range"]::-webkit-slider-runnable-track, .game-settings-... | 767-772 |
-| .settings-grid input[type="range"]::-webkit-slider-thumb, .game-settings-grid inpu... | 777-786 |
-| .settings-grid input[type="range"]:focus-visible::-webkit-slider-thumb, .game-sett... | 791-794 |
-| .settings-grid input[type="range"]::-moz-range-track, .game-settings-grid input[ty... | 799-804 |
-| .settings-grid input[type="range"]::-moz-range-thumb, .game-settings-grid input[ty... | 809-816 |
-| .settings-grid input[type="range"]:focus-visible::-moz-range-thumb, .game-settings... | 821-824 |
-| .volume-value | 826-829 |
-| .status-row | 831-836 |
-| .switch | 838-847 |
-| .switch input | 849-854 |
-| .switch-track | 856-862 |
-| .switch-thumb | 864-874 |
-| .switch input:checked+.switch-track | 876-878 |
-| .switch input:checked+.switch-track .switch-thumb | 880-882 |
-| .switch input:focus-visible+.switch-track | 884-887 |
-| .control.compact .unit | 889-891 |
-| .test-tone | 893-905 |
-| .test-tone:hover | 907-910 |
-| .test-tone:active | 912-914 |
-| .test-tone-icon | 916-923 |
-| .test-tone-label | 925-929 |
-| .result | 931-935 |
-| .reveal | 937-945 |
-| .reveal strong | 947-949 |
-| .reveal-label | 951-958 |
-| .reveal-grid.compact | 960-968 |
-| .reveal-cell | 970-973 |
-| .reveal-cell.reveal-target-chord | 975-977 |
-| .reveal-cell.reveal-target-notes | 979-981 |
-| .reveal-cell.reveal-your-chord | 983-985 |
-| .reveal-cell.reveal-your-notes | 987-989 |
+| :where(.settings-grid, .game-settings-grid, .advanced-panel, .options-panel) input... | 764-769 |
+| :where(.settings-grid, .game-settings-grid, .advanced-panel, .options-panel) input... | 771-780 |
+| :where(.settings-grid, .game-settings-grid, .advanced-panel, .options-panel) input... | 782-785 |
+| :where(.settings-grid, .game-settings-grid, .advanced-panel, .options-panel) input... | 787-792 |
+| :where(.settings-grid, .game-settings-grid, .advanced-panel, .options-panel) input... | 794-801 |
+| :where(.settings-grid, .game-settings-grid, .advanced-panel, .options-panel) input... | 803-806 |
+| .volume-value | 808-811 |
+| .status-row | 813-818 |
+| .switch | 820-829 |
+| .switch input | 831-836 |
+| .switch-track | 838-844 |
+| .switch-thumb | 846-856 |
+| .switch input:checked+.switch-track | 858-860 |
+| .switch input:checked+.switch-track .switch-thumb | 862-864 |
+| .switch input:focus-visible+.switch-track | 866-869 |
+| .control.compact .unit | 871-873 |
+| .test-tone | 875-887 |
+| .test-tone:hover | 889-892 |
+| .test-tone:active | 894-896 |
+| .test-tone-icon | 898-905 |
+| .test-tone-label | 907-911 |
+| .result | 913-917 |
+| .reveal | 919-927 |
+| .reveal strong | 929-931 |
+| .reveal-label | 933-940 |
+| .reveal-grid.compact | 942-950 |
+| .reveal-cell | 952-955 |
+| .reveal-cell.reveal-target-chord | 957-959 |
+| .reveal-cell.reveal-target-notes | 961-963 |
+| .reveal-cell.reveal-your-chord | 965-967 |
+| .reveal-cell.reveal-your-notes | 969-971 |
 
 ### css/07-keyboard.css
 File: css/07-keyboard.css (1-463)
@@ -813,7 +811,6 @@ File lines: 1-192
 
 | Symbol | Lines |
 |---|---|
-| clampValue | 62-62 |
 | releaseRateToSeconds | 63-63 |
 | getBaseAdsrForProgram | 64-69 |
 | toUnixPath | 76-76 |
@@ -919,7 +916,7 @@ File lines: 1-164
 | buildPreviewSequence | 103-147 |
 
 ### js/core.00-bootstrap.js (Active Runtime)
-File lines: 1-288
+File lines: 1-284
 
 _No function declarations detected._
 
@@ -953,7 +950,7 @@ File lines: 1-133
 | resetAllSettings | 98-132 |
 
 ### js/core.40-runtime.js (Active Runtime)
-File lines: 1-125
+File lines: 1-127
 
 | Symbol | Lines |
 |---|---|
@@ -965,10 +962,10 @@ File lines: 1-125
 | updateNoteCountMax | 102-110 |
 | getCssNumber | 112-112 |
 | clamp | 113-113 |
-| getMaxStartMidi | 114-114 |
-| clampStartMidi | 115-115 |
-| getMidiLabel | 116-120 |
-| getPanelBottomGap | 121-124 |
+| getMaxStartMidi | 116-116 |
+| clampStartMidi | 117-117 |
+| getMidiLabel | 118-122 |
+| getPanelBottomGap | 123-126 |
 
 ### js/core.50-soundfonts.js (Active Runtime)
 File lines: 1-91
@@ -990,15 +987,15 @@ File lines: 1-60
 | rebuildKeyboard | 48-59 |
 
 ### js/events.00-settings.js (Active Runtime)
-File lines: 1-644
+File lines: 1-636
 
 | Symbol | Lines |
 |---|---|
 | primeAudioFromGesture | 5-14 |
-| shouldRestartRoundForSetting | 28-31 |
-| patchSettingsState | 33-39 |
-| adjustKeyCount | 432-435 |
-| bindKeyCountStepper | 437-442 |
+| shouldRestartRoundForSetting | 30-33 |
+| patchSettingsState | 35-41 |
+| adjustKeyCount | 416-419 |
+| bindKeyCountStepper | 421-426 |
 
 Event bindings:
 | Target | Event | Line |
@@ -1006,51 +1003,49 @@ Event bindings:
 | document | pointerdown | 16 |
 | document | keydown | 17 |
 | document | touchstart | 18 |
-| noteCountInput | input | 70 |
-| noteCountInput | change | 77 |
-| noteCountInput | pointerup | 81 |
-| button | click | 86 |
-| button | click | 101 |
-| blindToggle | change | 109 |
-| hideLivePreviewToggle | change | 118 |
-| niceNotesToggle | change | 127 |
-| chordRoundsToggle | change | 143 |
-| practiceModeSelect | change | 149 |
-| trainingModeSelect | change | 156 |
-| chordDifficultySelect | change | 171 |
-| chordExtraHelpersToggle | change | 188 |
-| chordRootHintToggle | change | 198 |
-| customCursorToggle | change | 214 |
-| typingShowPianoToggle | change | 226 |
-| typingShowTypedToggle | change | 236 |
-| resetSettingsButton | click | 248 |
-| settingsToggle | click | 262 |
-| themeToggle | click | 271 |
-| homeToggle | click | 282 |
-| settingsPanel | click | 291 |
-| optionsTrigger | click | 313 |
-| gameSettingsOpen | click | 320 |
-| gameSettingsBackdrop | click | 327 |
-| gameSettingsClose | click | 334 |
-| document | click | 340 |
-| window | resize | 344 |
-| playSelectedButton | click | 356 |
-| playSelectedButton | pointerdown | 360 |
-| playSelectedButton | pointerup | 365 |
-| playSelectedButton | pointerleave | 369 |
-| primaryActionButton | click | 373 |
-| volumeSlider | input | 381 |
-| lengthSlider | input | 387 |
-| attackSlider | input | 393 |
-| decaySlider | input | 399 |
-| releaseSlider | input | 405 |
-| sustainSlider | input | 411 |
-| keyCountSlider | input | 417 |
-| keyCountSlider | change | 424 |
-| keyCountSlider | pointerup | 428 |
-| hintButton | click | 447 |
-| chordAnswerInput | input | 452 |
-| chordAnswerInput | keydown | 459 |
+| noteCountInput | input | 75 |
+| noteCountInput | change | 82 |
+| noteCountInput | pointerup | 86 |
+| button | click | 91 |
+| button | click | 106 |
+| blindToggle | change | 114 |
+| hideLivePreviewToggle | change | 123 |
+| practiceModeSelect | change | 133 |
+| trainingModeSelect | change | 140 |
+| chordDifficultySelect | change | 155 |
+| chordExtraHelpersToggle | change | 172 |
+| chordRootHintToggle | change | 182 |
+| customCursorToggle | change | 198 |
+| typingShowPianoToggle | change | 210 |
+| typingShowTypedToggle | change | 220 |
+| resetSettingsButton | click | 232 |
+| settingsToggle | click | 246 |
+| themeToggle | click | 255 |
+| homeToggle | click | 266 |
+| settingsPanel | click | 275 |
+| optionsTrigger | click | 297 |
+| gameSettingsOpen | click | 304 |
+| gameSettingsBackdrop | click | 311 |
+| gameSettingsClose | click | 318 |
+| document | click | 324 |
+| window | resize | 328 |
+| playSelectedButton | click | 340 |
+| playSelectedButton | pointerdown | 344 |
+| playSelectedButton | pointerup | 349 |
+| playSelectedButton | pointerleave | 353 |
+| primaryActionButton | click | 357 |
+| volumeSlider | input | 365 |
+| lengthSlider | input | 371 |
+| attackSlider | input | 377 |
+| decaySlider | input | 383 |
+| releaseSlider | input | 389 |
+| sustainSlider | input | 395 |
+| keyCountSlider | input | 401 |
+| keyCountSlider | change | 408 |
+| keyCountSlider | pointerup | 412 |
+| hintButton | click | 431 |
+| chordAnswerInput | input | 436 |
+| chordAnswerInput | keydown | 443 |
 
 ### js/events.10-tutorial.js (Active Runtime)
 File lines: 1-633
@@ -1110,118 +1105,116 @@ Event bindings:
 | chordTutorialNext | click | 623 |
 
 ### js/events.20-helper-cursor.js (Active Runtime)
-File lines: 1-813
+File lines: 1-818
 
 | Symbol | Lines |
 |---|---|
 | syncHelperPinnedUi | 1-10 |
-| shouldBlurAfterPointer | 12-17 |
-| toggleRootHintFromHelper | 19-36 |
-| toggleHelperPinned | 38-78 |
-| getCursorTarget | 80-85 |
-| handleHelperPinEvent | 87-93 |
-| isChordTypingCaptureActive | 189-194 |
-| insertTypedCharacter | 196-203 |
-| triggerPrimaryAction | 206-215 |
-| getButtonLikeTarget | 218-218 |
-| blurPointerActivatedControl | 219-226 |
-| markHelperIndicatorDirty | 256-259 |
-| getHelperIndicatorItems | 261-273 |
-| ensureHelperIndicatorObserver | 287-291 |
-| getHelperIndicatorCache | 293-328 |
-| updateHelperIndicatorPositions | 330-340 |
-| scheduleHelperIndicatorUpdate | 342-354 |
-| isPointerInsideRect | 356-362 |
-| handleHelperIndicatorProximity | 364-397 |
-| ensureCustomCursorEl | 399-416 |
-| getCustomCursorMode | 417-436 |
-| syncCustomCursorState | 437-443 |
-| renderCustomCursor | 444-457 |
-| scheduleCustomCursorRender | 458-461 |
-| scheduleCursorMotion | 463-466 |
-| stepCursorMotion | 468-486 |
-| setCustomCursorEnabled | 487-507 |
-| updateCustomCursorPosition | 508-530 |
-| handleHelperPointerEnter | 532-537 |
-| handleHelperPointerLeave | 539-544 |
-| triggerReplayAction | 546-552 |
-| bindPianoOptionEvents | 712-737 |
+| shouldBlurAfterPointer | 23-28 |
+| toggleRootHintFromHelper | 30-47 |
+| toggleHelperPinned | 49-89 |
+| getCursorTarget | 91-96 |
+| handleHelperPinEvent | 98-104 |
+| isEventsTypingEnabled | 190-190 |
+| isEventsTypingOnlyMode | 191-191 |
+| getEventsChordRound | 192-192 |
+| isChordTypingCaptureActive | 194-199 |
+| insertTypedCharacter | 201-208 |
+| triggerPrimaryAction | 211-220 |
+| getButtonLikeTarget | 223-223 |
+| blurPointerActivatedControl | 224-231 |
+| markHelperIndicatorDirty | 261-264 |
+| getHelperIndicatorItems | 266-278 |
+| ensureHelperIndicatorObserver | 292-296 |
+| getHelperIndicatorCache | 298-333 |
+| updateHelperIndicatorPositions | 335-345 |
+| scheduleHelperIndicatorUpdate | 347-359 |
+| isPointerInsideRect | 361-367 |
+| handleHelperIndicatorProximity | 369-402 |
+| ensureCustomCursorEl | 404-421 |
+| getCustomCursorMode | 422-441 |
+| syncCustomCursorState | 442-448 |
+| renderCustomCursor | 449-462 |
+| scheduleCustomCursorRender | 463-466 |
+| scheduleCursorMotion | 468-471 |
+| stepCursorMotion | 473-491 |
+| setCustomCursorEnabled | 492-512 |
+| applyCustomCursorMediaState | 513-516 |
+| updateCustomCursorPosition | 525-547 |
+| handleHelperPointerEnter | 549-554 |
+| handleHelperPointerLeave | 556-561 |
+| triggerReplayAction | 563-569 |
+| bindDoubleClickReset | 571-574 |
+| bindPianoOptionEvents | 717-742 |
 
 Event bindings:
 | Target | Event | Line |
 |---|---|---:|
-| document | click | 95 |
-| document | keydown | 97 |
-| document | contextmenu | 102 |
-| chordTutorialRootList | mouseover | 105 |
-| chordTutorialRootList | mouseleave | 113 |
-| chordTutorialRootList | focusin | 116 |
-| chordTutorialRootList | focusout | 124 |
-| chordTutorialRootList | click | 127 |
-| chordTutorialQualityList | mouseover | 143 |
-| chordTutorialQualityList | mouseleave | 150 |
-| chordTutorialQualityList | focusin | 153 |
-| chordTutorialQualityList | focusout | 160 |
-| chordTutorialQualityList | click | 163 |
-| volumeSlider | dblclick | 554 |
-| lengthSlider | dblclick | 558 |
-| keyCountSlider | dblclick | 562 |
-| startNoteDownButton | click | 568 |
-| startNoteUpButton | click | 571 |
-| startNoteDownOctButton | click | 577 |
-| startNoteUpOctButton | click | 580 |
-| noteCountInput | dblclick | 585 |
-| attackSlider | dblclick | 593 |
-| decaySlider | dblclick | 597 |
-| releaseSlider | dblclick | 601 |
-| sustainSlider | dblclick | 605 |
-| profileSearch | input | 610 |
-| profileList | click | 616 |
-| profileList | dblclick | 621 |
-| profileList | keydown | 624 |
-| profileApply | click | 635 |
-| profileSave | click | 641 |
-| instrumentPresetSearch | input | 647 |
-| instrumentPresetList | click | 653 |
-| instrumentPresetList | dblclick | 658 |
-| instrumentPresetList | keydown | 661 |
-| instrumentPresetApply | click | 672 |
-| advancedTrigger | click | 677 |
-| advancedPanel | click | 682 |
-| pianoTrigger | click | 687 |
-| pianoPanel | click | 694 |
-| instrumentBrowserTrigger | click | 700 |
-| instrumentBrowserPanel | click | 707 |
-| pianoOptionsContainer | click | 715 |
-| pianoOptionsContainer | keydown | 729 |
-| pianoPreviewMain | click | 740 |
-| testEnvelopeButton | click | 747 |
-| keyboardEl | pointerdown | 752 |
-| document | pointerup | 788 |
-| document | pointercancel | 795 |
-| document | pointerdown | 802 |
-| document | click | 810 |
+| document | click | 106 |
+| document | keydown | 108 |
+| document | contextmenu | 113 |
+| chordTutorialRootList | mouseover | 116 |
+| chordTutorialRootList | mouseleave | 124 |
+| chordTutorialRootList | focusin | 127 |
+| chordTutorialRootList | focusout | 135 |
+| chordTutorialRootList | click | 138 |
+| chordTutorialQualityList | mouseover | 154 |
+| chordTutorialQualityList | mouseleave | 161 |
+| chordTutorialQualityList | focusin | 164 |
+| chordTutorialQualityList | focusout | 171 |
+| chordTutorialQualityList | click | 174 |
+| CUSTOM_CURSOR_QUERY | change | 518 |
+| target | dblclick | 573 |
+| startNoteDownButton | click | 597 |
+| startNoteUpButton | click | 600 |
+| startNoteDownOctButton | click | 606 |
+| startNoteUpOctButton | click | 609 |
+| profileSearch | input | 615 |
+| profileList | click | 621 |
+| profileList | dblclick | 626 |
+| profileList | keydown | 629 |
+| profileApply | click | 640 |
+| profileSave | click | 646 |
+| instrumentPresetSearch | input | 652 |
+| instrumentPresetList | click | 658 |
+| instrumentPresetList | dblclick | 663 |
+| instrumentPresetList | keydown | 666 |
+| instrumentPresetApply | click | 677 |
+| advancedTrigger | click | 682 |
+| advancedPanel | click | 687 |
+| pianoTrigger | click | 692 |
+| pianoPanel | click | 699 |
+| instrumentBrowserTrigger | click | 705 |
+| instrumentBrowserPanel | click | 712 |
+| pianoOptionsContainer | click | 720 |
+| pianoOptionsContainer | keydown | 734 |
+| pianoPreviewMain | click | 745 |
+| testEnvelopeButton | click | 752 |
+| keyboardEl | pointerdown | 757 |
+| document | pointerup | 793 |
+| document | pointercancel | 800 |
+| document | pointerdown | 807 |
+| document | click | 815 |
 
 ### js/events.30-bindings.js (Active Runtime)
-File lines: 1-445
+File lines: 1-434
 
 | Symbol | Lines |
 |---|---|
 | handlePointerUpdate | 1-20 |
-| applyCustomCursorMediaState | 70-73 |
-| isElementVisible | 89-95 |
-| getFocusableElements | 97-101 |
-| focusFirstInModal | 107-113 |
-| trapModalFocus | 115-137 |
-| isTextEditableTarget | 139-144 |
-| getActiveModalEl | 146-151 |
-| closeGameSettingsModalUi | 153-169 |
-| openGameSettingsModalUi | 171-178 |
-| closeActiveModal | 180-194 |
-| moveFocusInPanel | 196-207 |
-| setRandomBackgroundAngle | 397-400 |
-| init | 402-439 |
-| runDeferredCatalogLoad | 423-432 |
+| isElementVisible | 78-84 |
+| getFocusableElements | 86-90 |
+| focusFirstInModal | 96-102 |
+| trapModalFocus | 104-126 |
+| isTextEditableTarget | 128-133 |
+| getActiveModalEl | 135-140 |
+| closeGameSettingsModalUi | 142-158 |
+| openGameSettingsModalUi | 160-167 |
+| closeActiveModal | 169-183 |
+| moveFocusInPanel | 185-196 |
+| setRandomBackgroundAngle | 386-389 |
+| init | 391-428 |
+| runDeferredCatalogLoad | 412-421 |
 
 Event bindings:
 | Target | Event | Line |
@@ -1236,52 +1229,55 @@ Event bindings:
 | document | pointerout | 54 |
 | window | blur | 56 |
 | document | visibilitychange | 62 |
-| CUSTOM_CURSOR_QUERY | change | 75 |
-| keyboardEl | click | 81 |
-| document | keydown | 209 |
-| document | keyup | 345 |
-| pedalBox | pointerdown | 364 |
-| pedalBox | pointerup | 373 |
-| pedalBox | pointercancel | 382 |
-| pedalBox | pointerleave | 390 |
+| keyboardEl | click | 70 |
+| document | keydown | 198 |
+| document | keyup | 334 |
+| pedalBox | pointerdown | 353 |
+| pedalBox | pointerup | 362 |
+| pedalBox | pointercancel | 371 |
+| pedalBox | pointerleave | 379 |
 
 ### js/game.00-bootstrap.js (Active Runtime)
-File lines: 1-416
+File lines: 1-456
 
 | Symbol | Lines |
 |---|---|
-| getHelperPinRound | 138-138 |
-| syncHelperPinRound | 140-146 |
-| getLocalPinnedHelperLabels | 148-151 |
-| getGlobalPinnedHelperLabels | 153-153 |
-| isHelperPinnedGlobalLabel | 155-159 |
-| isHelperPinnedLocalLabel | 161-161 |
-| toggleHelperPinnedLocalLabel | 167-177 |
-| toggleHelperPinnedGlobalLabel | 179-190 |
-| setHelperPinnedGlobalLabel | 192-210 |
-| setRootHelperPinned | 212-216 |
-| getHelperPinFlags | 218-226 |
-| applyRoundStatePatch | 232-241 |
-| applySubmissionStatePatch | 243-252 |
-| normalizeQualityToken | 254-271 |
-| renderChordLink | 280-304 |
-| getKeyboardZoneEl | 332-332 |
-| normalizePitchClass | 333-333 |
-| getRootName | 334-334 |
-| getMidiFromNoteId | 335-335 |
-| buildChordLabel | 336-336 |
-| getPitchClassSetFromNoteIds | 338-346 |
-| getRootGuideNoteId | 352-367 |
-| getEffectiveKeyboardSelection | 369-381 |
-| getChordDifficultyId | 383-388 |
-| getChordDisplayLabel | 390-390 |
-| getChordQualityDisplaySuffix | 392-392 |
-| getChordDifficultyConfig | 394-397 |
-| getAllowedChordQualities | 399-404 |
-| getChordQualityHint | 406-409 |
+| getHelperPinRound | 174-174 |
+| syncHelperPinRound | 176-182 |
+| getLocalPinnedHelperLabels | 184-187 |
+| getGlobalPinnedHelperLabels | 189-189 |
+| isHelperPinnedGlobalLabel | 191-195 |
+| isHelperPinnedLocalLabel | 197-197 |
+| toggleHelperPinnedLocalLabel | 203-213 |
+| toggleHelperPinnedGlobalLabel | 215-226 |
+| setHelperPinnedGlobalLabel | 228-246 |
+| setRootHelperPinned | 248-252 |
+| getHelperPinFlags | 254-262 |
+| applyRoundStatePatch | 268-277 |
+| applySubmissionStatePatch | 279-288 |
+| normalizeQualityToken | 298-309 |
+| renderChordLink | 318-342 |
+| isTypingEnabled | 368-368 |
+| isTypingOnlyMode | 369-369 |
+| getIsChordRound | 370-370 |
+| getEffectiveBlindMode | 371-371 |
+| getKeyboardZoneEl | 372-372 |
+| normalizePitchClass | 373-373 |
+| getRootName | 374-374 |
+| getMidiFromNoteId | 375-375 |
+| buildChordLabel | 376-376 |
+| getPitchClassSetFromNoteIds | 378-386 |
+| getRootGuideNoteId | 392-407 |
+| getEffectiveKeyboardSelection | 409-421 |
+| getChordDifficultyId | 423-428 |
+| getChordDisplayLabel | 430-430 |
+| getChordQualityDisplaySuffix | 432-432 |
+| getChordDifficultyConfig | 434-437 |
+| getAllowedChordQualities | 439-444 |
+| getChordQualityHint | 446-449 |
 
 ### js/game.10-chord-targets.js (Active Runtime)
-File lines: 1-456
+File lines: 1-451
 
 | Symbol | Lines |
 |---|---|
@@ -1293,16 +1289,16 @@ File lines: 1-456
 | randomSample | 127-134 |
 | getNiceTarget | 136-173 |
 | getQualityPitchClassSet | 175-181 |
-| parseChordInput | 183-222 |
-| detectChordFromNoteIds | 224-260 |
-| normalizeIntervals | 262-264 |
-| fitIntervalsToAvailableRange | 266-286 |
-| buildVoicedIntervals | 288-316 |
-| chooseRootCandidatesForIntervals | 318-327 |
-| buildChordFromRoot | 329-357 |
-| createChordTarget | 359-409 |
-| createNoteTarget | 411-446 |
-| createTarget | 448-455 |
+| parseChordInput | 183-217 |
+| detectChordFromNoteIds | 219-255 |
+| normalizeIntervals | 257-259 |
+| fitIntervalsToAvailableRange | 261-281 |
+| buildVoicedIntervals | 283-311 |
+| chooseRootCandidatesForIntervals | 313-322 |
+| buildChordFromRoot | 324-352 |
+| createChordTarget | 354-404 |
+| createNoteTarget | 406-441 |
+| createTarget | 443-450 |
 
 ### js/game.20-round-ui.js (Active Runtime)
 File lines: 1-512
@@ -1445,24 +1441,26 @@ Event bindings:
 | appDialogInput | keydown | 114 |
 
 ### js/settings.20-game.js (Active Runtime)
-File lines: 1-313
+File lines: 1-298
 
 | Symbol | Lines |
 |---|---|
 | normalizeChordDifficultyId | 1-6 |
-| getKeyCountMinimum | 8-13 |
-| resolveKeyCountForPreference | 24-28 |
-| clampStartMidiForKeyCount | 30-33 |
-| updateKeyCountDisplay | 35-45 |
-| setKeyCount | 47-66 |
-| setStartMidi | 68-77 |
-| setKeyCountVisual | 79-82 |
-| refreshOptionsModeVisibility | 91-113 |
-| setPracticeMode | 115-204 |
-| applyUiFromState | 206-273 |
-| commitCriticalChange | 280-285 |
-| commitNoteCountChange | 287-296 |
-| handleCriticalSettingChange | 298-312 |
+| getKeyCountMinimum | 10-15 |
+| resolveKeyCountForPreference | 26-30 |
+| clampStartMidiForKeyCount | 32-35 |
+| updateKeyCountDisplay | 37-47 |
+| setKeyCount | 49-68 |
+| setStartMidi | 70-79 |
+| setKeyCountVisual | 81-84 |
+| getEffectivePracticeMode | 86-86 |
+| isSettingsTypingEnabled | 87-87 |
+| refreshOptionsModeVisibility | 89-108 |
+| setPracticeMode | 110-193 |
+| applyUiFromState | 195-258 |
+| commitCriticalChange | 265-270 |
+| commitNoteCountChange | 272-281 |
+| handleCriticalSettingChange | 283-297 |
 
 ### js/settings.30-panels.js (Active Runtime)
 File lines: 1-300

@@ -59,7 +59,7 @@ const sf2Runtime = {
 const RUNNING_FROM_FILE_PROTOCOL = window.location?.protocol === "file:";
 let didWarnFileProtocol = false;
 
-const clampValue = (value, min, max) => Math.min(Math.max(value, min), max);
+const clampValue = App.utils.clamp;
 const releaseRateToSeconds = (releaseRate) => Math.max(0.03, 0.8 / Math.max(1, releaseRate));
 const getBaseAdsrForProgram = (program = 0) => {
     const normalized = clampValue(Math.round(program), 0, 127);

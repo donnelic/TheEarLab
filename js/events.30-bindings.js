@@ -67,17 +67,6 @@ document.addEventListener("visibilitychange", () => {
     }
 });
 
-const applyCustomCursorMediaState = () => {
-    const allowCustomCursor = CUSTOM_CURSOR_QUERY.matches && state.customCursorEnabled !== false;
-    setCustomCursorEnabled(allowCustomCursor);
-};
-if (typeof CUSTOM_CURSOR_QUERY.addEventListener === "function") {
-    CUSTOM_CURSOR_QUERY.addEventListener("change", applyCustomCursorMediaState);
-} else if (typeof CUSTOM_CURSOR_QUERY.addListener === "function") {
-    CUSTOM_CURSOR_QUERY.addListener(applyCustomCursorMediaState);
-}
-applyCustomCursorMediaState();
-
 keyboardEl.addEventListener("click", (event) => {
     event.preventDefault();
 });
@@ -408,7 +397,7 @@ const init = async () => {
     updateNoteCountMax();
     renderPianoOptions();
     applyUiFromState();
-    applyCustomCursorMediaState();
+    App.events?.applyCustomCursorMediaState?.();
     if (typeof App.game?.updateTypedPreviewFromInput === "function") {
         App.game.updateTypedPreviewFromInput();
     }

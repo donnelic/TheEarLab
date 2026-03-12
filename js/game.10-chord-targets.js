@@ -183,13 +183,8 @@ const getQualityPitchClassSet = (rootPc, quality) => {
 const parseChordInput = (raw, options = {}) => {
     const input = String(raw ?? "").trim();
     if (!input) return null;
-    const normalizedInput = input
-        .replace(/♯/g, "#")
-        .replace(/♭/g, "b")
-        .replace(/\u266f/g, "#")
-        .replace(/\u266d/g, "b")
-        .replace(/\u266F/g, "#")
-        .replace(/\u266D/g, "b");
+    const normalizeSymbols = App.chords?.normalizeSymbols;
+    const normalizedInput = typeof normalizeSymbols === "function" ? normalizeSymbols(input) : input;
     const match = normalizedInput.match(/^(-?\d+)?\s*([A-Ga-g])\s*([#b]?)\s*(.*)$/);
     if (!match) return null;
 

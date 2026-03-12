@@ -7,7 +7,7 @@
     background: linear-gradient(145deg,
             color-mix(in oklab, var(--panel) 86%, transparent),
             color-mix(in oklab, var(--panel) 68%, var(--input-bg)));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--card) 35%, transparent);
 }
 
 .helper-head {
@@ -58,9 +58,9 @@
 }
 
 .helper-item:not(.pinned):not(.latched) {
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 60%);
+    background-image: linear-gradient(135deg, color-mix(in oklab, var(--card) 42%, transparent) 0%, transparent 60%);
     border-color: color-mix(in oklab, var(--input-border) 55%, transparent);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--card) 28%, transparent);
 }
 
 .helper-item::before {
@@ -69,7 +69,7 @@
     inset: 0;
     background:
         radial-gradient(circle at var(--helper-cursor-x) var(--helper-cursor-y),
-            rgba(15, 23, 42, 0.65) 0 2px,
+            color-mix(in oklab, var(--ink) 65%, transparent) 0 2px,
             transparent 2px),
         radial-gradient(30px circle at var(--helper-cursor-x) var(--helper-cursor-y),
             color-mix(in oklab, var(--accent) 82%, transparent) 0%,
@@ -111,7 +111,7 @@
     background: color-mix(in oklab, var(--panel) 70%, var(--input-bg));
     border-color: color-mix(in oklab, var(--accent) 45%, var(--input-border));
     transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 6px 14px color-mix(in oklab, var(--shadow) 50%, transparent);
 }
 
 .helper-item:focus-visible {
@@ -126,15 +126,15 @@
     border: 1px solid color-mix(in oklab, var(--accent) 92%, var(--input-border));
     box-shadow:
         inset 3px 0 0 color-mix(in oklab, var(--accent) 92%, var(--input-border)),
-        0 6px 14px rgba(15, 23, 42, 0.16);
+        0 6px 14px var(--shadow);
 }
 
 .helper-item.pinned::after {
     opacity: 1;
     background: color-mix(in oklab, var(--accent) 30%, var(--input-border));
     box-shadow:
-        0 0 0 1px color-mix(in oklab, var(--accent) 85%, transparent),
-        0 3px 6px rgba(15, 23, 42, 0.18);
+        0 0 0 2px color-mix(in oklab, var(--accent) 95%, transparent),
+        0 3px 6px var(--shadow-strong);
     transform: rotate(45deg) scale(1);
 }
 
@@ -146,7 +146,7 @@
     border-color: color-mix(in oklab, var(--accent) 45%, var(--input-border));
     box-shadow:
         inset 3px 0 0 color-mix(in oklab, var(--accent) 55%, transparent),
-        0 4px 12px rgba(15, 23, 42, 0.1);
+        0 4px 12px color-mix(in oklab, var(--shadow) 60%, transparent);
 }
 
 .helper-item.latched .helper-label {
@@ -198,9 +198,9 @@ body.system-cursor-hidden * {
 .app-cursor-ring {
     width: 24px;
     height: 24px;
-    border: 1px solid rgba(15, 23, 42, 0.5);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+    border: 1px solid color-mix(in oklab, var(--ink) 50%, transparent);
+    background: color-mix(in oklab, var(--card) 12%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--card) 18%, transparent) inset;
     backdrop-filter: blur(1px);
     -webkit-backdrop-filter: blur(1px);
 }
@@ -208,14 +208,14 @@ body.system-cursor-hidden * {
 .app-cursor-dot {
     width: 4px;
     height: 4px;
-    background: rgba(15, 23, 42, 0.82);
+    background: color-mix(in oklab, var(--ink) 82%, transparent);
 }
 
 .app-cursor.is-interactive .app-cursor-ring {
     width: 34px;
     height: 34px;
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(15, 23, 42, 0.58);
+    background: color-mix(in oklab, var(--card) 18%, transparent);
+    border-color: color-mix(in oklab, var(--ink) 58%, transparent);
 }
 
 .app-cursor.is-interactive .app-cursor-dot {
@@ -225,7 +225,7 @@ body.system-cursor-hidden * {
 .app-cursor.is-helper .app-cursor-ring {
     width: 14px;
     height: 14px;
-    border-color: color-mix(in oklab, var(--accent) 55%, rgba(15, 23, 42, 0.35));
+    border-color: color-mix(in oklab, var(--accent) 55%, color-mix(in oklab, var(--ink) 35%, transparent));
     background: color-mix(in oklab, var(--accent) 12%, transparent);
     box-shadow: 0 0 10px color-mix(in oklab, var(--accent) 35%, transparent);
     opacity: 0.25;
@@ -234,7 +234,7 @@ body.system-cursor-hidden * {
 .app-cursor.is-helper .app-cursor-dot {
     width: 2px;
     height: 2px;
-    background: color-mix(in oklab, var(--accent) 65%, rgba(15, 23, 42, 0.85));
+    background: color-mix(in oklab, var(--accent) 65%, color-mix(in oklab, var(--ink) 85%, transparent));
     opacity: 0.45;
 }
 
@@ -242,7 +242,7 @@ body.system-cursor-hidden * {
     width: 16px;
     height: 28px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.06);
+    background: color-mix(in oklab, var(--card) 8%, transparent);
 }
 
 .app-cursor.is-pressed .app-cursor-ring {

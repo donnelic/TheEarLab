@@ -25,6 +25,12 @@
     --green: #22c55e;
     --red: #ff6471;
     --yellow: #fbbf24;
+    --accent-warm: #ffd166;
+    --accent-warm-gradient-v: linear-gradient(180deg, var(--accent), var(--accent-warm));
+    --accent-warm-gradient-h: linear-gradient(90deg, var(--accent), var(--accent-warm));
+    --success-ink: var(--btn-submit-text);
+    --success-gradient: linear-gradient(160deg, color-mix(in oklab, var(--green) 65%, white), var(--green));
+    --success-glow: color-mix(in oklab, var(--green) 35%, transparent);
     /* Elevation + focus */
     --shadow: rgba(15, 23, 42, 0.16);
     --shadow-strong: rgba(15, 23, 42, 0.2);
@@ -146,6 +152,12 @@ body.theme-dark {
     --green: #34d399;
     --red: #fb8da0;
     --yellow: #fbbf24;
+    --accent-warm: #fbbf24;
+    --accent-warm-gradient-v: linear-gradient(180deg, var(--accent), var(--accent-warm));
+    --accent-warm-gradient-h: linear-gradient(90deg, var(--accent), var(--accent-warm));
+    --success-ink: var(--btn-submit-text);
+    --success-gradient: linear-gradient(160deg, color-mix(in oklab, var(--green) 55%, var(--card)), var(--green));
+    --success-glow: color-mix(in oklab, var(--green) 35%, transparent);
     /* Elevation + focus */
     --shadow: rgba(2, 6, 23, 0.6);
     --shadow-strong: rgba(2, 6, 23, 0.7);

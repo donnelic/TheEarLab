@@ -111,6 +111,8 @@ const updateNoteCountMax = () => {
 
 const getCssNumber = (value) => Number.parseFloat(value.replace("px", "")) || 0;
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+App.utils = App.utils || {};
+App.utils.clamp = clamp;
 const getMaxStartMidi = () => Math.max(MIN_START_MIDI, MAX_MIDI - state.keyCount + 1);
 const clampStartMidi = (value) => clamp(value, MIN_START_MIDI, getMaxStartMidi());
 const getMidiLabel = (midi) => {

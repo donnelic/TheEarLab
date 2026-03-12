@@ -5,6 +5,8 @@ const normalizeChordDifficultyId = (value) => {
     return "easy";
 };
 
+const SETTINGS_MODE_POLICY = App.modePolicy;
+
 const getKeyCountMinimum = (nextState = state) => {
     const mode = getEffectivePracticeMode();
     if (mode !== "chord") return KEY_COUNT_GLOBAL_MIN;
@@ -81,12 +83,8 @@ const setKeyCountVisual = (value) => {
     updateKeyCountDisplay(clamped);
 };
 
-const getEffectivePracticeMode = () => SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState
-    ? SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState(state)
-    : "random";
-const isSettingsTypingEnabled = () => SETTINGS_MODE_POLICY.isTypingEnabledFromState
-    ? SETTINGS_MODE_POLICY.isTypingEnabledFromState(state)
-    : (state.trainingMode === "type" || state.trainingMode === "both");
+const getEffectivePracticeMode = () => SETTINGS_MODE_POLICY.getEffectivePracticeModeFromState(state);
+const isSettingsTypingEnabled = () => SETTINGS_MODE_POLICY.isTypingEnabledFromState(state);
 
 const refreshOptionsModeVisibility = () => {
     const mode = getEffectivePracticeMode();
@@ -94,9 +92,6 @@ const refreshOptionsModeVisibility = () => {
     const showTyping = showChord && isSettingsTypingEnabled();
     const showNoteCount = mode !== "chord";
 
-    document.querySelectorAll('[data-option-group="legacy"]').forEach((el) => {
-        el.hidden = true;
-    });
     document.querySelectorAll('[data-option-group="notes"]').forEach((el) => {
         el.hidden = !showNoteCount;
     });
@@ -152,12 +147,6 @@ const setPracticeMode = (mode, options = {}) => {
         rootHintSuppressed: false
     }, "settings/practice-mode");
 
-    if (niceNotesToggle) {
-        niceNotesToggle.checked = state.niceMode;
-    }
-    if (chordRoundsToggle) {
-        chordRoundsToggle.checked = state.chordMode;
-    }
     if (blindToggle) {
         blindToggle.checked = state.blindMode;
     }
@@ -232,10 +221,6 @@ const applyUiFromState = () => {
     pianoOptions.forEach((option) => {
         option.classList.toggle("active", option.dataset.piano === state.pianoTone);
     });
-    niceNotesToggle.checked = state.niceMode;
-    if (chordRoundsToggle) {
-        chordRoundsToggle.checked = state.chordMode;
-    }
     if (trainingModeSelect) {
         trainingModeSelect.value = state.trainingMode;
     }

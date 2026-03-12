@@ -1,5 +1,6 @@
 var App = window.App || (window.App = {});
 App.game = App.game || {};
+App.chords = App.chords || {};
 
 const CHORD_ROOT_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const CHORD_ROOT_ALIASES = {
@@ -24,6 +25,33 @@ const CHORD_ROOT_ALIASES = {
     BB: 10,
     B: 11,
     CB: 11
+};
+
+const CHORD_QUALITY_META = {
+    maj: { label: "Major", roles: ["R", "3", "5"] },
+    min: { label: "Minor", roles: ["R", "b3", "5"] },
+    sus2: { label: "Sus2", roles: ["R", "2", "5"] },
+    sus4: { label: "Sus4", roles: ["R", "4", "5"] },
+    sus47: { label: "7sus4" },
+    power5: { label: "Power chord", roles: ["R", "5"] },
+    maj7: { label: "Major 7", roles: ["R", "3", "5", "7"] },
+    min7: { label: "Minor 7", roles: ["R", "b3", "5", "b7"] },
+    dom7: { label: "Dominant 7", roles: ["R", "3", "5", "b7"] },
+    dim: { label: "Diminished", roles: ["R", "b3", "b5"] },
+    aug: { label: "Augmented", roles: ["R", "3", "#5"] },
+    m7b5: { label: "Half-diminished" },
+    dim7: { label: "Diminished 7" },
+    six: { label: "Major 6", roles: ["R", "3", "5", "6"] },
+    min6: { label: "Minor 6", roles: ["R", "b3", "5", "6"] },
+    sixNine: { label: "6/9" },
+    nine: { label: "Dominant 9", roles: ["R", "3", "5", "b7", "9"] },
+    maj9: { label: "Major 9", roles: ["R", "3", "5", "7", "9"] },
+    min9: { label: "Minor 9", roles: ["R", "b3", "5", "b7", "9"] },
+    add9: { label: "Add9", roles: ["R", "2", "3", "5"] },
+    add11: { label: "Add11" },
+    mMaj7: { label: "Minor Major 7" },
+    "maj7#11": { label: "Major 7 #11" },
+    "7b9": { label: "Dominant 7 b9" }
 };
 
 const CHORD_QUALITIES = [
@@ -51,7 +79,14 @@ const CHORD_QUALITIES = [
     { id: "mMaj7", suffix: "mMaj7", intervals: [0, 3, 7, 11], aliases: ["mmaj7", "minmaj7", "minormajor7"] },
     { id: "maj7#11", suffix: "maj7#11", intervals: [0, 4, 6, 11], aliases: ["maj7#11", "major7#11", "lydian"] },
     { id: "7b9", suffix: "7b9", intervals: [0, 1, 4, 7, 10], aliases: ["7b9", "dom7b9", "dominant7b9"] }
-];
+].map((entry) => {
+    const meta = CHORD_QUALITY_META[entry.id] || {};
+    return {
+        ...entry,
+        label: meta.label ?? entry.label ?? entry.id,
+        roles: meta.roles ?? entry.roles ?? null
+    };
+});
 
 const CHORD_QUALITY_BY_ID = new Map(CHORD_QUALITIES.map((entry) => [entry.id, entry]));
 const CHORD_QUALITY_ALIASES = new Map();
@@ -113,7 +148,7 @@ const recentChordTargets = [];
 let typingAutoNextTimer = null;
 let roundStartInProgress = false;
 let roundStartToken = 0;
-const GAME_MODE_POLICY = App.modePolicy || {};
+const GAME_MODE_POLICY = App.modePolicy;
 const GAME_UI_COPY = App.uiCopy || {};
 const CHORD_READOUT_COPY = GAME_UI_COPY.chordReadout || {};
 const PROMPT_COPY = GAME_UI_COPY.prompts || {};
@@ -129,6 +164,7 @@ const HELPER_LABELS = {
     voicing: HELPER_COPY.voicing || "Voicing",
     pitchSpan: HELPER_COPY.pitchSpan || "Pitch span"
 };
+App.game.helperLabels = HELPER_LABELS;
 const helperPinState = {
     round: null,
     localLabels: new Set(),
@@ -251,14 +287,16 @@ const applySubmissionStatePatch = (patch, mutation = "submission/patch") => {
     Object.assign(state, patch || {});
 };
 
+const normalizeChordSymbols = (value) => String(value ?? "")
+    .replace(/???/g, "#")
+    .replace(/???/g, "b")
+    .replace(/\u266f/g, "#")
+    .replace(/\u266d/g, "b")
+    .replace(/\u266F/g, "#")
+    .replace(/\u266D/g, "b");
+
 const normalizeQualityToken = (value) => {
-    let normalized = String(value ?? "")
-        .replace(/\u266f/g, "#")
-        .replace(/\u266d/g, "b")
-        .replace(/♯/g, "#")
-        .replace(/♭/g, "b")
-        .replace(/\u266F/g, "#")
-        .replace(/\u266D/g, "b")
+    let normalized = normalizeChordSymbols(value)
         .replace(/^\s*M(?=\d|aj)/, "maj")
         .replace(/major/gi, "maj")
         .replace(/minor/gi, "min")
@@ -317,18 +355,20 @@ CHORD_QUALITIES.forEach((quality) => {
     }
 });
 
-const isTypingEnabled = () => GAME_MODE_POLICY.isTypingEnabledFromState
-    ? GAME_MODE_POLICY.isTypingEnabledFromState(state)
-    : (state.trainingMode === "type" || state.trainingMode === "both");
-const isTypingOnlyMode = () => GAME_MODE_POLICY.isTypingOnlyModeFromState
-    ? GAME_MODE_POLICY.isTypingOnlyModeFromState(state)
-    : state.trainingMode === "type";
-const getIsChordRound = () => GAME_MODE_POLICY.getIsChordRoundFromState
-    ? GAME_MODE_POLICY.getIsChordRoundFromState(state)
-    : (isTypingEnabled() || state.chordMode);
-const getEffectiveBlindMode = () => GAME_MODE_POLICY.getEffectiveBlindModeFromState
-    ? GAME_MODE_POLICY.getEffectiveBlindModeFromState(state)
-    : state.blindMode;
+Object.assign(App.chords, {
+    rootNames: CHORD_ROOT_NAMES,
+    rootAliases: CHORD_ROOT_ALIASES,
+    qualities: CHORD_QUALITIES,
+    qualityById: CHORD_QUALITY_BY_ID,
+    qualityAliases: CHORD_QUALITY_ALIASES,
+    normalizeQualityToken,
+    normalizeSymbols: normalizeChordSymbols
+});
+
+const isTypingEnabled = () => GAME_MODE_POLICY.isTypingEnabledFromState(state);
+const isTypingOnlyMode = () => GAME_MODE_POLICY.isTypingOnlyModeFromState(state);
+const getIsChordRound = () => GAME_MODE_POLICY.getIsChordRoundFromState(state);
+const getEffectiveBlindMode = () => GAME_MODE_POLICY.getEffectiveBlindModeFromState(state);
 const getKeyboardZoneEl = () => document.querySelector(".keyboard-zone");
 const normalizePitchClass = (value) => ((Math.round(value) % 12) + 12) % 12;
 const getRootName = (pitchClass) => CHORD_ROOT_NAMES[normalizePitchClass(pitchClass)];

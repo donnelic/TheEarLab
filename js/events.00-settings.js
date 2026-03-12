@@ -17,10 +17,12 @@ document.addEventListener("pointerdown", primeAudioFromGesture, true);
 document.addEventListener("keydown", primeAudioFromGesture, true);
 document.addEventListener("touchstart", primeAudioFromGesture, true);
 
+const EVENTS_MODE_POLICY = App.modePolicy;
+
 const ROUND_RESTART_POLICY_BY_SETTING = Object.freeze({
     playbackOrder: () => state.active,
-    trainingMode: () => state.active && getEventsChordRound(),
-    chordDifficulty: () => state.active && getEventsChordRound(),
+    trainingMode: () => state.active && EVENTS_MODE_POLICY.getIsChordRoundFromState(state),
+    chordDifficulty: () => state.active && EVENTS_MODE_POLICY.getIsChordRoundFromState(state),
     chordRootHint: () => false,
     customCursorEnabled: () => false
 });
@@ -65,7 +67,10 @@ const applySettingMutationEffects = (
     }
 };
 
-const ROOT_HELPER_LABEL = (App.uiCopy?.helpers?.rootNote || "Root note");
+Object.assign(App.events, {
+    patchSettingsState,
+    applySettingMutationEffects
+});
 
 noteCountInput.addEventListener("input", (event) => {
     const next = clampNoteCount(event.target.value);
@@ -121,27 +126,6 @@ if (hideLivePreviewToggle) {
             refreshKeys: false,
             restartOverride: false
         });
-    });
-}
-
-niceNotesToggle.addEventListener("change", (event) => {
-    if (event.target.checked) {
-        setPracticeMode("nice");
-    } else if (getEffectivePracticeMode() === "nice") {
-        setPracticeMode("random");
-    } else {
-        patchSettingsState({ niceMode: false }, "events/nice-mode");
-        updateNoteCountMax();
-        applySettingMutationEffects("niceMode", {
-            refreshKeys: false,
-            restartOverride: false
-        });
-    }
-});
-
-if (chordRoundsToggle) {
-    chordRoundsToggle.addEventListener("change", (event) => {
-        setPracticeMode(event.target.checked ? "chord" : "random");
     });
 }
 
@@ -218,7 +202,7 @@ if (customCursorToggle) {
             refreshKeys: false,
             restartOverride: false
         });
-        applyCustomCursorMediaState();
+        App.events?.applyCustomCursorMediaState?.();
     });
 }
 
@@ -478,24 +462,32 @@ const TUTORIAL_ROOTS = [
     { pc: 11, label: "B" }
 ];
 
-const TUTORIAL_QUALITIES = [
-    { id: "maj", label: "Major", suffix: "", intervals: [0, 4, 7], roles: ["R", "3", "5"] },
-    { id: "min", label: "Minor", suffix: "m", intervals: [0, 3, 7], roles: ["R", "b3", "5"] },
-    { id: "power5", label: "Power chord", suffix: "5", intervals: [0, 7], roles: ["R", "5"] },
-    { id: "maj7", label: "Major 7", suffix: "maj7", intervals: [0, 4, 7, 11], roles: ["R", "3", "5", "7"] },
-    { id: "m7", label: "Minor 7", suffix: "m7", intervals: [0, 3, 7, 10], roles: ["R", "b3", "5", "b7"] },
-    { id: "dom7", label: "Dominant 7", suffix: "7", intervals: [0, 4, 7, 10], roles: ["R", "3", "5", "b7"] },
-    { id: "nine", label: "Dominant 9", suffix: "9", intervals: [0, 4, 7, 10, 14], roles: ["R", "3", "5", "b7", "9"] },
-    { id: "maj9", label: "Major 9", suffix: "maj9", intervals: [0, 4, 7, 11, 14], roles: ["R", "3", "5", "7", "9"] },
-    { id: "m9", label: "Minor 9", suffix: "m9", intervals: [0, 3, 7, 10, 14], roles: ["R", "b3", "5", "b7", "9"] },
-    { id: "six", label: "Major 6", suffix: "6", intervals: [0, 4, 7, 9], roles: ["R", "3", "5", "6"] },
-    { id: "m6", label: "Minor 6", suffix: "m6", intervals: [0, 3, 7, 9], roles: ["R", "b3", "5", "6"] },
-    { id: "add9", label: "Add9", suffix: "add9", intervals: [0, 2, 4, 7], roles: ["R", "2", "3", "5"] },
-    { id: "sus2", label: "Sus2", suffix: "sus2", intervals: [0, 2, 7], roles: ["R", "2", "5"] },
-    { id: "sus4", label: "Sus4", suffix: "sus4", intervals: [0, 5, 7], roles: ["R", "4", "5"] },
-    { id: "dim", label: "Diminished", suffix: "dim", intervals: [0, 3, 6], roles: ["R", "b3", "b5"] },
-    { id: "aug", label: "Augmented", suffix: "aug", intervals: [0, 4, 8], roles: ["R", "3", "#5"] }
+const TUTORIAL_QUALITY_IDS = [
+    "maj",
+    "min",
+    "power5",
+    "maj7",
+    "min7",
+    "dom7",
+    "nine",
+    "maj9",
+    "min9",
+    "six",
+    "min6",
+    "add9",
+    "sus2",
+    "sus4",
+    "dim",
+    "aug"
 ];
+
+const TUTORIAL_QUALITIES = TUTORIAL_QUALITY_IDS
+    .map((qualityId) => App.chords?.qualityById?.get(qualityId))
+    .filter(Boolean)
+    .map((quality) => ({
+        ...quality,
+        roles: Array.isArray(quality.roles) ? quality.roles : []
+    }));
 
 const TUTORIAL_QUALITY_BY_ID = new Map(TUTORIAL_QUALITIES.map((entry) => [entry.id, entry]));
 const TUTORIAL_ALL_ROOT_PCS = TUTORIAL_ROOTS.map((entry) => entry.pc);
@@ -503,8 +495,8 @@ const TUTORIAL_ALL_QUALITY_IDS = TUTORIAL_QUALITIES.map((entry) => entry.id);
 const TUTORIAL_QUALITY_GROUPS = [
     { label: "Core Triads", ids: ["maj", "min", "power5"] },
     { label: "Suspended", ids: ["sus2", "sus4"] },
-    { label: "6th / 7th", ids: ["six", "m6", "maj7", "m7", "dom7"] },
-    { label: "9th / Add", ids: ["nine", "maj9", "m9", "add9"] },
+    { label: "6th / 7th", ids: ["six", "min6", "maj7", "min7", "dom7"] },
+    { label: "9th / Add", ids: ["nine", "maj9", "min9", "add9"] },
     { label: "Altered", ids: ["dim", "aug"] }
 ];
 const TUTORIAL_MIDI_START = 48; // C3
@@ -577,7 +569,7 @@ const CHORD_TUTORIAL_STEPS = [
             <p>All root notes are now available so you can transpose every formula across the keyboard.</p>
         `,
         unlockedRootPcs: [...TUTORIAL_ALL_ROOT_PCS],
-        unlockedQualityIds: ["maj", "min", "sus2", "sus4", "power5", "dim", "aug", "six", "m6", "maj7", "m7", "dom7"]
+        unlockedQualityIds: ["maj", "min", "sus2", "sus4", "power5", "dim", "aug", "six", "min6", "maj7", "min7", "dom7"]
     },
     {
         title: "7. Extensions (9th)",
@@ -613,13 +605,13 @@ const TUTORIAL_QUALITY_STEP_INDEX = Object.freeze({
     dim: 4,
     aug: 4,
     six: 5,
-    m6: 5,
+    min6: 5,
     maj7: 5,
-    m7: 5,
+    min7: 5,
     dom7: 5,
     nine: 6,
     maj9: 6,
-    m9: 6,
+    min9: 6,
     add9: 6
 });
 
