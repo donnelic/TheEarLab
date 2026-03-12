@@ -1304,9 +1304,19 @@ const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {
     if (persistent && label === ROOT_HELPER_LABEL) {
         toggled = toggleRootHintFromHelper();
     } else {
-        const toggleFn = persistent ? App.game?.toggleHelperPinGlobal : App.game?.toggleHelperPinLocal;
-        if (typeof toggleFn !== "function") return false;
-        toggled = toggleFn(label);
+        const pinFlags = App.game?.getHelperPinFlags?.(label);
+        if (!persistent && pinFlags?.pinnedGlobal) {
+            const unpinFn = App.game?.toggleHelperPinGlobal;
+            const latchFn = App.game?.toggleHelperPinLocal;
+            if (typeof unpinFn !== "function" || typeof latchFn !== "function") return false;
+            const unpinned = unpinFn(label);
+            const latched = latchFn(label);
+            toggled = unpinned || latched;
+        } else {
+            const toggleFn = persistent ? App.game?.toggleHelperPinGlobal : App.game?.toggleHelperPinLocal;
+            if (typeof toggleFn !== "function") return false;
+            toggled = toggleFn(label);
+        }
     }
     if (toggled) {
         syncHelperPinnedUi(helperItem);
@@ -1646,14 +1656,15 @@ const ensureCustomCursorEl = () => {
     return cursor;
 };
 const getCustomCursorMode = (target) => {
+    if (target instanceof Element) {
+        if (target.closest("input[type=\"text\"], input[type=\"search\"], input[type=\"email\"], input[type=\"password\"], textarea, [contenteditable=\"true\"]")) {
+            return "text";
+        }
+        if (target.closest("button, [role=\"button\"], a[href], input, select, label.switch, .key, .piano-option, .sf2-row, .profile-row, .tutorial-chip, [tabindex]:not([tabindex=\"-1\"])")) {
+            return "interactive";
+        }
+    }
     if (helperZoneActive) return "helper";
-    if (!(target instanceof Element)) return "default";
-    if (target.closest("input[type=\"text\"], input[type=\"search\"], input[type=\"email\"], input[type=\"password\"], textarea, [contenteditable=\"true\"]")) {
-        return "text";
-    }
-    if (target.closest("button, [role=\"button\"], a[href], input, select, label.switch, .key, .piano-option, .sf2-row, .profile-row, .tutorial-chip, [tabindex]:not([tabindex=\"-1\"])")) {
-        return "interactive";
-    }
     return "default";
 };
 const syncCustomCursorState = () => {

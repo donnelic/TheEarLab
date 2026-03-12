@@ -27,3 +27,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Restored helper dot-in-background version (no overlay element, gradient pinned marker).
 
 - 2026-03-12: Restyled pinned marker to a solid color matching latched border and added transitions for marker/label/value colors.
+
+- 2026-03-12: Left-click on globally pinned helper now unpins and latches; text cursor mode now wins over helper zone for typing input.
