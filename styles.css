@@ -1751,13 +1751,17 @@ body.modal-open {
             rgba(15, 23, 42, 0.12) 55%,
             transparent 75%),
         radial-gradient(80px circle at var(--helper-cursor-x) var(--helper-cursor-y),
-            color-mix(in oklab, var(--accent) 55%, transparent) 0%,
-            color-mix(in oklab, var(--accent) 28%, transparent) 35%,
-            transparent 70%);
+            color-mix(in oklab, var(--accent) 82%, transparent) 0%,
+            color-mix(in oklab, var(--accent) 68%, transparent) 8%,
+            color-mix(in oklab, var(--accent) 52%, transparent) 16%,
+            color-mix(in oklab, var(--accent) 36%, transparent) 28%,
+            color-mix(in oklab, var(--accent) 22%, transparent) 45%,
+            color-mix(in oklab, var(--accent) 12%, transparent) 62%,
+            transparent 80%);
     opacity: var(--helper-cursor-opacity);
     transition: opacity 0.18s ease;
     pointer-events: none;
-    z-index: 0;
+    z-index: 2;
 }
 
 .helper-item>* {
@@ -1806,6 +1810,7 @@ body.modal-open {
     box-shadow:
         0 0 0 1px color-mix(in oklab, var(--accent) 85%, transparent),
         0 3px 6px rgba(15, 23, 42, 0.18);
+    z-index: 3;
 }
 
 .helper-item.pinned .helper-label {
