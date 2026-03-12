@@ -31,3 +31,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Left-click on globally pinned helper now unpins and latches; text cursor mode now wins over helper zone for typing input.
 
 - 2026-03-12: Left-click on root helper now turns off root hint and latches; custom cursor text mode now explicitly matches chord typing input wrapper.
+
+- 2026-03-12: Root helper detection now uses data-helper-root; custom cursor mode uses elementFromPoint to resolve text inputs reliably.

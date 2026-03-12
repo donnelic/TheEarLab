@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-12 17:03:47 +01:00
+Generated: 2026-03-12 17:09:31 +01:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -36,8 +36,8 @@ Generated: 2026-03-12 17:03:47 +01:00
 | styles.css | CSS | Loaded directly | Yes | 3464 |
 | js/audio.js | JavaScript | Browser runtime module | Yes | 1529 |
 | js/core.js | JavaScript | Browser runtime module | Yes | 1072 |
-| js/events.js | JavaScript | Browser runtime module | Yes | 2485 |
-| js/game.js | JavaScript | Browser runtime module | Yes | 2219 |
+| js/events.js | JavaScript | Browser runtime module | Yes | 2493 |
+| js/game.js | JavaScript | Browser runtime module | Yes | 2220 |
 | js/settings.js | JavaScript | Browser runtime module | Yes | 1480 |
 | README.md | Markdown | Human + AI onboarding | Yes | 135 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
@@ -833,7 +833,7 @@ File lines: 1-1072
 | rebuildKeyboard | 1060-1071 |
 
 ### js/events.js (Active Runtime)
-File lines: 1-2485
+File lines: 1-2493
 
 | Symbol | Lines |
 |---|---|
@@ -880,49 +880,50 @@ File lines: 1-2485
 | syncHelperPinnedUi | 1262-1271 |
 | shouldBlurAfterPointer | 1273-1278 |
 | toggleRootHintFromHelper | 1280-1297 |
-| toggleHelperPinned | 1299-1338 |
-| handleHelperPinEvent | 1340-1346 |
-| isChordTypingCaptureActive | 1442-1447 |
-| insertTypedCharacter | 1449-1456 |
-| triggerPrimaryAction | 1459-1468 |
-| getButtonLikeTarget | 1471-1471 |
-| blurPointerActivatedControl | 1472-1479 |
-| markHelperIndicatorDirty | 1507-1510 |
-| getHelperIndicatorItems | 1512-1524 |
-| ensureHelperIndicatorObserver | 1538-1542 |
-| getHelperIndicatorCache | 1544-1579 |
-| updateHelperIndicatorPositions | 1581-1591 |
-| scheduleHelperIndicatorUpdate | 1593-1605 |
-| isPointerInsideRect | 1607-1613 |
-| handleHelperIndicatorProximity | 1615-1648 |
-| ensureCustomCursorEl | 1650-1667 |
-| getCustomCursorMode | 1668-1682 |
-| syncCustomCursorState | 1683-1689 |
-| renderCustomCursor | 1690-1696 |
-| scheduleCustomCursorRender | 1697-1700 |
-| scheduleCursorMotion | 1702-1705 |
-| stepCursorMotion | 1707-1725 |
-| setCustomCursorEnabled | 1726-1746 |
-| updateCustomCursorPosition | 1747-1769 |
-| handleHelperPointerEnter | 1771-1776 |
-| handleHelperPointerLeave | 1778-1783 |
-| triggerReplayAction | 1785-1791 |
-| bindPianoOptionEvents | 1951-1976 |
-| handlePointerUpdate | 2051-2070 |
-| applyCustomCursorMediaState | 2119-2122 |
-| isElementVisible | 2137-2143 |
-| getFocusableElements | 2145-2149 |
-| focusFirstInModal | 2155-2161 |
-| trapModalFocus | 2163-2185 |
-| isTextEditableTarget | 2187-2192 |
-| getActiveModalEl | 2194-2199 |
-| closeGameSettingsModalUi | 2201-2210 |
-| openGameSettingsModalUi | 2212-2218 |
-| closeActiveModal | 2220-2234 |
-| moveFocusInPanel | 2236-2247 |
-| setRandomBackgroundAngle | 2437-2440 |
-| init | 2442-2479 |
-| runDeferredCatalogLoad | 2463-2472 |
+| toggleHelperPinned | 1299-1339 |
+| getCursorTarget | 1341-1346 |
+| handleHelperPinEvent | 1348-1354 |
+| isChordTypingCaptureActive | 1450-1455 |
+| insertTypedCharacter | 1457-1464 |
+| triggerPrimaryAction | 1467-1476 |
+| getButtonLikeTarget | 1479-1479 |
+| blurPointerActivatedControl | 1480-1487 |
+| markHelperIndicatorDirty | 1515-1518 |
+| getHelperIndicatorItems | 1520-1532 |
+| ensureHelperIndicatorObserver | 1546-1550 |
+| getHelperIndicatorCache | 1552-1587 |
+| updateHelperIndicatorPositions | 1589-1599 |
+| scheduleHelperIndicatorUpdate | 1601-1613 |
+| isPointerInsideRect | 1615-1621 |
+| handleHelperIndicatorProximity | 1623-1656 |
+| ensureCustomCursorEl | 1658-1675 |
+| getCustomCursorMode | 1676-1690 |
+| syncCustomCursorState | 1691-1697 |
+| renderCustomCursor | 1698-1704 |
+| scheduleCustomCursorRender | 1705-1708 |
+| scheduleCursorMotion | 1710-1713 |
+| stepCursorMotion | 1715-1733 |
+| setCustomCursorEnabled | 1734-1754 |
+| updateCustomCursorPosition | 1755-1777 |
+| handleHelperPointerEnter | 1779-1784 |
+| handleHelperPointerLeave | 1786-1791 |
+| triggerReplayAction | 1793-1799 |
+| bindPianoOptionEvents | 1959-1984 |
+| handlePointerUpdate | 2059-2078 |
+| applyCustomCursorMediaState | 2127-2130 |
+| isElementVisible | 2145-2151 |
+| getFocusableElements | 2153-2157 |
+| focusFirstInModal | 2163-2169 |
+| trapModalFocus | 2171-2193 |
+| isTextEditableTarget | 2195-2200 |
+| getActiveModalEl | 2202-2207 |
+| closeGameSettingsModalUi | 2209-2218 |
+| openGameSettingsModalUi | 2220-2226 |
+| closeActiveModal | 2228-2242 |
+| moveFocusInPanel | 2244-2255 |
+| setRandomBackgroundAngle | 2445-2448 |
+| init | 2450-2487 |
+| runDeferredCatalogLoad | 2471-2480 |
 
 Event bindings:
 | Target | Event | Line |
@@ -986,78 +987,78 @@ Event bindings:
 | chordTutorialBackdrop | click | 1237 |
 | chordTutorialPrev | click | 1243 |
 | chordTutorialNext | click | 1251 |
-| document | click | 1348 |
-| document | keydown | 1350 |
-| document | contextmenu | 1355 |
-| chordTutorialRootList | mouseover | 1358 |
-| chordTutorialRootList | mouseleave | 1366 |
-| chordTutorialRootList | focusin | 1369 |
-| chordTutorialRootList | focusout | 1377 |
-| chordTutorialRootList | click | 1380 |
-| chordTutorialQualityList | mouseover | 1396 |
-| chordTutorialQualityList | mouseleave | 1403 |
-| chordTutorialQualityList | focusin | 1406 |
-| chordTutorialQualityList | focusout | 1413 |
-| chordTutorialQualityList | click | 1416 |
-| volumeSlider | dblclick | 1793 |
-| lengthSlider | dblclick | 1797 |
-| keyCountSlider | dblclick | 1801 |
-| startNoteDownButton | click | 1807 |
-| startNoteUpButton | click | 1810 |
-| startNoteDownOctButton | click | 1816 |
-| startNoteUpOctButton | click | 1819 |
-| noteCountInput | dblclick | 1824 |
-| attackSlider | dblclick | 1832 |
-| decaySlider | dblclick | 1836 |
-| releaseSlider | dblclick | 1840 |
-| sustainSlider | dblclick | 1844 |
-| profileSearch | input | 1849 |
-| profileList | click | 1855 |
-| profileList | dblclick | 1860 |
-| profileList | keydown | 1863 |
-| profileApply | click | 1874 |
-| profileSave | click | 1880 |
-| instrumentPresetSearch | input | 1886 |
-| instrumentPresetList | click | 1892 |
-| instrumentPresetList | dblclick | 1897 |
-| instrumentPresetList | keydown | 1900 |
-| instrumentPresetApply | click | 1911 |
-| advancedTrigger | click | 1916 |
-| advancedPanel | click | 1921 |
-| pianoTrigger | click | 1926 |
-| pianoPanel | click | 1933 |
-| instrumentBrowserTrigger | click | 1939 |
-| instrumentBrowserPanel | click | 1946 |
-| pianoOptionsContainer | click | 1954 |
-| pianoOptionsContainer | keydown | 1968 |
-| pianoPreviewMain | click | 1979 |
-| testEnvelopeButton | click | 1986 |
-| keyboardEl | pointerdown | 1991 |
-| document | pointerup | 2027 |
-| document | pointercancel | 2034 |
-| document | pointerdown | 2041 |
-| document | click | 2047 |
-| document | pointerrawupdate | 2073 |
-| document | pointermove | 2075 |
-| document | pointerup | 2077 |
-| document | pointercancel | 2082 |
-| document | pointerover | 2087 |
-| document | pointerout | 2093 |
-| document | pointerover | 2102 |
-| document | pointerout | 2103 |
-| window | blur | 2105 |
-| document | visibilitychange | 2111 |
-| CUSTOM_CURSOR_QUERY | change | 2124 |
-| keyboardEl | click | 2130 |
-| document | keydown | 2249 |
-| document | keyup | 2385 |
-| pedalBox | pointerdown | 2404 |
-| pedalBox | pointerup | 2413 |
-| pedalBox | pointercancel | 2422 |
-| pedalBox | pointerleave | 2430 |
+| document | click | 1356 |
+| document | keydown | 1358 |
+| document | contextmenu | 1363 |
+| chordTutorialRootList | mouseover | 1366 |
+| chordTutorialRootList | mouseleave | 1374 |
+| chordTutorialRootList | focusin | 1377 |
+| chordTutorialRootList | focusout | 1385 |
+| chordTutorialRootList | click | 1388 |
+| chordTutorialQualityList | mouseover | 1404 |
+| chordTutorialQualityList | mouseleave | 1411 |
+| chordTutorialQualityList | focusin | 1414 |
+| chordTutorialQualityList | focusout | 1421 |
+| chordTutorialQualityList | click | 1424 |
+| volumeSlider | dblclick | 1801 |
+| lengthSlider | dblclick | 1805 |
+| keyCountSlider | dblclick | 1809 |
+| startNoteDownButton | click | 1815 |
+| startNoteUpButton | click | 1818 |
+| startNoteDownOctButton | click | 1824 |
+| startNoteUpOctButton | click | 1827 |
+| noteCountInput | dblclick | 1832 |
+| attackSlider | dblclick | 1840 |
+| decaySlider | dblclick | 1844 |
+| releaseSlider | dblclick | 1848 |
+| sustainSlider | dblclick | 1852 |
+| profileSearch | input | 1857 |
+| profileList | click | 1863 |
+| profileList | dblclick | 1868 |
+| profileList | keydown | 1871 |
+| profileApply | click | 1882 |
+| profileSave | click | 1888 |
+| instrumentPresetSearch | input | 1894 |
+| instrumentPresetList | click | 1900 |
+| instrumentPresetList | dblclick | 1905 |
+| instrumentPresetList | keydown | 1908 |
+| instrumentPresetApply | click | 1919 |
+| advancedTrigger | click | 1924 |
+| advancedPanel | click | 1929 |
+| pianoTrigger | click | 1934 |
+| pianoPanel | click | 1941 |
+| instrumentBrowserTrigger | click | 1947 |
+| instrumentBrowserPanel | click | 1954 |
+| pianoOptionsContainer | click | 1962 |
+| pianoOptionsContainer | keydown | 1976 |
+| pianoPreviewMain | click | 1987 |
+| testEnvelopeButton | click | 1994 |
+| keyboardEl | pointerdown | 1999 |
+| document | pointerup | 2035 |
+| document | pointercancel | 2042 |
+| document | pointerdown | 2049 |
+| document | click | 2055 |
+| document | pointerrawupdate | 2081 |
+| document | pointermove | 2083 |
+| document | pointerup | 2085 |
+| document | pointercancel | 2090 |
+| document | pointerover | 2095 |
+| document | pointerout | 2101 |
+| document | pointerover | 2110 |
+| document | pointerout | 2111 |
+| window | blur | 2113 |
+| document | visibilitychange | 2119 |
+| CUSTOM_CURSOR_QUERY | change | 2132 |
+| keyboardEl | click | 2138 |
+| document | keydown | 2257 |
+| document | keyup | 2393 |
+| pedalBox | pointerdown | 2412 |
+| pedalBox | pointerup | 2421 |
+| pedalBox | pointercancel | 2430 |
+| pedalBox | pointerleave | 2438 |
 
 ### js/game.js (Active Runtime)
-File lines: 1-2219
+File lines: 1-2220
 
 | Symbol | Lines |
 |---|---|
@@ -1118,47 +1119,47 @@ File lines: 1-2219
 | updateReplayAvailability | 1058-1065 |
 | getChordHelperHints | 1067-1083 |
 | createDeterministicHelperMask | 1101-1129 |
-| renderChordHelperBox | 1131-1160 |
-| updateStatus | 1162-1286 |
-| updateKeyStates | 1288-1349 |
-| setKeyboardEnabled | 1351-1354 |
-| updateKeyboardScale | 1356-1367 |
-| lockKeyboardForPlayback | 1369-1382 |
-| setSubmitted | 1384-1391 |
-| goHome | 1393-1445 |
-| refreshTarget | 1447-1473 |
-| startRound | 1475-1551 |
-| ensureRound | 1553-1562 |
-| playTarget | 1564-1578 |
-| startManualNote | 1580-1598 |
-| releaseManualNote | 1600-1608 |
-| releasePedalNotes | 1610-1620 |
-| startPedalHold | 1622-1628 |
-| stopPedalHold | 1630-1637 |
-| toggleSelection | 1639-1683 |
-| isSelectionCorrect | 1685-1702 |
-| getPlaybackSpan | 1704-1709 |
-| renderNotePills | 1711-1717 |
-| renderChordPill | 1719-1723 |
-| renderTonePills | 1725-1733 |
-| renderRevealCell | 1735-1740 |
-| renderChordRevealGrid | 1742-1745 |
-| renderChordDetectionMeta | 1747-1751 |
-| renderPressedPills | 1753-1758 |
-| buildNoteComparison | 1760-1767 |
-| buildAnswerNoteCell | 1769-1778 |
-| buildTargetNoteCell | 1780-1793 |
-| getSubmittedReplaySnapshot | 1817-1831 |
-| playSubmittedReplaySequence | 1833-1846 |
-| playRevealSequence | 1848-1898 |
-| playSelectedChord | 1900-1924 |
-| playTypedInputChord | 1926-1939 |
-| startHeldPlayback | 1941-1967 |
-| releaseHeldPlayback | 1969-1983 |
-| buildTypingRevealDetail | 1985-2005 |
-| submitTypedAnswer | 2007-2081 |
-| submitAnswer | 2083-2146 |
-| sanitizeRoundStateForKeyboardRange | 2148-2188 |
+| renderChordHelperBox | 1131-1161 |
+| updateStatus | 1163-1287 |
+| updateKeyStates | 1289-1350 |
+| setKeyboardEnabled | 1352-1355 |
+| updateKeyboardScale | 1357-1368 |
+| lockKeyboardForPlayback | 1370-1383 |
+| setSubmitted | 1385-1392 |
+| goHome | 1394-1446 |
+| refreshTarget | 1448-1474 |
+| startRound | 1476-1552 |
+| ensureRound | 1554-1563 |
+| playTarget | 1565-1579 |
+| startManualNote | 1581-1599 |
+| releaseManualNote | 1601-1609 |
+| releasePedalNotes | 1611-1621 |
+| startPedalHold | 1623-1629 |
+| stopPedalHold | 1631-1638 |
+| toggleSelection | 1640-1684 |
+| isSelectionCorrect | 1686-1703 |
+| getPlaybackSpan | 1705-1710 |
+| renderNotePills | 1712-1718 |
+| renderChordPill | 1720-1724 |
+| renderTonePills | 1726-1734 |
+| renderRevealCell | 1736-1741 |
+| renderChordRevealGrid | 1743-1746 |
+| renderChordDetectionMeta | 1748-1752 |
+| renderPressedPills | 1754-1759 |
+| buildNoteComparison | 1761-1768 |
+| buildAnswerNoteCell | 1770-1779 |
+| buildTargetNoteCell | 1781-1794 |
+| getSubmittedReplaySnapshot | 1818-1832 |
+| playSubmittedReplaySequence | 1834-1847 |
+| playRevealSequence | 1849-1899 |
+| playSelectedChord | 1901-1925 |
+| playTypedInputChord | 1927-1940 |
+| startHeldPlayback | 1942-1968 |
+| releaseHeldPlayback | 1970-1984 |
+| buildTypingRevealDetail | 1986-2006 |
+| submitTypedAnswer | 2008-2082 |
+| submitAnswer | 2084-2147 |
+| sanitizeRoundStateForKeyboardRange | 2149-2189 |
 
 ### js/settings.js (Active Runtime)
 File lines: 1-1480

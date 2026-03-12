@@ -1300,8 +1300,9 @@ const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {
     if (!helperItem) return false;
     const label = helperItem.dataset?.helperLabel;
     if (!label) return false;
+    const isRootHelper = helperItem.dataset?.helperRoot === "true" || label === ROOT_HELPER_LABEL;
     let toggled = false;
-    if (!persistent && label === ROOT_HELPER_LABEL) {
+    if (!persistent && isRootHelper) {
         const latchFn = App.game?.toggleHelperPinLocal;
         if (state.chordRootHint) {
             const rootToggled = toggleRootHintFromHelper();
@@ -1311,7 +1312,7 @@ const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {
             if (typeof latchFn !== "function") return false;
             toggled = latchFn(label);
         }
-    } else if (persistent && label === ROOT_HELPER_LABEL) {
+    } else if (persistent && isRootHelper) {
         toggled = toggleRootHintFromHelper();
     } else {
         const pinFlags = App.game?.getHelperPinFlags?.(label);
@@ -1335,6 +1336,13 @@ const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {
         }
     }
     return toggled;
+};
+
+const getCursorTarget = (event) => {
+    if (event && typeof event.clientX === "number" && typeof event.clientY === "number") {
+        return document.elementFromPoint(event.clientX, event.clientY) || event.target;
+    }
+    return event?.target ?? null;
 };
 
 const handleHelperPinEvent = (event, { persistent = false } = {}) => {
@@ -2061,7 +2069,7 @@ const handlePointerUpdate = (event) => {
     updateCustomCursorPosition(latest);
     if (event.type !== "pointerrawupdate") {
         handleHelperIndicatorProximity(latest);
-        const nextMode = getCustomCursorMode(latest.target);
+        const nextMode = getCustomCursorMode(getCursorTarget(latest));
         if (nextMode !== customCursorMode) {
             customCursorMode = nextMode;
             scheduleCustomCursorRender();
@@ -2086,7 +2094,7 @@ document.addEventListener("pointercancel", () => {
 
 document.addEventListener("pointerover", (event) => {
     if (!customCursorEnabled) return;
-    customCursorMode = getCustomCursorMode(event.target);
+    customCursorMode = getCustomCursorMode(getCursorTarget(event));
     scheduleCustomCursorRender();
 }, true);
 

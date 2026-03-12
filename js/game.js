@@ -1133,13 +1133,14 @@ const renderChordHelperBox = () => {
     if (!hints.length) return "";
     const helperHint = HELPER_COPY.revealHint || "Hover or focus to reveal";
     const rows = hints.map((hint) => {
+        const isRoot = hint.label === HELPER_LABELS.rootNote;
         const label = escapeHtml(hint.label);
         const pinned = isHelperPinnedLabel(hint.label);
         const pinnedGlobal = isHelperPinnedGlobalLabel(hint.label);
         const pinnedLocal = !pinnedGlobal && isHelperPinnedLocalLabel(hint.label);
         return `
         <div class="helper-item${pinnedGlobal ? " pinned" : ""}${pinnedLocal ? " latched" : ""}" tabindex="0" role="button"
-            data-helper-label="${label}" aria-pressed="${pinned}">
+            data-helper-label="${label}"${isRoot ? " data-helper-root=\"true\"" : ""} aria-pressed="${pinned}">
             <div class="helper-label">${label}</div>
             <div class="helper-value">
                 <span class="helper-mask" aria-hidden="true">${createDeterministicHelperMask(hint.label)}</span>
