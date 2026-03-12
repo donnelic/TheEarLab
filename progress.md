@@ -21,3 +21,7 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Moved helper hover dot to its own overlay element so it sits above helper content.
 
 - 2026-03-12: Excluded helper cursor dot from generic child stacking rule and forced absolute overlay above content.
+
+- 2026-03-12: Reverted helper cursor dot to background gradient (removed overlay span).
+
+- 2026-03-12: Restored helper dot-in-background version (no overlay element, gradient pinned marker).

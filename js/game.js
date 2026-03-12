@@ -1140,7 +1140,6 @@ const renderChordHelperBox = () => {
         return `
         <div class="helper-item${pinnedGlobal ? " pinned" : ""}${pinnedLocal ? " latched" : ""}" tabindex="0" role="button"
             data-helper-label="${label}" aria-pressed="${pinned}">
-            <span class="helper-cursor-dot" aria-hidden="true"></span>
             <div class="helper-label">${label}</div>
             <div class="helper-value">
                 <span class="helper-mask" aria-hidden="true">${createDeterministicHelperMask(hint.label)}</span>
