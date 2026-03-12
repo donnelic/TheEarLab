@@ -1301,7 +1301,17 @@ const toggleHelperPinned = (helperItem, { persistent = false, event = null } = {
     const label = helperItem.dataset?.helperLabel;
     if (!label) return false;
     let toggled = false;
-    if (persistent && label === ROOT_HELPER_LABEL) {
+    if (!persistent && label === ROOT_HELPER_LABEL) {
+        const latchFn = App.game?.toggleHelperPinLocal;
+        if (state.chordRootHint) {
+            const rootToggled = toggleRootHintFromHelper();
+            const latched = typeof latchFn === "function" ? latchFn(label) : false;
+            toggled = rootToggled || latched;
+        } else {
+            if (typeof latchFn !== "function") return false;
+            toggled = latchFn(label);
+        }
+    } else if (persistent && label === ROOT_HELPER_LABEL) {
         toggled = toggleRootHintFromHelper();
     } else {
         const pinFlags = App.game?.getHelperPinFlags?.(label);
@@ -1657,6 +1667,9 @@ const ensureCustomCursorEl = () => {
 };
 const getCustomCursorMode = (target) => {
     if (target instanceof Element) {
+        if (target.closest("#chord-answer, .typing-input-wrap")) {
+            return "text";
+        }
         if (target.closest("input[type=\"text\"], input[type=\"search\"], input[type=\"email\"], input[type=\"password\"], textarea, [contenteditable=\"true\"]")) {
             return "text";
         }
