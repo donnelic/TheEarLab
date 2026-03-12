@@ -37,3 +37,5 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Typing help button now forces interactive cursor mode ahead of text mode.
 
 - 2026-03-12: Custom cursor mode now re-evaluates from elementFromPoint each render; helper mode priority restored after typing text detection.
+
+- 2026-03-12: Pointer-up now blurs pointer-activated buttons to avoid sticky focus; increased custom cursor smoothing to reduce lag.

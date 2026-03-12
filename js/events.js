@@ -1494,7 +1494,7 @@ let customCursorX = -100;
 let customCursorY = -100;
 let customCursorRenderX = -100;
 let customCursorRenderY = -100;
-let customCursorSmoothing = 0.35;
+let customCursorSmoothing = 0.5;
 let customCursorVisible = false;
 let customCursorPressed = false;
 let customCursorMode = "default";
@@ -2097,6 +2097,7 @@ document.addEventListener("pointermove", handlePointerUpdate, { passive: true, c
 document.addEventListener("pointerup", (event) => {
     customCursorPressed = false;
     updateCustomCursorPosition(event);
+    requestAnimationFrame(blurPointerActivatedControl);
 }, true);
 
 document.addEventListener("pointercancel", () => {
