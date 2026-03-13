@@ -242,6 +242,12 @@ const applyUiFromState = () => {
     if (typingShowTypedToggle) {
         typingShowTypedToggle.checked = state.typingShowTyped;
     }
+    if (relativeKeySelect) {
+        const keyValue = state.relativeKeyMode === "target"
+            ? "target"
+            : String(((Number.isFinite(state.relativeKeyRootPc) ? state.relativeKeyRootPc : 0) % 12 + 12) % 12);
+        relativeKeySelect.value = keyValue;
+    }
     if (practiceModeSelect) {
         practiceModeSelect.value = getEffectivePracticeMode();
     }

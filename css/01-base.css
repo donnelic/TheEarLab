@@ -195,7 +195,7 @@ body:not(.landing) .hero {
     font-size: 0.85rem;
     line-height: 1;
     cursor: pointer;
-    transition: transform 0.12s ease, box-shadow 0.2s ease;
+    transition: transform var(--dur-fast) var(--ease-quick), box-shadow var(--dur-slow) var(--ease-soft);
 }
 
 .step-btn.oct {
@@ -245,7 +245,7 @@ input[type="number"] {
     border-radius: 999px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: all var(--dur-slow) var(--ease-soft);
     color: var(--ink);
 }
 
@@ -282,7 +282,7 @@ input[type="number"] {
     display: grid;
     gap: 2px;
     cursor: pointer;
-    transition: transform 0.14s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    transition: transform var(--dur-fast) var(--ease-quick), border-color var(--dur-med) var(--ease-soft), box-shadow var(--dur-med) var(--ease-soft);
     align-self: start;
 }
 
@@ -318,7 +318,7 @@ body:not(.landing) .quick-start {
     border-radius: var(--field-radius);
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.2s ease;
+    transition: transform var(--dur-fast) var(--ease-quick), box-shadow var(--dur-slow) var(--ease-soft);
 }
 
 .btn:focus-visible {
@@ -352,5 +352,39 @@ body:not(.landing) .quick-start {
 
 .btn:hover {
     transform: translateY(-1px);
+}
+
+body[data-reduced-motion="true"] {
+    --dur-fast: 1ms;
+    --dur-med: 1ms;
+    --dur-slow: 1ms;
+    --dur-panel: 1ms;
+    --dur-flash: 1ms;
+    --dur-unlock: 1ms;
+    --delay-short: 0ms;
+}
+
+@keyframes app-pulse {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    55% {
+        transform: scale(1.015);
+        filter: brightness(1.06);
+    }
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+.pulse-once {
+    animation: app-pulse var(--dur-med) var(--ease-soft);
+    transform-origin: center;
+}
+
+body[data-reduced-motion="true"] .pulse-once {
+    animation: none;
 }
 

@@ -180,13 +180,155 @@ const getQualityPitchClassSet = (rootPc, quality) => {
     return set;
 };
 
+const SCALE_DEGREE_SEMITONES = [0, 2, 4, 5, 7, 9, 11];
+const ROMAN_DEGREE_MAP = Object.freeze({
+    I: 1,
+    II: 2,
+    III: 3,
+    IV: 4,
+    V: 5,
+    VI: 6,
+    VII: 7
+});
+
+const resolveRelativeKeyRootPc = () => {
+    if (state.relativeKeyMode === "target" && state.targetChord && Number.isFinite(state.targetChord.rootPc)) {
+        return state.targetChord.rootPc;
+    }
+    if (!Number.isFinite(state.relativeKeyRootPc)) return 0;
+    return ((Math.round(state.relativeKeyRootPc) % 12) + 12) % 12;
+};
+
+const getAccidentalOffset = (token) => {
+    let offset = 0;
+    const source = String(token ?? "");
+    for (let i = 0; i < source.length; i += 1) {
+        if (source[i] === "#") offset += 1;
+        if (source[i] === "b") offset -= 1;
+    }
+    return offset;
+};
+
+const resolveQualityFromToken = (qualityToken, fallbackQualityId = null) => {
+    const normalized = normalizeQualityToken(qualityToken || "");
+    const qualityId = CHORD_QUALITY_ALIASES.get(normalized) ?? fallbackQualityId;
+    if (!qualityId) return null;
+    return CHORD_QUALITY_BY_ID.get(qualityId) ?? null;
+};
+
+const parseBassToken = (token) => {
+    const normalizeSymbols = App.chords?.normalizeSymbols;
+    const normalized = typeof normalizeSymbols === "function"
+        ? normalizeSymbols(token)
+        : String(token ?? "");
+    const match = normalized.match(/^\s*([A-Ga-g])\s*([#b]?)\s*$/);
+    if (!match) return null;
+    const rootToken = `${match[1].toUpperCase()}${(match[2] || "").toUpperCase()}`;
+    const bassPc = CHORD_ROOT_ALIASES[rootToken];
+    if (!Number.isFinite(bassPc)) return null;
+    return {
+        bassPc,
+        bassName: getRootName(bassPc)
+    };
+};
+
+const splitQualityAndBass = (rawQuality) => {
+    const raw = String(rawQuality ?? "");
+    if (!raw.includes("/")) {
+        return { qualityToken: raw, bass: null };
+    }
+    const normalized = normalizeQualityToken(raw);
+    if (normalized && CHORD_QUALITY_ALIASES.has(normalized)) {
+        return { qualityToken: raw, bass: null };
+    }
+    const [before, after] = raw.split("/");
+    const normalizedBefore = normalizeQualityToken(before);
+    const hasBeforeQuality = CHORD_QUALITY_ALIASES.has(normalizedBefore);
+    if (!hasBeforeQuality && before.trim()) {
+        return { qualityToken: raw, bass: null };
+    }
+    const bass = parseBassToken(after);
+    if (!bass) {
+        return { qualityToken: raw, bass: null };
+    }
+    return { qualityToken: before, bass };
+};
+
+const buildChordLabelWithBass = (rootPc, quality, bass) => {
+    const base = buildChordLabel(rootPc, quality);
+    if (!bass?.bassName || bass.bassName === getRootName(rootPc)) {
+        return base;
+    }
+    return `${base}/${bass.bassName}`;
+};
+
+const parseRelativeChordInput = (raw, options = {}) => {
+    const input = String(raw ?? "").trim();
+    if (!input) return null;
+    const normalizeSymbols = App.chords?.normalizeSymbols;
+    const normalizedInput = typeof normalizeSymbols === "function" ? normalizeSymbols(input) : input;
+    const romanMatch = normalizedInput.match(/^([#b]*)([ivIV]+)\s*(.*)$/);
+    const numberMatch = normalizedInput.match(/^([#b]*)([1-7])\s*(.*)$/);
+    const match = romanMatch ?? numberMatch;
+    if (!match) return null;
+
+    const accidentalToken = match[1] || "";
+    const degreeToken = match[2] || "";
+    const remainder = match[3] || "";
+    const isRoman = Boolean(romanMatch);
+    let degree = null;
+
+    if (isRoman) {
+        degree = ROMAN_DEGREE_MAP[String(degreeToken).toUpperCase()] ?? null;
+    } else {
+        degree = Number.parseInt(degreeToken, 10);
+    }
+    if (!Number.isFinite(degree) || degree < 1 || degree > 7) return null;
+
+    const offset = getAccidentalOffset(accidentalToken);
+    const keyRootPc = resolveRelativeKeyRootPc();
+    const degreeSemitone = SCALE_DEGREE_SEMITONES[degree - 1] ?? 0;
+    const rootPc = normalizePitchClass(keyRootPc + degreeSemitone + offset);
+
+    const { qualityToken, bass } = splitQualityAndBass(remainder);
+    const fallbackQuality = qualityToken.trim()
+        ? null
+        : (isRoman
+            ? (degreeToken === degreeToken.toUpperCase() ? "maj" : "min")
+            : "maj");
+    const quality = resolveQualityFromToken(qualityToken, fallbackQuality);
+    if (!quality) return null;
+
+    if (Array.isArray(options.allowedQualityIds) && options.allowedQualityIds.length) {
+        if (!options.allowedQualityIds.includes(quality.id)) return null;
+    }
+
+    const label = buildChordLabelWithBass(rootPc, quality, bass);
+    const displayLabel = `${label} (${input})`;
+    return {
+        rootPc,
+        rootName: getRootName(rootPc),
+        rootOctave: null,
+        rootMidi: null,
+        quality,
+        label,
+        displayLabel,
+        inputLabel: input,
+        inputType: isRoman ? "roman" : "nashville",
+        bassPc: bass?.bassPc ?? null,
+        bassName: bass?.bassName ?? null
+    };
+};
+
 const parseChordInput = (raw, options = {}) => {
     const input = String(raw ?? "").trim();
     if (!input) return null;
     const normalizeSymbols = App.chords?.normalizeSymbols;
     const normalizedInput = typeof normalizeSymbols === "function" ? normalizeSymbols(input) : input;
     const match = normalizedInput.match(/^(-?\d+)?\s*([A-Ga-g])\s*([#b]?)\s*(.*)$/);
-    if (!match) return null;
+    if (!match) {
+        return parseRelativeChordInput(input, options);
+    }
 
     const rootToken = `${match[2].toUpperCase()}${(match[3] || "").toUpperCase()}`;
     const rootPc = CHORD_ROOT_ALIASES[rootToken];
@@ -194,25 +336,28 @@ const parseChordInput = (raw, options = {}) => {
     const rootOctave = match[1] !== undefined ? Number.parseInt(match[1], 10) : null;
     const rootMidi = Number.isFinite(rootOctave) ? ((rootOctave + 1) * 12) + rootPc : null;
 
-    const qualityToken = normalizeQualityToken(match[4] || "");
-    const fallbackQuality = qualityToken ? null : "maj";
-    const qualityId = CHORD_QUALITY_ALIASES.get(qualityToken) ?? fallbackQuality;
-    if (!qualityId) return null;
-
-    const quality = CHORD_QUALITY_BY_ID.get(qualityId);
+    const { qualityToken, bass } = splitQualityAndBass(match[4] || "");
+    const fallbackQuality = qualityToken.trim() ? null : "maj";
+    const quality = resolveQualityFromToken(qualityToken, fallbackQuality);
     if (!quality) return null;
 
     if (Array.isArray(options.allowedQualityIds) && options.allowedQualityIds.length) {
         if (!options.allowedQualityIds.includes(quality.id)) return null;
     }
 
+    const label = buildChordLabelWithBass(rootPc, quality, bass);
     return {
         rootPc,
         rootName: getRootName(rootPc),
         rootOctave: Number.isFinite(rootOctave) ? rootOctave : null,
         rootMidi: Number.isFinite(rootMidi) ? rootMidi : null,
         quality,
-        label: buildChordLabel(rootPc, quality)
+        label,
+        displayLabel: label,
+        inputLabel: input,
+        inputType: "absolute",
+        bassPc: bass?.bassPc ?? null,
+        bassName: bass?.bassName ?? null
     };
 };
 

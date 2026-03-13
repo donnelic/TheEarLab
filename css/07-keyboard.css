@@ -19,7 +19,7 @@
     flex-shrink: 0;
     transform: scale(var(--stack-scale, 1));
     transform-origin: center center;
-    transition: transform 0.12s ease;
+    transition: transform var(--dur-fast) var(--ease-quick);
 }
 
 .keyboard-wrapper {
@@ -39,7 +39,7 @@
     width: calc(var(--white-count) * var(--white-width));
     max-width: none;
     height: var(--keyboard-height);
-    transition: opacity 0.24s ease, filter 0.24s ease, width 0.12s ease;
+    transition: opacity var(--dur-slow) var(--ease-soft), filter var(--dur-slow) var(--ease-soft), width var(--dur-fast) var(--ease-quick);
 }
 
 .keyboard-wrapper.ends-black {
@@ -68,7 +68,7 @@
     align-items: flex-end;
     justify-content: center;
     font-weight: 600;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    transition: transform var(--dur-fast) var(--ease-quick), box-shadow var(--dur-fast) var(--ease-quick);
     user-select: none;
     will-change: transform, box-shadow;
 }
@@ -191,7 +191,7 @@ body.tutorial-open .keyboard.disabled {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
     opacity: 0.5;
     pointer-events: none;
-    transition: opacity 0.12s ease;
+    transition: opacity var(--dur-fast) var(--ease-quick);
 }
 
 body.tutorial-open .keyboard.disabled::before {
@@ -209,7 +209,7 @@ body.tutorial-open .keyboard.disabled::before {
     backdrop-filter: blur(2px) saturate(1.02);
     -webkit-backdrop-filter: blur(2px) saturate(1.02);
     pointer-events: none;
-    transition: opacity 0.12s ease;
+    transition: opacity var(--dur-fast) var(--ease-quick);
     -webkit-mask-image:
         linear-gradient(to right,
             transparent 0px,
@@ -291,7 +291,7 @@ body.landing .pedal-box {
     border-radius: 12px;
     background: var(--pedal-plunger-bg);
     box-shadow: var(--pedal-plunger-shadow);
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    transition: transform var(--dur-fast) var(--ease-quick), box-shadow var(--dur-fast) var(--ease-quick);
 }
 
 .pedal-icon.active {

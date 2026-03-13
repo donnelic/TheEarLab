@@ -47,6 +47,17 @@ const renderPressedPills = () => {
     return `<div>${REVEAL_COPY.yourNotes || "Your notes"}</div><div class="note-pills">${pills}</div>`;
 };
 
+const pulseFeedback = (elements, className = "pulse-once") => {
+    if (document.body?.dataset?.reducedMotion === "true") return;
+    const list = Array.isArray(elements) ? elements : [elements];
+    list.forEach((el) => {
+        if (!el) return;
+        el.classList.remove(className);
+        void el.offsetWidth;
+        el.classList.add(className);
+    });
+};
+
 const buildNoteComparison = (targetNotes, answerNotes) => {
     const targetSet = new Set(targetNotes);
     const answerSet = new Set(answerNotes);
@@ -272,6 +283,17 @@ const releaseHeldPlayback = () => {
     holdState.noteIds = [];
 };
 
+const normalizePitchClassLocal = (value) => ((Math.round(value) % 12) + 12) % 12;
+const getPitchClassLabel = (pc) => App.chords?.rootNames?.[normalizePitchClassLocal(pc)] ?? "C";
+const getBassPcFromNoteIds = (noteIds) => {
+    if (!Array.isArray(noteIds) || !noteIds.length) return null;
+    const lowestMidi = noteIds
+        .map((noteId) => getMidiFromNoteId(noteId))
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b)[0];
+    return Number.isFinite(lowestMidi) ? normalizePitchClassLocal(lowestMidi) : null;
+};
+
 const buildTypingRevealDetail = (parsed) => {
     if (!state.targetChord) return "";
     if (!parsed) {
@@ -285,6 +307,12 @@ const buildTypingRevealDetail = (parsed) => {
     }
     if (parsed.quality.id !== state.targetChord.quality.id) {
         mismatches.push(`quality should be ${escapeHtml(getChordQualityDisplaySuffix(state.targetChord.quality))}`);
+    }
+    if (Number.isFinite(parsed.bassPc)) {
+        const targetBassPc = getBassPcFromNoteIds(state.targetNotes);
+        if (Number.isFinite(targetBassPc) && parsed.bassPc !== targetBassPc) {
+            mismatches.push(`bass should be ${escapeHtml(getPitchClassLabel(targetBassPc))}`);
+        }
     }
     if (Number.isFinite(parsed.rootMidi) && Number.isFinite(state.targetChord.rootMidi) && parsed.rootMidi !== state.targetChord.rootMidi) {
         const expectedOctave = Math.floor(state.targetChord.rootMidi / 12) - 1;
@@ -312,12 +340,17 @@ const submitTypedAnswer = () => {
         || !Number.isFinite(parsed.rootMidi)
         || !Number.isFinite(target.rootMidi)
         || parsed.rootMidi === target.rootMidi;
+    const targetBassPc = getBassPcFromNoteIds(state.targetNotes);
+    const bassValid = !parsed
+        || !Number.isFinite(parsed.bassPc)
+        || (Number.isFinite(targetBassPc) && parsed.bassPc === targetBassPc);
 
     const isCorrect = Boolean(
         parsed &&
         parsed.rootPc === target.rootPc &&
         parsed.quality.id === target.quality.id &&
-        octaveValid
+        octaveValid &&
+        bassValid
     );
     applySubmissionStatePatch({
         submissionSource: "typing",
@@ -326,14 +359,16 @@ const submitTypedAnswer = () => {
     setSubmitted(true);
     if (isCorrect) {
         resultEl.textContent = ACTION_COPY.correctChord?.(targetDisplayLabel) ?? `Correct: ${targetDisplayLabel}`;
+        const answerLabel = parsed?.displayLabel ?? parsed?.label ?? "";
         revealEl.innerHTML = renderChordRevealGrid(buildChordRevealEntries({
             targetChordLabel: target.label,
             targetNotes: state.targetNotes,
-            answerChordLabel: answerNotes.length ? parsed.label : "",
+            answerChordLabel: answerNotes.length ? answerLabel : "",
             answerChordTone: "good",
             answerNotes: answerNotes.length ? answerNotes : state.targetNotes,
             includeAnswerNotes: false
         }));
+        pulseFeedback([resultEl, revealEl]);
         lastReveal = {
             target: [...state.targetNotes],
             selected: []
@@ -350,7 +385,7 @@ const submitTypedAnswer = () => {
         return;
     }
 
-    const answerLabel = parsed?.label || (state.typedAnswer?.trim() || "No answer");
+    const answerLabel = parsed?.displayLabel || parsed?.label || (state.typedAnswer?.trim() || "No answer");
     const detail = buildTypingRevealDetail(parsed);
     revealEl.innerHTML = `${renderChordRevealGrid(buildChordRevealEntries({
         targetChordLabel: target.label,
@@ -361,6 +396,7 @@ const submitTypedAnswer = () => {
         includeAnswerNotes: false
     }))}${detail}`;
     resultEl.textContent = FEEDBACK_COPY.wrongChordName || "Not quite. Compare the chord name and quality.";
+    pulseFeedback([resultEl, revealEl]);
     lastReveal = {
         target: [...state.targetNotes],
         selected: [...answerNotes]
@@ -420,6 +456,7 @@ const submitAnswer = () => {
         const selectedChordMeta = renderChordDetectionMeta("Detected your chord", keyboardSelection, isCorrect ? "good" : "bad");
         revealEl.innerHTML = `${targetHtml}${pressedHtml}${targetChordMeta}${selectedChordMeta}`;
     }
+    pulseFeedback([resultEl, revealEl]);
 
     lastReveal = {
         target: [...state.targetNotes],

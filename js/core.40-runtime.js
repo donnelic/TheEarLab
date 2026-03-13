@@ -125,3 +125,21 @@ const getPanelBottomGap = () => {
     return getCssNumber(rootStyles.getPropertyValue("--panel-bottom-gap")) || 24;
 };
 
+const motionQuery = window.matchMedia?.("(prefers-reduced-motion: reduce)") ?? null;
+const syncReducedMotionPreference = () => {
+    const reduced = Boolean(motionQuery?.matches);
+    if (document.body) {
+        document.body.dataset.reducedMotion = reduced ? "true" : "false";
+    }
+};
+if (motionQuery) {
+    if (typeof motionQuery.addEventListener === "function") {
+        motionQuery.addEventListener("change", syncReducedMotionPreference);
+    } else if (typeof motionQuery.addListener === "function") {
+        motionQuery.addListener(syncReducedMotionPreference);
+    }
+}
+syncReducedMotionPreference();
+App.motion = App.motion || {};
+App.motion.isReduced = () => document.body?.dataset?.reducedMotion === "true";
+

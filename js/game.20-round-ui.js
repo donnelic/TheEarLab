@@ -62,10 +62,27 @@ const getTypedPreviewNoteIds = (parsed) => {
         return b.midi - a.midi;
     });
     const root = roots[0];
-
-    return parsed.quality.intervals
+    const noteIds = parsed.quality.intervals
         .map((interval) => getNoteIdByMidi(root.midi + interval))
         .filter(Boolean);
+    if (Number.isFinite(parsed.bassPc) && parsed.bassPc !== parsed.rootPc) {
+        const candidates = notes.filter((note) => normalizePitchClass(note.midi) === parsed.bassPc);
+        if (candidates.length) {
+            const targetMidi = root.midi;
+            const below = candidates.filter((note) => note.midi <= targetMidi);
+            const pool = below.length ? below : candidates;
+            pool.sort((a, b) => {
+                const dist = Math.abs(a.midi - targetMidi) - Math.abs(b.midi - targetMidi);
+                if (dist !== 0) return dist;
+                return a.midi - b.midi;
+            });
+            const bassId = getNoteIdByMidi(pool[0].midi);
+            if (bassId && !noteIds.includes(bassId)) {
+                noteIds.unshift(bassId);
+            }
+        }
+    }
+    return noteIds;
 };
 
 const updateTypedPreviewFromInput = () => {
@@ -81,6 +98,15 @@ const updateTypedPreviewFromInput = () => {
         typedPreviewNotes: nextTypedPreview
     }, "submission/update-typed-preview");
     return parsed;
+};
+
+const buildTypedDisplayHtml = (parsed) => {
+    if (!parsed) return "";
+    const base = renderChordLink(parsed.label);
+    if (parsed.inputType === "absolute" || !parsed.inputLabel || parsed.displayLabel === parsed.label) {
+        return base;
+    }
+    return `${base} <span class="chord-input-hint">(${escapeHtml(parsed.inputLabel)})</span>`;
 };
 
 const updateChordReadout = () => {
@@ -107,7 +133,7 @@ const updateChordReadout = () => {
         }
         const parsed = parseChordInput(state.typedAnswer);
         if (parsed) {
-            const typedHtml = renderChordLink(parsed.label);
+            const typedHtml = buildTypedDisplayHtml(parsed);
             chordReadout.innerHTML = CHORD_READOUT_COPY.typedPreview?.(typedHtml)
                 ?? `Typed chord: ${typedHtml} (preview)`;
         } else {
@@ -121,17 +147,15 @@ const updateChordReadout = () => {
 
     if (state.trainingMode === "both") {
         const parsed = hasTypedInput ? parseChordInput(state.typedAnswer) : null;
-        const typedLabel = hasTypedInput ? (parsed?.label ?? "unrecognized") : "";
+        const typedLabel = hasTypedInput ? (parsed ? buildTypedDisplayHtml(parsed) : "unrecognized") : "";
         if (state.selectedChordLabel && typedLabel) {
             const selectedHtml = renderChordLink(state.selectedChordLabel);
-            const typedHtml = renderChordLink(typedLabel);
-            chordReadout.innerHTML = CHORD_READOUT_COPY.selectedAndTyped?.(selectedHtml, typedHtml)
-                ?? `Selected chord: ${selectedHtml} | Typed chord: ${typedHtml}`;
+            chordReadout.innerHTML = CHORD_READOUT_COPY.selectedAndTyped?.(selectedHtml, typedLabel)
+                ?? `Selected chord: ${selectedHtml} | Typed chord: ${typedLabel}`;
             return;
         }
         if (typedLabel) {
-            const typedHtml = renderChordLink(typedLabel);
-            chordReadout.innerHTML = CHORD_READOUT_COPY.typed?.(typedHtml) ?? `Typed chord: ${typedHtml}`;
+            chordReadout.innerHTML = CHORD_READOUT_COPY.typed?.(typedLabel) ?? `Typed chord: ${typedLabel}`;
             return;
         }
         if (state.selectedChordLabel) {

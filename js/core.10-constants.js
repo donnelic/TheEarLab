@@ -238,6 +238,8 @@ const DEFAULTS = {
     typingShowPiano: true,
     typingShowTyped: true,
     hideLivePreview: false,
+    relativeKeyMode: "fixed",
+    relativeKeyRootPc: 0,
     practiceProfiles: createDefaultPracticeProfiles(),
     rootHintSuppressed: false
 };
@@ -274,6 +276,8 @@ const state = {
     typingShowPiano: DEFAULTS.typingShowPiano,
     typingShowTyped: DEFAULTS.typingShowTyped,
     hideLivePreview: DEFAULTS.hideLivePreview,
+    relativeKeyMode: DEFAULTS.relativeKeyMode,
+    relativeKeyRootPc: DEFAULTS.relativeKeyRootPc,
     practiceProfiles: createDefaultPracticeProfiles(),
     targetChord: null,
     selectedChordLabel: "",

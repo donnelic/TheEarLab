@@ -50,7 +50,7 @@
     border: 1px solid color-mix(in oklab, var(--input-border) 70%, transparent);
     border-radius: 9px;
     cursor: pointer;
-    transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    transition: background var(--dur-med) var(--ease-soft), border-color var(--dur-med) var(--ease-soft), transform var(--dur-med) var(--ease-soft), box-shadow var(--dur-med) var(--ease-soft);
     overflow: hidden;
     --helper-cursor-x: 50%;
     --helper-cursor-y: 50%;
@@ -80,7 +80,7 @@
             color-mix(in oklab, var(--accent) 12%, transparent) 62%,
             transparent 80%);
     opacity: var(--helper-cursor-opacity);
-    transition: opacity 0.18s ease, background 0.22s ease;
+    transition: opacity var(--dur-med) var(--ease-soft), background var(--dur-slow) var(--ease-soft);
     pointer-events: none;
     z-index: 2;
 }
@@ -98,7 +98,7 @@
     pointer-events: none;
     opacity: 0;
     z-index: 3;
-    transition: opacity 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    transition: opacity var(--dur-med) var(--ease-soft), background var(--dur-med) var(--ease-soft), box-shadow var(--dur-med) var(--ease-soft), transform var(--dur-med) var(--ease-soft);
 }
 
 .helper-item>* {
@@ -177,7 +177,7 @@ body.system-cursor-hidden * {
     transform: translate3d(-100px, -100px, 0);
     will-change: transform;
     overflow: visible;
-    transition: opacity 0.12s ease;
+    transition: opacity var(--dur-fast) var(--ease-quick);
     z-index: 9999;
 }
 
@@ -192,7 +192,7 @@ body.system-cursor-hidden * {
     top: 0;
     border-radius: 999px;
     transform: translate(-50%, -50%);
-    transition: width 0.12s ease, height 0.12s ease, transform 0.12s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease, border-radius 0.12s ease;
+    transition: width var(--dur-fast) var(--ease-quick), height var(--dur-fast) var(--ease-quick), transform var(--dur-fast) var(--ease-quick), opacity var(--dur-fast) var(--ease-quick), background var(--dur-fast) var(--ease-quick), border-color var(--dur-fast) var(--ease-quick), border-radius var(--dur-fast) var(--ease-quick);
 }
 
 .app-cursor-ring {
@@ -262,7 +262,7 @@ body.system-cursor-hidden * {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: color 0.18s ease;
+    transition: color var(--dur-med) var(--ease-soft);
 }
 
 .helper-item .helper-value {
@@ -282,7 +282,7 @@ body.system-cursor-hidden * {
     opacity: 0.62;
     letter-spacing: 0.04em;
     white-space: pre;
-    transition: filter 0.24s ease 0.2s, opacity 0.24s ease 0.2s;
+    transition: filter var(--dur-slow) var(--ease-soft) 0.2s, opacity var(--dur-slow) var(--ease-soft) 0.2s;
     will-change: filter, opacity;
 }
 
@@ -293,7 +293,7 @@ body.system-cursor-hidden * {
     color: var(--ink);
     opacity: 0;
     filter: blur(3px);
-    transition: filter 0.24s ease 0.2s, opacity 0.24s ease 0.2s, color 0.18s ease;
+    transition: filter var(--dur-slow) var(--ease-soft) 0.2s, opacity var(--dur-slow) var(--ease-soft) 0.2s, color var(--dur-med) var(--ease-soft);
     will-change: filter, opacity;
     white-space: nowrap;
     max-width: min(24ch, 100%);

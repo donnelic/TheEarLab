@@ -1,6 +1,6 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260312174927";
+const BUILD_ID = "20260313111711";
 App.buildId = BUILD_ID;
 
 const dom = {
@@ -81,6 +81,7 @@ const dom = {
     chordExtraHelpersToggle: document.getElementById("chord-extra-helpers"),
     chordRootHintToggle: document.getElementById("chord-root-hint"),
     customCursorToggle: document.getElementById("custom-cursor"),
+    relativeKeySelect: document.getElementById("relative-key"),
     typingShowPianoToggle: document.getElementById("typing-show-piano"),
     typingShowTypedToggle: document.getElementById("typing-show-typed"),
     typingZone: document.getElementById("typing-zone"),
@@ -210,6 +211,7 @@ const {
     chordExtraHelpersToggle,
     chordRootHintToggle,
     customCursorToggle,
+    relativeKeySelect,
     typingShowPianoToggle,
     typingShowTypedToggle,
     typingZone,

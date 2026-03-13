@@ -79,6 +79,16 @@
     --floating-stack-gap: 6px;
     --floating-shadow: 0 12px 24px var(--settings-shadow);
     --floating-icon-size: 20px;
+    /* Motion */
+    --ease-quick: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --ease-soft: cubic-bezier(0.16, 0.84, 0.3, 1);
+    --dur-fast: 120ms;
+    --dur-med: 180ms;
+    --dur-slow: 240ms;
+    --dur-panel: 260ms;
+    --dur-flash: 900ms;
+    --dur-unlock: 1100ms;
+    --delay-short: 200ms;
     /* Inputs */
     --input-bg: rgba(255, 255, 255, 0.9);
     --input-border: rgba(148, 163, 184, 0.35);
