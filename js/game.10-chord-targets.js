@@ -180,35 +180,6 @@ const getQualityPitchClassSet = (rootPc, quality) => {
     return set;
 };
 
-const SCALE_DEGREE_SEMITONES = [0, 2, 4, 5, 7, 9, 11];
-const ROMAN_DEGREE_MAP = Object.freeze({
-    I: 1,
-    II: 2,
-    III: 3,
-    IV: 4,
-    V: 5,
-    VI: 6,
-    VII: 7
-});
-
-const resolveRelativeKeyRootPc = () => {
-    if (state.relativeKeyMode === "target" && state.targetChord && Number.isFinite(state.targetChord.rootPc)) {
-        return state.targetChord.rootPc;
-    }
-    if (!Number.isFinite(state.relativeKeyRootPc)) return 0;
-    return ((Math.round(state.relativeKeyRootPc) % 12) + 12) % 12;
-};
-
-const getAccidentalOffset = (token) => {
-    let offset = 0;
-    const source = String(token ?? "");
-    for (let i = 0; i < source.length; i += 1) {
-        if (source[i] === "#") offset += 1;
-        if (source[i] === "b") offset -= 1;
-    }
-    return offset;
-};
-
 const resolveQualityFromToken = (qualityToken, fallbackQualityId = null) => {
     const normalized = normalizeQualityToken(qualityToken || "");
     const qualityId = CHORD_QUALITY_ALIASES.get(normalized) ?? fallbackQualityId;
@@ -262,73 +233,13 @@ const buildChordLabelWithBass = (rootPc, quality, bass) => {
     return `${base}/${bass.bassName}`;
 };
 
-const parseRelativeChordInput = (raw, options = {}) => {
-    const input = String(raw ?? "").trim();
-    if (!input) return null;
-    const normalizeSymbols = App.chords?.normalizeSymbols;
-    const normalizedInput = typeof normalizeSymbols === "function" ? normalizeSymbols(input) : input;
-    const romanMatch = normalizedInput.match(/^([#b]*)([ivIV]+)\s*(.*)$/);
-    const numberMatch = normalizedInput.match(/^([#b]*)([1-7])\s*(.*)$/);
-    const match = romanMatch ?? numberMatch;
-    if (!match) return null;
-
-    const accidentalToken = match[1] || "";
-    const degreeToken = match[2] || "";
-    const remainder = match[3] || "";
-    const isRoman = Boolean(romanMatch);
-    let degree = null;
-
-    if (isRoman) {
-        degree = ROMAN_DEGREE_MAP[String(degreeToken).toUpperCase()] ?? null;
-    } else {
-        degree = Number.parseInt(degreeToken, 10);
-    }
-    if (!Number.isFinite(degree) || degree < 1 || degree > 7) return null;
-
-    const offset = getAccidentalOffset(accidentalToken);
-    const keyRootPc = resolveRelativeKeyRootPc();
-    const degreeSemitone = SCALE_DEGREE_SEMITONES[degree - 1] ?? 0;
-    const rootPc = normalizePitchClass(keyRootPc + degreeSemitone + offset);
-
-    const { qualityToken, bass } = splitQualityAndBass(remainder);
-    const fallbackQuality = qualityToken.trim()
-        ? null
-        : (isRoman
-            ? (degreeToken === degreeToken.toUpperCase() ? "maj" : "min")
-            : "maj");
-    const quality = resolveQualityFromToken(qualityToken, fallbackQuality);
-    if (!quality) return null;
-
-    if (Array.isArray(options.allowedQualityIds) && options.allowedQualityIds.length) {
-        if (!options.allowedQualityIds.includes(quality.id)) return null;
-    }
-
-    const label = buildChordLabelWithBass(rootPc, quality, bass);
-    const displayLabel = `${label} (${input})`;
-    return {
-        rootPc,
-        rootName: getRootName(rootPc),
-        rootOctave: null,
-        rootMidi: null,
-        quality,
-        label,
-        displayLabel,
-        inputLabel: input,
-        inputType: isRoman ? "roman" : "nashville",
-        bassPc: bass?.bassPc ?? null,
-        bassName: bass?.bassName ?? null
-    };
-};
-
 const parseChordInput = (raw, options = {}) => {
     const input = String(raw ?? "").trim();
     if (!input) return null;
     const normalizeSymbols = App.chords?.normalizeSymbols;
     const normalizedInput = typeof normalizeSymbols === "function" ? normalizeSymbols(input) : input;
     const match = normalizedInput.match(/^(-?\d+)?\s*([A-Ga-g])\s*([#b]?)\s*(.*)$/);
-    if (!match) {
-        return parseRelativeChordInput(input, options);
-    }
+    if (!match) return null;
 
     const rootToken = `${match[2].toUpperCase()}${(match[3] || "").toUpperCase()}`;
     const rootPc = CHORD_ROOT_ALIASES[rootToken];

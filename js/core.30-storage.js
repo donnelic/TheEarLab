@@ -26,9 +26,7 @@ const saveSettings = () => {
         customCursorEnabled: state.customCursorEnabled,
         typingShowPiano: state.typingShowPiano,
         typingShowTyped: state.typingShowTyped,
-        hideLivePreview: state.hideLivePreview,
-        relativeKeyMode: state.relativeKeyMode,
-        relativeKeyRootPc: state.relativeKeyRootPc
+        hideLivePreview: state.hideLivePreview
     };
     const modeId = getEffectivePracticeModeFromState(state);
     state.practiceProfiles = normalizePracticeProfiles(state.practiceProfiles);
@@ -77,10 +75,6 @@ const loadSettings = () => {
         state.typingShowPiano = data.typingShowPiano !== false;
         state.typingShowTyped = data.typingShowTyped !== false;
         state.hideLivePreview = Boolean(data.hideLivePreview);
-        state.relativeKeyMode = data.relativeKeyMode === "target" ? "target" : DEFAULTS.relativeKeyMode;
-        state.relativeKeyRootPc = Number.isFinite(data.relativeKeyRootPc)
-            ? ((Math.round(data.relativeKeyRootPc) % 12) + 12) % 12
-            : DEFAULTS.relativeKeyRootPc;
         state.practiceProfiles = normalizePracticeProfiles(data.practiceProfiles);
         const trim = data.adsrTrim ?? {};
         state.adsrTrim = {
@@ -127,8 +121,6 @@ const resetAllSettings = () => {
     state.typingShowPiano = DEFAULTS.typingShowPiano;
     state.typingShowTyped = DEFAULTS.typingShowTyped;
     state.hideLivePreview = DEFAULTS.hideLivePreview;
-    state.relativeKeyMode = DEFAULTS.relativeKeyMode;
-    state.relativeKeyRootPc = DEFAULTS.relativeKeyRootPc;
     state.practiceProfiles = createDefaultPracticeProfiles();
     state.targetChord = null;
     state.selectedChordLabel = "";

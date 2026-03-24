@@ -229,28 +229,6 @@ if (typingShowTypedToggle) {
     });
 }
 
-if (relativeKeySelect) {
-    relativeKeySelect.addEventListener("change", (event) => {
-        const value = String(event.target.value ?? "").trim();
-        if (value === "target") {
-            patchSettingsState({ relativeKeyMode: "target" }, "events/relative-key-mode");
-        } else {
-            const pc = Number.parseInt(value, 10);
-            patchSettingsState({
-                relativeKeyMode: "fixed",
-                relativeKeyRootPc: Number.isFinite(pc) ? ((pc % 12) + 12) % 12 : DEFAULTS.relativeKeyRootPc
-            }, "events/relative-key-root");
-        }
-        if (typeof App.game?.updateTypedPreviewFromInput === "function") {
-            App.game.updateTypedPreviewFromInput();
-        }
-        applySettingMutationEffects("relativeKey", {
-            refreshKeys: false,
-            restartOverride: false
-        });
-    });
-}
-
 resetSettingsButton.addEventListener("click", () => {
     resetAllSettings();
     rebuildKeyboard();
@@ -611,7 +589,6 @@ const CHORD_TUTORIAL_STEPS = [
             <p>Examples: C, Cm, C7, Cmaj7, Csus4, Cdim, Caug, F#m7, Bbmaj7.</p>
             <p>Optional: add octave as a prefix (example: <strong>3A#m</strong>, <strong>4Cmaj7</strong>). If included, octave is checked.</p>
             <p>Slash chords are supported (example: <strong>C/E</strong> for a C major chord over E in the bass).</p>
-            <p>Relative input is supported in typing mode: <strong>Roman numerals</strong> (I, ii, V7) and <strong>Nashville numbers</strong> (1, 4m, b7). Set the key in Game Settings -> Relative input key.</p>
             <p>Buttons are grouped by chord family for clarity; full theory includes extra variants like <strong>min6</strong> and <strong>min9</strong>.</p>
             <p>Typing mode accepts compact forms and spaced forms. Enter submits. Space previews typed input when blind mode is off.</p>
         `,

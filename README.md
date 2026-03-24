@@ -135,7 +135,6 @@ Browser-based piano ear-training app for note and chord recognition.
   - keeps hint/replay available,
   - supports optional visual piano and optional typed-chord key preview.
   - pressing `Space` inside the typing field previews the typed chord when parsing succeeds and blind mode is off; it will not auto-replay target notes when nothing is selected/typed.
-  - typing also accepts relative inputs (Nashville numbers and roman numerals) once you set `Relative input key` in Game Settings (for example `V7`, `iv`, `bVII`, `4m`, `V7/B`).
   - includes a built-in chord tutorial opened directly from the `?` button in typing mode and from `Game Settings -> Chord tutorial`.
 - typed chords can optionally include root octave as a prefix (for example `4Cm`, `3A#maj7`); when octave is included, grading checks it.
   - when no octave is typed, typed chord preview roots are anchored around the target-root register and choose the nearest valid octave for each root (with range-fit fallback), so trying different roots stays musically close instead of forcing one fixed octave bucket.
