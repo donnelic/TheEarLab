@@ -1,6 +1,6 @@
 ﻿# Project Map
 
-Generated: 2026-03-24 15:50:30 +01:00
+Generated: 2026-03-30 10:10:44 +02:00
 
 ## Mandatory Protocol (Humans + AI)
 1. Read README.md first, then read this file before making any edit.
@@ -34,7 +34,7 @@ Generated: 2026-03-24 15:50:30 +01:00
 |---|---|---|---|---:|
 | index.html | HTML | Loaded directly | Yes | 594 |
 | css/00-theme.css | CSS | Loaded directly | Yes | 236 |
-| css/01-base.css | CSS | Loaded directly | Yes | 390 |
+| css/01-base.css | CSS | Loaded directly | Yes | 443 |
 | css/02-chord-typing.css | CSS | Loaded directly | Yes | 231 |
 | css/03-modals.css | CSS | Loaded directly | Yes | 346 |
 | css/04-tutorial.css | CSS | Loaded directly | Yes | 537 |
@@ -46,17 +46,17 @@ Generated: 2026-03-24 15:50:30 +01:00
 | js/audio.20-engine.js | JavaScript | Browser runtime module | Yes | 473 |
 | js/audio.30-playback.js | JavaScript | Browser runtime module | Yes | 277 |
 | js/audio.40-preview.js | JavaScript | Browser runtime module | Yes | 164 |
-| js/core.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 284 |
+| js/core.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 446 |
 | js/core.10-constants.js | JavaScript | Browser runtime module | Yes | 295 |
 | js/core.20-envelope.js | JavaScript | Browser runtime module | Yes | 80 |
 | js/core.30-storage.js | JavaScript | Browser runtime module | Yes | 133 |
 | js/core.40-runtime.js | JavaScript | Browser runtime module | Yes | 145 |
 | js/core.50-soundfonts.js | JavaScript | Browser runtime module | Yes | 91 |
 | js/core.60-keyboard.js | JavaScript | Browser runtime module | Yes | 60 |
-| js/events.00-settings.js | JavaScript | Browser runtime module | Yes | 637 |
+| js/events.00-settings.js | JavaScript | Browser runtime module | Yes | 663 |
 | js/events.10-tutorial.js | JavaScript | Browser runtime module | Yes | 633 |
-| js/events.20-helper-cursor.js | JavaScript | Browser runtime module | Yes | 818 |
-| js/events.30-bindings.js | JavaScript | Browser runtime module | Yes | 434 |
+| js/events.20-helper-cursor.js | JavaScript | Browser runtime module | Yes | 834 |
+| js/events.30-bindings.js | JavaScript | Browser runtime module | Yes | 494 |
 | js/game.00-bootstrap.js | JavaScript | Browser runtime module | Yes | 456 |
 | js/game.10-chord-targets.js | JavaScript | Browser runtime module | Yes | 507 |
 | js/game.20-round-ui.js | JavaScript | Browser runtime module | Yes | 536 |
@@ -66,12 +66,12 @@ Generated: 2026-03-24 15:50:30 +01:00
 | js/settings.10-dialogs.js | JavaScript | Browser runtime module | Yes | 324 |
 | js/settings.20-game.js | JavaScript | Browser runtime module | Yes | 298 |
 | js/settings.30-panels.js | JavaScript | Browser runtime module | Yes | 300 |
-| README.md | Markdown | Human + AI onboarding | Yes | 155 |
+| README.md | Markdown | Human + AI onboarding | Yes | 162 |
 | IMPLEMENTATION_CHECKLIST.md | Markdown | Implementation roadmap checklist | Yes | 237 |
 | AGENTS.md | Markdown | AI instruction override | Yes | 67 |
-| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1526 |
+| PROJECT_MAP.md | Markdown | Generated reference map | Yes | 1521 |
 | tools/generate-project-map.ps1 | PowerShell | Documentation generator | Yes | 582 |
-| tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 59 |
+| tools/smoke-checklist.md | Markdown | Manual regression checklist | Yes | 60 |
 | soundfonts/GeneralUser-GS.sf2 | Asset | Soundfont asset | Yes | 0 |
 | soundfonts/index.json | JSON | Soundfont asset | Yes | 3 |
 | soundfonts/README.md | Markdown | Soundfont asset | Yes | 39 |
@@ -260,7 +260,7 @@ File: css/00-theme.css (1-236)
 | body.theme-dark | 141-235 |
 
 ### css/01-base.css
-File: css/01-base.css (1-390)
+File: css/01-base.css (1-443)
 
 #### Top-Level CSS Blocks
 | Selector | Lines |
@@ -268,57 +268,64 @@ File: css/01-base.css (1-390)
 | * | 1-3 |
 | body | 5-17 |
 | body.landing | 19-21 |
-| .app | 23-39 |
-| .app>section, .app>header, .app>footer | 43-45 |
-| .hero | 47-51 |
-| .badge | 53-66 |
-| h1 | 68-72 |
-| .hero p | 74-80 |
-| body:not(.landing) .hero h1, body:not(.landing) .hero p | 83-85 |
-| body:not(.landing) .tips | 87-89 |
-| .hero, .actions, .quick-start, .game-stack, .tips | 95-98 |
-| body:not(.landing) .hero | 100-104 |
-| .control | 106-112 |
-| .control.compact | 114-116 |
-| .control.compact>label | 118-120 |
-| .control.compact .control-row | 122-124 |
-| .control>label | 126-133 |
-| .control-row | 135-139 |
-| .control-row.toggle-row | 141-144 |
-| .control-row.toggle-row .switch | 146-148 |
-| .control-row.toggle-row .unit | 150-152 |
-| .control-row.align-end | 154-157 |
-| .start-note-row | 159-161 |
-| .start-note-stepper | 163-173 |
-| .range-hidden | 175-177 |
-| .start-note-value | 179-185 |
-| .step-btn | 187-199 |
-| .step-btn.oct | 201-207 |
-| .step-btn:hover | 209-212 |
-| .advanced-test | 214-217 |
-| .advanced-test .unit | 219-222 |
-| input[type="number"] | 224-233 |
-| .segmented | 235-239 |
-| .segmented-btn | 241-250 |
-| .segmented-btn.active | 252-256 |
-| .actions | 258-264 |
-| .quick-start | 266-272 |
-| .quick-mode-btn | 274-287 |
-| .quick-mode-btn:hover, .quick-mode-btn:focus-visible | 290-295 |
-| .quick-mode-title | 297-303 |
-| .quick-mode-sub | 305-309 |
-| body:not(.landing) .quick-start | 311-313 |
-| .btn | 315-322 |
-| .btn:focus-visible | 324-327 |
-| .btn.primary | 329-333 |
-| .btn.secondary | 335-339 |
-| .btn.ghost | 341-345 |
-| .btn.submit | 347-351 |
-| .btn:hover | 353-355 |
-| body[data-reduced-motion="true"] | 357-365 |
-| @keyframes app-pulse | 367-380 |
-| .pulse-once | 382-385 |
-| body[data-reduced-motion="true"] .pulse-once | 387-389 |
+| body.runtime-degraded | 23-25 |
+| .app | 27-43 |
+| .app>section, .app>header, .app>footer | 47-49 |
+| .hero | 51-55 |
+| .badge | 57-70 |
+| h1 | 72-76 |
+| .hero p | 78-84 |
+| body:not(.landing) .hero h1, body:not(.landing) .hero p | 87-89 |
+| body:not(.landing) .tips | 91-93 |
+| .hero, .actions, .quick-start, .game-stack, .tips | 99-102 |
+| body:not(.landing) .hero | 104-108 |
+| .control | 110-116 |
+| .control.compact | 118-120 |
+| .control.compact>label | 122-124 |
+| .control.compact .control-row | 126-128 |
+| .control>label | 130-137 |
+| .control-row | 139-143 |
+| .control-row.toggle-row | 145-148 |
+| .control-row.toggle-row .switch | 150-152 |
+| .control-row.toggle-row .unit | 154-156 |
+| .control-row.align-end | 158-161 |
+| .start-note-row | 163-165 |
+| .start-note-stepper | 167-177 |
+| .range-hidden | 179-181 |
+| .start-note-value | 183-189 |
+| .step-btn | 191-203 |
+| .step-btn.oct | 205-211 |
+| .step-btn:hover | 213-216 |
+| .advanced-test | 218-221 |
+| .advanced-test .unit | 223-226 |
+| input[type="number"] | 228-237 |
+| .segmented | 239-243 |
+| .segmented-btn | 245-254 |
+| .segmented-btn.active | 256-260 |
+| .actions | 262-268 |
+| .quick-start | 270-276 |
+| .quick-mode-btn | 278-291 |
+| .quick-mode-btn:hover, .quick-mode-btn:focus-visible | 294-299 |
+| .quick-mode-title | 301-307 |
+| .quick-mode-sub | 309-313 |
+| body:not(.landing) .quick-start | 315-317 |
+| .runtime-banner | 319-327 |
+| .runtime-banner__body | 329-341 |
+| .runtime-banner__title | 343-347 |
+| .runtime-banner__summary | 349-353 |
+| .runtime-banner__list | 355-362 |
+| .runtime-banner__list strong | 364-366 |
+| .btn | 368-375 |
+| .btn:focus-visible | 377-380 |
+| .btn.primary | 382-386 |
+| .btn.secondary | 388-392 |
+| .btn.ghost | 394-398 |
+| .btn.submit | 400-404 |
+| .btn:hover | 406-408 |
+| body[data-reduced-motion="true"] | 410-418 |
+| @keyframes app-pulse | 420-433 |
+| .pulse-once | 435-438 |
+| body[data-reduced-motion="true"] .pulse-once | 440-442 |
 
 ### css/02-chord-typing.css
 File: css/02-chord-typing.css (1-231)
@@ -740,17 +747,18 @@ File: css/07-keyboard.css (1-463)
 
 ## Documentation + Tooling Maps
 ### README.md
-File: README.md (1-155)
+File: README.md (1-162)
 | Heading | Line |
 |---|---:|
 | TheEarLab | 1 |
 | Read First | 5 |
 | Project Layout | 49 |
-| Run Locally | 67 |
-| SF2 Behavior | 81 |
-| Chord Training Modes | 104 |
-| Maintenance Rules | 146 |
-| Verification | 153 |
+| Runtime Safety | 67 |
+| Run Locally | 72 |
+| SF2 Behavior | 86 |
+| Chord Training Modes | 109 |
+| Maintenance Rules | 151 |
+| Verification | 158 |
 
 ### IMPLEMENTATION_CHECKLIST.md
 File: IMPLEMENTATION_CHECKLIST.md (1-237)
@@ -796,18 +804,18 @@ File: tools/generate-project-map.ps1 (1-582)
 | Get-PsFunctionStarts | 229 |
 
 ### tools/smoke-checklist.md
-File: tools/smoke-checklist.md (1-59)
+File: tools/smoke-checklist.md (1-60)
 | Heading | Line |
 |---|---:|
 | TheEarLab Smoke Checklist (<=10 Minutes) | 1 |
 | Setup (1 minute) | 5 |
-| Core Flow (3 minutes) | 11 |
-| Chord Flow (2 minutes) | 19 |
-| Replay + Blind Rules (1 minute) | 29 |
-| Settings Stress (1 minute) | 36 |
-| Tutorial + Panel Basics (1 minute) | 43 |
-| SF2 Sanity (1 minute) | 50 |
-| Exit Criteria | 55 |
+| Core Flow (3 minutes) | 12 |
+| Chord Flow (2 minutes) | 20 |
+| Replay + Blind Rules (1 minute) | 30 |
+| Settings Stress (1 minute) | 37 |
+| Tutorial + Panel Basics (1 minute) | 44 |
+| SF2 Sanity (1 minute) | 51 |
+| Exit Criteria | 56 |
 
 
 ## JavaScript Maps
@@ -921,9 +929,24 @@ File lines: 1-164
 | buildPreviewSequence | 103-147 |
 
 ### js/core.00-bootstrap.js (Active Runtime)
-File lines: 1-284
+File lines: 1-446
 
-_No function declarations detected._
+| Symbol | Lines |
+|---|---|
+| getRuntimeMessage | 300-308 |
+| ensureRuntimeBanner | 310-332 |
+| updateRuntimeBanner | 334-357 |
+| reportRuntimeIssue | 359-382 |
+| runProtected | 384-391 |
+| runProtectedAsync | 393-400 |
+| bindRuntimeEvent | 402-412 |
+| reportMissingDomRefs | 414-421 |
+
+Event bindings:
+| Target | Event | Line |
+|---|---|---:|
+| window | error | 423 |
+| window | unhandledrejection | 431 |
 
 ### js/core.10-constants.js (Active Runtime)
 File lines: 1-295
@@ -998,65 +1021,15 @@ File lines: 1-60
 | rebuildKeyboard | 48-59 |
 
 ### js/events.00-settings.js (Active Runtime)
-File lines: 1-637
+File lines: 1-663
 
 | Symbol | Lines |
 |---|---|
-| primeAudioFromGesture | 5-14 |
-| shouldRestartRoundForSetting | 30-33 |
-| patchSettingsState | 35-41 |
-| adjustKeyCount | 416-419 |
-| bindKeyCountStepper | 421-426 |
-
-Event bindings:
-| Target | Event | Line |
-|---|---|---:|
-| document | pointerdown | 16 |
-| document | keydown | 17 |
-| document | touchstart | 18 |
-| noteCountInput | input | 75 |
-| noteCountInput | change | 82 |
-| noteCountInput | pointerup | 86 |
-| button | click | 91 |
-| button | click | 106 |
-| blindToggle | change | 114 |
-| hideLivePreviewToggle | change | 123 |
-| practiceModeSelect | change | 133 |
-| trainingModeSelect | change | 140 |
-| chordDifficultySelect | change | 155 |
-| chordExtraHelpersToggle | change | 172 |
-| chordRootHintToggle | change | 182 |
-| customCursorToggle | change | 198 |
-| typingShowPianoToggle | change | 210 |
-| typingShowTypedToggle | change | 220 |
-| resetSettingsButton | click | 232 |
-| settingsToggle | click | 246 |
-| themeToggle | click | 255 |
-| homeToggle | click | 266 |
-| settingsPanel | click | 275 |
-| optionsTrigger | click | 297 |
-| gameSettingsOpen | click | 304 |
-| gameSettingsBackdrop | click | 311 |
-| gameSettingsClose | click | 318 |
-| document | click | 324 |
-| window | resize | 328 |
-| playSelectedButton | click | 340 |
-| playSelectedButton | pointerdown | 344 |
-| playSelectedButton | pointerup | 349 |
-| playSelectedButton | pointerleave | 353 |
-| primaryActionButton | click | 357 |
-| volumeSlider | input | 365 |
-| lengthSlider | input | 371 |
-| attackSlider | input | 377 |
-| decaySlider | input | 383 |
-| releaseSlider | input | 389 |
-| sustainSlider | input | 395 |
-| keyCountSlider | input | 401 |
-| keyCountSlider | change | 408 |
-| keyCountSlider | pointerup | 412 |
-| hintButton | click | 431 |
-| chordAnswerInput | input | 436 |
-| chordAnswerInput | keydown | 443 |
+| primeAudioFromGesture | 17-26 |
+| shouldRestartRoundForSetting | 42-45 |
+| patchSettingsState | 47-53 |
+| adjustKeyCount | 442-445 |
+| bindKeyCountStepper | 447-452 |
 
 ### js/events.10-tutorial.js (Active Runtime)
 File lines: 1-633
@@ -1116,137 +1089,101 @@ Event bindings:
 | chordTutorialNext | click | 623 |
 
 ### js/events.20-helper-cursor.js (Active Runtime)
-File lines: 1-818
+File lines: 1-834
 
 | Symbol | Lines |
 |---|---|
 | syncHelperPinnedUi | 1-10 |
-| shouldBlurAfterPointer | 23-28 |
-| toggleRootHintFromHelper | 30-47 |
-| toggleHelperPinned | 49-89 |
-| getCursorTarget | 91-96 |
-| handleHelperPinEvent | 98-104 |
-| isEventsTypingEnabled | 190-190 |
-| isEventsTypingOnlyMode | 191-191 |
-| getEventsChordRound | 192-192 |
-| isChordTypingCaptureActive | 194-199 |
-| insertTypedCharacter | 201-208 |
-| triggerPrimaryAction | 211-220 |
-| getButtonLikeTarget | 223-223 |
-| blurPointerActivatedControl | 224-231 |
-| markHelperIndicatorDirty | 261-264 |
-| getHelperIndicatorItems | 266-278 |
-| ensureHelperIndicatorObserver | 292-296 |
-| getHelperIndicatorCache | 298-333 |
-| updateHelperIndicatorPositions | 335-345 |
-| scheduleHelperIndicatorUpdate | 347-359 |
-| isPointerInsideRect | 361-367 |
-| handleHelperIndicatorProximity | 369-402 |
-| ensureCustomCursorEl | 404-421 |
-| getCustomCursorMode | 422-441 |
-| syncCustomCursorState | 442-448 |
-| renderCustomCursor | 449-462 |
-| scheduleCustomCursorRender | 463-466 |
-| scheduleCursorMotion | 468-471 |
-| stepCursorMotion | 473-491 |
-| setCustomCursorEnabled | 492-512 |
-| applyCustomCursorMediaState | 513-516 |
-| updateCustomCursorPosition | 525-547 |
-| handleHelperPointerEnter | 549-554 |
-| handleHelperPointerLeave | 556-561 |
-| triggerReplayAction | 563-569 |
-| bindDoubleClickReset | 571-574 |
-| bindPianoOptionEvents | 717-742 |
+| shouldBlurAfterPointer | 34-39 |
+| toggleRootHintFromHelper | 41-58 |
+| toggleHelperPinned | 60-100 |
+| getCursorTarget | 102-107 |
+| handleHelperPinEvent | 109-115 |
+| isEventsTypingEnabled | 207-207 |
+| isEventsTypingOnlyMode | 208-208 |
+| getEventsChordRound | 209-209 |
+| isChordTypingCaptureActive | 211-216 |
+| insertTypedCharacter | 218-225 |
+| triggerPrimaryAction | 228-237 |
+| getButtonLikeTarget | 240-240 |
+| blurPointerActivatedControl | 241-248 |
+| markHelperIndicatorDirty | 278-281 |
+| getHelperIndicatorItems | 283-295 |
+| ensureHelperIndicatorObserver | 309-313 |
+| getHelperIndicatorCache | 315-350 |
+| updateHelperIndicatorPositions | 352-362 |
+| scheduleHelperIndicatorUpdate | 364-376 |
+| isPointerInsideRect | 378-384 |
+| handleHelperIndicatorProximity | 386-419 |
+| ensureCustomCursorEl | 421-438 |
+| getCustomCursorMode | 439-458 |
+| syncCustomCursorState | 459-465 |
+| renderCustomCursor | 466-479 |
+| scheduleCustomCursorRender | 480-483 |
+| scheduleCursorMotion | 485-488 |
+| stepCursorMotion | 490-508 |
+| setCustomCursorEnabled | 509-529 |
+| applyCustomCursorMediaState | 530-533 |
+| updateCustomCursorPosition | 542-564 |
+| handleHelperPointerEnter | 566-571 |
+| handleHelperPointerLeave | 573-578 |
+| triggerReplayAction | 580-586 |
+| bindDoubleClickReset | 588-590 |
+| bindPianoOptionEvents | 733-758 |
 
 Event bindings:
 | Target | Event | Line |
 |---|---|---:|
-| document | click | 106 |
-| document | keydown | 108 |
-| document | contextmenu | 113 |
-| chordTutorialRootList | mouseover | 116 |
-| chordTutorialRootList | mouseleave | 124 |
-| chordTutorialRootList | focusin | 127 |
-| chordTutorialRootList | focusout | 135 |
-| chordTutorialRootList | click | 138 |
-| chordTutorialQualityList | mouseover | 154 |
-| chordTutorialQualityList | mouseleave | 161 |
-| chordTutorialQualityList | focusin | 164 |
-| chordTutorialQualityList | focusout | 171 |
-| chordTutorialQualityList | click | 174 |
-| CUSTOM_CURSOR_QUERY | change | 518 |
-| target | dblclick | 573 |
-| startNoteDownButton | click | 597 |
-| startNoteUpButton | click | 600 |
-| startNoteDownOctButton | click | 606 |
-| startNoteUpOctButton | click | 609 |
-| profileSearch | input | 615 |
-| profileList | click | 621 |
-| profileList | dblclick | 626 |
-| profileList | keydown | 629 |
-| profileApply | click | 640 |
-| profileSave | click | 646 |
-| instrumentPresetSearch | input | 652 |
-| instrumentPresetList | click | 658 |
-| instrumentPresetList | dblclick | 663 |
-| instrumentPresetList | keydown | 666 |
-| instrumentPresetApply | click | 677 |
-| advancedTrigger | click | 682 |
-| advancedPanel | click | 687 |
-| pianoTrigger | click | 692 |
-| pianoPanel | click | 699 |
-| instrumentBrowserTrigger | click | 705 |
-| instrumentBrowserPanel | click | 712 |
-| pianoOptionsContainer | click | 720 |
-| pianoOptionsContainer | keydown | 734 |
-| pianoPreviewMain | click | 745 |
-| testEnvelopeButton | click | 752 |
-| keyboardEl | pointerdown | 757 |
-| document | pointerup | 793 |
-| document | pointercancel | 800 |
-| document | pointerdown | 807 |
-| document | click | 815 |
+| chordTutorialRootList | mouseover | 133 |
+| chordTutorialRootList | mouseleave | 141 |
+| chordTutorialRootList | focusin | 144 |
+| chordTutorialRootList | focusout | 152 |
+| chordTutorialRootList | click | 155 |
+| chordTutorialQualityList | mouseover | 171 |
+| chordTutorialQualityList | mouseleave | 178 |
+| chordTutorialQualityList | focusin | 181 |
+| chordTutorialQualityList | focusout | 188 |
+| chordTutorialQualityList | click | 191 |
+| profileSearch | input | 631 |
+| profileList | click | 637 |
+| profileList | dblclick | 642 |
+| profileList | keydown | 645 |
+| profileApply | click | 656 |
+| profileSave | click | 662 |
+| instrumentPresetSearch | input | 668 |
+| instrumentPresetList | click | 674 |
+| instrumentPresetList | dblclick | 679 |
+| instrumentPresetList | keydown | 682 |
+| instrumentPresetApply | click | 693 |
+| pianoTrigger | click | 708 |
+| pianoPanel | click | 715 |
+| instrumentBrowserTrigger | click | 721 |
+| instrumentBrowserPanel | click | 728 |
+| pianoOptionsContainer | click | 736 |
+| pianoOptionsContainer | keydown | 750 |
+| pianoPreviewMain | click | 761 |
+| testEnvelopeButton | click | 768 |
 
 ### js/events.30-bindings.js (Active Runtime)
-File lines: 1-434
+File lines: 1-494
 
 | Symbol | Lines |
 |---|---|
-| handlePointerUpdate | 1-20 |
-| isElementVisible | 78-84 |
-| getFocusableElements | 86-90 |
-| focusFirstInModal | 96-102 |
-| trapModalFocus | 104-126 |
-| isTextEditableTarget | 128-133 |
-| getActiveModalEl | 135-140 |
-| closeGameSettingsModalUi | 142-158 |
-| openGameSettingsModalUi | 160-167 |
-| closeActiveModal | 169-183 |
-| moveFocusInPanel | 185-196 |
-| setRandomBackgroundAngle | 386-389 |
-| init | 391-428 |
-| runDeferredCatalogLoad | 412-421 |
-
-Event bindings:
-| Target | Event | Line |
-|---|---|---:|
-| document | pointerrawupdate | 23 |
-| document | pointermove | 25 |
-| document | pointerup | 27 |
-| document | pointercancel | 33 |
-| document | pointerover | 38 |
-| document | pointerout | 44 |
-| document | pointerover | 53 |
-| document | pointerout | 54 |
-| window | blur | 56 |
-| document | visibilitychange | 62 |
-| keyboardEl | click | 70 |
-| document | keydown | 198 |
-| document | keyup | 334 |
-| pedalBox | pointerdown | 353 |
-| pedalBox | pointerup | 362 |
-| pedalBox | pointercancel | 371 |
-| pedalBox | pointerleave | 379 |
+| handlePointerUpdate | 19-38 |
+| isElementVisible | 106-112 |
+| getFocusableElements | 114-118 |
+| focusFirstInModal | 124-130 |
+| trapModalFocus | 132-154 |
+| isTextEditableTarget | 156-161 |
+| getActiveModalEl | 163-168 |
+| closeGameSettingsModalUi | 170-186 |
+| openGameSettingsModalUi | 188-195 |
+| closeActiveModal | 197-211 |
+| moveFocusInPanel | 213-224 |
+| setRandomBackgroundAngle | 414-417 |
+| runStartupSmokeCheck | 419-437 |
+| init | 439-490 |
+| runDeferredCatalogLoad | 478-483 |
 
 ### js/game.00-bootstrap.js (Active Runtime)
 File lines: 1-456

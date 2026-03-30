@@ -20,6 +20,10 @@ body.landing {
     --layout-extra: var(--pedal-width);
 }
 
+body.runtime-degraded {
+    padding-top: 84px;
+}
+
 .app {
     width: min(100%, calc(var(--keyboard-width) + 140px + var(--layout-extra)));
     background: var(--card);
@@ -310,6 +314,55 @@ input[type="number"] {
 
 body:not(.landing) .quick-start {
     display: none;
+}
+
+.runtime-banner {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(920px, calc(100vw - 32px));
+    z-index: 1200;
+    pointer-events: none;
+}
+
+.runtime-banner__body {
+    pointer-events: auto;
+    display: grid;
+    gap: 6px;
+    padding: 12px 16px;
+    border-radius: calc(var(--surface-radius) + 2px);
+    border: 1px solid color-mix(in oklab, var(--red) 28%, var(--control-border));
+    background:
+        linear-gradient(135deg, color-mix(in oklab, var(--card) 90%, white), color-mix(in oklab, var(--panel) 92%, transparent)),
+        radial-gradient(circle at top right, color-mix(in oklab, var(--red) 16%, transparent), transparent 48%);
+    box-shadow: 0 18px 40px color-mix(in oklab, var(--shadow-strong) 70%, transparent);
+    backdrop-filter: blur(14px);
+}
+
+.runtime-banner__title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.runtime-banner__summary {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.35;
+}
+
+.runtime-banner__list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 4px;
+    font-size: 0.78rem;
+    color: var(--ink);
+}
+
+.runtime-banner__list strong {
+    color: var(--ink);
 }
 
 .btn {

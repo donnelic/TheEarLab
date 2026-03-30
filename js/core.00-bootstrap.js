@@ -282,3 +282,165 @@ const uiState = {
 App.dom = dom;
 App.uiState = uiState;
 
+const runtimeSafetyState = {
+    issues: [],
+    issueKeys: new Set(),
+    bannerEl: null,
+    summaryEl: null,
+    listEl: null
+};
+
+const escapeRuntimeText = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&#39;");
+
+const getRuntimeMessage = (error) => {
+    if (error instanceof Error && error.message) return error.message;
+    if (typeof error === "string" && error.trim()) return error.trim();
+    if (error && typeof error === "object") {
+        if (typeof error.message === "string" && error.message.trim()) return error.message.trim();
+        if (typeof error.reason === "string" && error.reason.trim()) return error.reason.trim();
+    }
+    return "Unknown error";
+};
+
+const ensureRuntimeBanner = () => {
+    if (runtimeSafetyState.bannerEl?.isConnected) return runtimeSafetyState.bannerEl;
+    if (!document.body) return null;
+
+    const bannerEl = document.createElement("section");
+    bannerEl.className = "runtime-banner";
+    bannerEl.hidden = true;
+    bannerEl.setAttribute("role", "status");
+    bannerEl.setAttribute("aria-live", "polite");
+    bannerEl.innerHTML = `
+        <div class="runtime-banner__body">
+            <div class="runtime-banner__title">TheEarLab hit a problem and switched to safe mode.</div>
+            <div class="runtime-banner__summary"></div>
+            <ul class="runtime-banner__list"></ul>
+        </div>
+    `;
+    document.body.insertBefore(bannerEl, document.body.firstChild);
+
+    runtimeSafetyState.bannerEl = bannerEl;
+    runtimeSafetyState.summaryEl = bannerEl.querySelector(".runtime-banner__summary");
+    runtimeSafetyState.listEl = bannerEl.querySelector(".runtime-banner__list");
+    return bannerEl;
+};
+
+const updateRuntimeBanner = () => {
+    const bannerEl = ensureRuntimeBanner();
+    if (!bannerEl) return;
+
+    const issues = runtimeSafetyState.issues;
+    bannerEl.hidden = issues.length === 0;
+    document.body.classList.toggle("runtime-degraded", issues.length > 0);
+    if (!issues.length) return;
+
+    const criticalCount = issues.filter((entry) => entry.fatal).length;
+    const issueCount = issues.length;
+    const summary = criticalCount
+        ? `${criticalCount} critical issue${criticalCount === 1 ? "" : "s"} detected. The app will keep loading what it can.`
+        : `${issueCount} runtime issue${issueCount === 1 ? "" : "s"} detected. Remaining features stay available when possible.`;
+    if (runtimeSafetyState.summaryEl) {
+        runtimeSafetyState.summaryEl.textContent = summary;
+    }
+    if (runtimeSafetyState.listEl) {
+        runtimeSafetyState.listEl.innerHTML = issues
+            .slice(0, 4)
+            .map((entry) => `<li><strong>${escapeRuntimeText(entry.context)}:</strong> ${escapeRuntimeText(entry.message)}</li>`)
+            .join("");
+    }
+};
+
+const reportRuntimeIssue = (context, error, options = {}) => {
+    const safeContext = String(context || "Unexpected runtime issue");
+    const message = getRuntimeMessage(error);
+    const level = options.level === "warn" ? "warn" : "error";
+    const fatal = Boolean(options.fatal);
+    const issueKey = `${level}|${fatal ? "fatal" : "recoverable"}|${safeContext}|${message}`;
+    if (runtimeSafetyState.issueKeys.has(issueKey)) {
+        return null;
+    }
+
+    runtimeSafetyState.issueKeys.add(issueKey);
+    runtimeSafetyState.issues.push({
+        context: safeContext,
+        message,
+        level,
+        fatal,
+        timestamp: Date.now()
+    });
+
+    const logger = level === "warn" ? console.warn : console.error;
+    logger(`[${safeContext}]`, error);
+    updateRuntimeBanner();
+    return runtimeSafetyState.issues[runtimeSafetyState.issues.length - 1];
+};
+
+const runProtected = (context, task, options = {}) => {
+    try {
+        return typeof task === "function" ? task() : undefined;
+    } catch (error) {
+        reportRuntimeIssue(context, error, options);
+        return options.fallback;
+    }
+};
+
+const runProtectedAsync = async (context, task, options = {}) => {
+    try {
+        return await Promise.resolve(typeof task === "function" ? task() : undefined);
+    } catch (error) {
+        reportRuntimeIssue(context, error, options);
+        return options.fallback;
+    }
+};
+
+const bindRuntimeEvent = (target, eventName, handler, options, label) => {
+    const eventLabel = String(label || `${eventName} handler`);
+    if (!target || typeof target.addEventListener !== "function") {
+        reportRuntimeIssue(eventLabel, new Error("Required event target is unavailable."), { level: "warn" });
+        return false;
+    }
+    target.addEventListener(eventName, (event) => {
+        runProtected(eventLabel, () => handler(event));
+    }, options);
+    return true;
+};
+
+const reportMissingDomRefs = (keys, context = "Runtime check") => {
+    const missing = (Array.isArray(keys) ? keys : [])
+        .filter((key) => !dom[key]);
+    if (missing.length) {
+        reportRuntimeIssue(`${context}: missing DOM refs`, new Error(missing.join(", ")), { level: "warn" });
+    }
+    return missing;
+};
+
+window.addEventListener("error", (event) => {
+    const error = event.error || new Error(event.message || "Unhandled runtime error");
+    const context = event.filename
+        ? `Unhandled runtime error in ${event.filename}`
+        : "Unhandled runtime error";
+    reportRuntimeIssue(context, error, { fatal: true });
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+    reportRuntimeIssue("Unhandled promise rejection", event.reason, { fatal: true });
+});
+
+App.safety = {
+    state: runtimeSafetyState,
+    ensureRuntimeBanner,
+    updateRuntimeBanner,
+    reportRuntimeIssue,
+    runProtected,
+    runProtectedAsync,
+    bindRuntimeEvent,
+    reportMissingDomRefs,
+    getIssues: () => runtimeSafetyState.issues.slice()
+};
+

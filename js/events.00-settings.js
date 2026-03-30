@@ -1,6 +1,18 @@
 var App = window.App || (window.App = {});
 App.events = App.events || {};
 
+const EVENT_SAFETY = App.safety || {};
+const bindRuntimeEvent = typeof EVENT_SAFETY.bindRuntimeEvent === "function"
+    ? EVENT_SAFETY.bindRuntimeEvent
+    : ((target, eventName, handler, options) => {
+        if (!target || typeof target.addEventListener !== "function") return false;
+        target.addEventListener(eventName, handler, options);
+        return true;
+    });
+const reportMissingDomRefs = typeof EVENT_SAFETY.reportMissingDomRefs === "function"
+    ? EVENT_SAFETY.reportMissingDomRefs
+    : (() => []);
+
 let audioPrimedFromGesture = false;
 const primeAudioFromGesture = () => {
     if (audioPrimedFromGesture) return;
@@ -13,9 +25,9 @@ const primeAudioFromGesture = () => {
     document.removeEventListener("touchstart", primeAudioFromGesture, true);
 };
 
-document.addEventListener("pointerdown", primeAudioFromGesture, true);
-document.addEventListener("keydown", primeAudioFromGesture, true);
-document.addEventListener("touchstart", primeAudioFromGesture, true);
+bindRuntimeEvent(document, "pointerdown", primeAudioFromGesture, true, "settings/prime-audio-pointerdown");
+bindRuntimeEvent(document, "keydown", primeAudioFromGesture, true, "settings/prime-audio-keydown");
+bindRuntimeEvent(document, "touchstart", primeAudioFromGesture, true, "settings/prime-audio-touchstart");
 
 const EVENTS_MODE_POLICY = App.modePolicy;
 
@@ -72,23 +84,37 @@ Object.assign(App.events, {
     applySettingMutationEffects
 });
 
-noteCountInput.addEventListener("input", (event) => {
+reportMissingDomRefs([
+    "noteCountInput",
+    "noteCountValue",
+    "settingsToggle",
+    "settingsPanel",
+    "themeToggle",
+    "playSelectedButton",
+    "primaryActionButton",
+    "volumeSlider",
+    "lengthSlider",
+    "keyCountSlider",
+    "hintButton"
+], "Settings event binding");
+
+bindRuntimeEvent(noteCountInput, "input", (event) => {
     const next = clampNoteCount(event.target.value);
     pendingNoteCount = next;
     noteCountInput.value = String(next);
     noteCountValue.textContent = `${next} notes`;
-});
+}, undefined, "settings/note-count-input");
 
-noteCountInput.addEventListener("change", () => {
+bindRuntimeEvent(noteCountInput, "change", () => {
     commitNoteCountChange();
-});
+}, undefined, "settings/note-count-change");
 
-noteCountInput.addEventListener("pointerup", () => {
+bindRuntimeEvent(noteCountInput, "pointerup", () => {
     commitNoteCountChange();
-});
+}, undefined, "settings/note-count-pointerup");
 
 segmentedButtons.forEach((button) => {
-    button.addEventListener("click", () => {
+    bindRuntimeEvent(button, "click", () => {
         const nextMode = button.dataset.mode === "ascending" ? "ascending" : "simultaneous";
         if (state.mode === nextMode && button.classList.contains("active")) {
             return;
@@ -99,45 +125,45 @@ segmentedButtons.forEach((button) => {
         applySettingMutationEffects("playbackOrder", {
             refreshKeys: false
         });
-    });
+    }, undefined, "settings/playback-order");
 });
 
 quickModeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
+    bindRuntimeEvent(button, "click", () => {
         const mode = String(button.dataset.quickMode ?? "").trim();
         if (!["random", "nice", "chord"].includes(mode)) return;
         setPracticeMode(mode);
         void startRound(true);
-    });
+    }, undefined, "settings/quick-mode");
 });
 
-blindToggle.addEventListener("change", (event) => {
+bindRuntimeEvent(blindToggle, "change", (event) => {
     patchSettingsState({ blindMode: event.target.checked }, "events/blind-mode");
     applySettingMutationEffects("blindMode", {
         refreshKeys: false,
         restartOverride: false
     });
-});
+}, undefined, "settings/blind-mode");
 
 if (hideLivePreviewToggle) {
-    hideLivePreviewToggle.addEventListener("change", (event) => {
+    bindRuntimeEvent(hideLivePreviewToggle, "change", (event) => {
         patchSettingsState({ hideLivePreview: Boolean(event.target.checked) }, "events/hide-live-preview");
         applySettingMutationEffects("hideLivePreview", {
             refreshKeys: false,
             restartOverride: false
         });
-    });
+    }, undefined, "settings/hide-live-preview");
 }
 
 if (practiceModeSelect) {
-    practiceModeSelect.addEventListener("change", (event) => {
+    bindRuntimeEvent(practiceModeSelect, "change", (event) => {
         const value = String(event.target.value ?? "");
         setPracticeMode(value);
-    });
+    }, undefined, "settings/practice-mode");
 }
 
 if (trainingModeSelect) {
-    trainingModeSelect.addEventListener("change", (event) => {
+    bindRuntimeEvent(trainingModeSelect, "change", (event) => {
         const value = String(event.target.value ?? "");
         const next = ["keyboard", "type", "both"].includes(value) ? value : "keyboard";
         patchSettingsState({
@@ -148,11 +174,11 @@ if (trainingModeSelect) {
             App.game.clearTypingAutoNext();
         }
         applySettingMutationEffects("trainingMode");
-    });
+    }, undefined, "settings/training-mode");
 }
 
 if (chordDifficultySelect) {
-    chordDifficultySelect.addEventListener("change", (event) => {
+    bindRuntimeEvent(chordDifficultySelect, "change", (event) => {
         const value = String(event.target.value ?? "").trim().toLowerCase();
         patchSettingsState({
             chordDifficulty: value === "playful"
@@ -165,21 +191,21 @@ if (chordDifficultySelect) {
         applySettingMutationEffects("chordDifficulty", {
             refreshKeys: false
         });
-    });
+    }, undefined, "settings/chord-difficulty");
 }
 
 if (chordExtraHelpersToggle) {
-    chordExtraHelpersToggle.addEventListener("change", (event) => {
+    bindRuntimeEvent(chordExtraHelpersToggle, "change", (event) => {
         patchSettingsState({ chordExtraHelpers: Boolean(event.target.checked) }, "events/chord-extra-helpers");
         applySettingMutationEffects("chordExtraHelpers", {
             refreshKeys: false,
             restartOverride: false
         });
-    });
+    }, undefined, "settings/chord-extra-helpers");
 }
 
 if (chordRootHintToggle) {
-    chordRootHintToggle.addEventListener("change", (event) => {
+    bindRuntimeEvent(chordRootHintToggle, "change", (event) => {
         const nextValue = Boolean(event.target.checked);
         patchSettingsState({
             chordRootHint: nextValue,
@@ -191,11 +217,11 @@ if (chordRootHintToggle) {
         applySettingMutationEffects("chordRootHint", {
             restartOverride: false
         });
-    });
+    }, undefined, "settings/chord-root-hint");
 }
 
 if (customCursorToggle) {
-    customCursorToggle.addEventListener("change", (event) => {
+    bindRuntimeEvent(customCursorToggle, "change", (event) => {
         patchSettingsState({ customCursorEnabled: Boolean(event.target.checked) }, "events/custom-cursor");
         applySettingMutationEffects("customCursorEnabled", {
             refreshStatus: false,
@@ -203,21 +229,21 @@ if (customCursorToggle) {
             restartOverride: false
         });
         App.events?.applyCustomCursorMediaState?.();
-    });
+    }, undefined, "settings/custom-cursor");
 }
 
 if (typingShowPianoToggle) {
-    typingShowPianoToggle.addEventListener("change", (event) => {
+    bindRuntimeEvent(typingShowPianoToggle, "change", (event) => {
         patchSettingsState({ typingShowPiano: Boolean(event.target.checked) }, "events/typing-show-piano");
         refreshOptionsModeVisibility();
         applySettingMutationEffects("typingShowPiano", {
             restartOverride: false
         });
-    });
+    }, undefined, "settings/typing-show-piano");
 }
 
 if (typingShowTypedToggle) {
-    typingShowTypedToggle.addEventListener("change", (event) => {
+    bindRuntimeEvent(typingShowTypedToggle, "change", (event) => {
         patchSettingsState({ typingShowTyped: Boolean(event.target.checked) }, "events/typing-show-typed");
         refreshOptionsModeVisibility();
         if (typeof App.game?.updateTypedPreviewFromInput === "function") {
@@ -226,10 +252,10 @@ if (typingShowTypedToggle) {
         applySettingMutationEffects("typingShowTyped", {
             restartOverride: false
         });
-    });
+    }, undefined, "settings/typing-show-typed");
 }
 
-resetSettingsButton.addEventListener("click", () => {
+bindRuntimeEvent(resetSettingsButton, "click", () => {
     resetAllSettings();
     rebuildKeyboard();
     updateNoteCountMax();
@@ -241,18 +267,18 @@ resetSettingsButton.addEventListener("click", () => {
     saveSettings();
     handleCriticalSettingChange(200);
     updateStatus();
-});
+}, undefined, "settings/reset");
 
-settingsToggle.addEventListener("click", (event) => {
+bindRuntimeEvent(settingsToggle, "click", (event) => {
     event.stopPropagation();
     if (settingsPanel.classList.contains("open")) {
         closeSettings();
     } else {
         openSettings();
     }
-});
+}, undefined, "settings/toggle-panel");
 
-themeToggle.addEventListener("click", (event) => {
+bindRuntimeEvent(themeToggle, "click", (event) => {
     event.stopPropagation();
     patchSettingsState({
         theme: state.theme === "dark" ? "light" : "dark"
@@ -260,19 +286,19 @@ themeToggle.addEventListener("click", (event) => {
     document.body.classList.toggle("theme-dark", state.theme === "dark");
     themeToggle.setAttribute("aria-pressed", state.theme === "dark");
     saveSettings();
-});
+}, undefined, "settings/theme-toggle");
 
 if (homeToggle) {
-    homeToggle.addEventListener("click", (event) => {
+    bindRuntimeEvent(homeToggle, "click", (event) => {
         event.stopPropagation();
         closeSettings();
         if (typeof App.game?.goHome === "function") {
             App.game.goHome();
         }
-    });
+    }, undefined, "settings/home");
 }
 
-settingsPanel.addEventListener("click", (event) => {
+bindRuntimeEvent(settingsPanel, "click", (event) => {
     const openPanelKey = typeof getOpenFloatingPanelKey === "function"
         ? getOpenFloatingPanelKey()
         : null;
@@ -291,41 +317,41 @@ settingsPanel.addEventListener("click", (event) => {
         }
     }
     event.stopPropagation();
-});
+}, undefined, "settings/panel-click");
 
 if (optionsTrigger) {
-    optionsTrigger.addEventListener("click", (event) => {
+    bindRuntimeEvent(optionsTrigger, "click", (event) => {
         event.stopPropagation();
         openGameSettingsModalUi(optionsTrigger, { skipReturnFocus: wasPointerActivated(optionsTrigger) });
-    });
+    }, undefined, "settings/options-trigger");
 }
 
 if (gameSettingsOpen) {
-    gameSettingsOpen.addEventListener("click", (event) => {
+    bindRuntimeEvent(gameSettingsOpen, "click", (event) => {
         event.preventDefault();
         openGameSettingsModalUi(gameSettingsOpen, { skipReturnFocus: wasPointerActivated(gameSettingsOpen) });
-    });
+    }, undefined, "settings/game-settings-open");
 }
 
 if (gameSettingsBackdrop) {
-    gameSettingsBackdrop.addEventListener("click", (event) => {
+    bindRuntimeEvent(gameSettingsBackdrop, "click", (event) => {
         event.preventDefault();
         closeGameSettingsModalUi();
-    });
+    }, undefined, "settings/game-settings-backdrop");
 }
 
 if (gameSettingsClose) {
-    gameSettingsClose.addEventListener("click", (event) => {
+    bindRuntimeEvent(gameSettingsClose, "click", (event) => {
         event.preventDefault();
         closeGameSettingsModalUi();
-    });
+    }, undefined, "settings/game-settings-close");
 }
 
-document.addEventListener("click", () => {
+bindRuntimeEvent(document, "click", () => {
     closeSettings();
-});
+}, undefined, "settings/document-click");
 
-window.addEventListener("resize", () => {
+bindRuntimeEvent(window, "resize", () => {
     updateKeyboardScale();
     if (typeof repositionOpenFloatingPanels === "function") {
         repositionOpenFloatingPanels();
@@ -335,83 +361,83 @@ window.addEventListener("resize", () => {
         fitTutorialProgressTabs();
     }
     markHelperIndicatorDirty();
-});
+}, undefined, "settings/window-resize");
 
-playSelectedButton.addEventListener("click", () => {
+bindRuntimeEvent(playSelectedButton, "click", () => {
     playSelectedChord();
-});
+}, undefined, "settings/play-selected-click");
 
-playSelectedButton.addEventListener("pointerdown", (event) => {
+bindRuntimeEvent(playSelectedButton, "pointerdown", (event) => {
     event.preventDefault();
     startHeldPlayback();
-});
+}, undefined, "settings/play-selected-pointerdown");
 
-playSelectedButton.addEventListener("pointerup", () => {
+bindRuntimeEvent(playSelectedButton, "pointerup", () => {
     releaseHeldPlayback();
-});
+}, undefined, "settings/play-selected-pointerup");
 
-playSelectedButton.addEventListener("pointerleave", () => {
+bindRuntimeEvent(playSelectedButton, "pointerleave", () => {
     releaseHeldPlayback();
-});
+}, undefined, "settings/play-selected-pointerleave");
 
-primaryActionButton.addEventListener("click", () => {
+bindRuntimeEvent(primaryActionButton, "click", () => {
     if (state.active && !state.submitted) {
         submitAnswer();
     } else {
         startRound(true);
     }
-});
+}, undefined, "settings/primary-action");
 
-volumeSlider.addEventListener("input", (event) => {
+bindRuntimeEvent(volumeSlider, "input", (event) => {
     const raw = Number.parseFloat(event.target.value);
     const next = Number.isFinite(raw) ? raw : state.volume;
     setVolume(next);
-});
+}, undefined, "settings/volume");
 
-lengthSlider.addEventListener("input", (event) => {
+bindRuntimeEvent(lengthSlider, "input", (event) => {
     const raw = Number.parseFloat(event.target.value);
     const next = Number.isFinite(raw) ? raw : state.noteDuration;
     setNoteLength(next);
-});
+}, undefined, "settings/note-length");
 
-attackSlider.addEventListener("input", (event) => {
+bindRuntimeEvent(attackSlider, "input", (event) => {
     const raw = Number.parseInt(event.target.value, 10);
     const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.attack * 100);
     setAdsrTrim("attack", next / 100);
-});
+}, undefined, "settings/adsr-attack");
 
-decaySlider.addEventListener("input", (event) => {
+bindRuntimeEvent(decaySlider, "input", (event) => {
     const raw = Number.parseInt(event.target.value, 10);
     const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.decay * 100);
     setAdsrTrim("decay", next / 100);
-});
+}, undefined, "settings/adsr-decay");
 
-releaseSlider.addEventListener("input", (event) => {
+bindRuntimeEvent(releaseSlider, "input", (event) => {
     const raw = Number.parseInt(event.target.value, 10);
     const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.release * 100);
     setAdsrTrim("release", next / 100);
-});
+}, undefined, "settings/adsr-release");
 
-sustainSlider.addEventListener("input", (event) => {
+bindRuntimeEvent(sustainSlider, "input", (event) => {
     const raw = Number.parseInt(event.target.value, 10);
     const next = Number.isFinite(raw) ? raw : Math.round(state.adsrTrim.length * 100);
     setAdsrTrim("length", next / 100);
-});
+}, undefined, "settings/adsr-length");
 
-keyCountSlider.addEventListener("input", (event) => {
+bindRuntimeEvent(keyCountSlider, "input", (event) => {
     const raw = Number.parseInt(event.target.value, 10);
     const next = Number.isFinite(raw) ? raw : state.keyCount;
     pendingKeyCount = next;
     setKeyCount(next, { preview: true });
-});
+}, undefined, "settings/key-count-input");
 
-keyCountSlider.addEventListener("change", () => {
+bindRuntimeEvent(keyCountSlider, "change", () => {
     commitCriticalChange();
-});
+}, undefined, "settings/key-count-change");
 
-keyCountSlider.addEventListener("pointerup", () => {
+bindRuntimeEvent(keyCountSlider, "pointerup", () => {
     commitCriticalChange();
-});
+}, undefined, "settings/key-count-pointerup");
 
 const adjustKeyCount = (delta) => {
     const base = Number.isFinite(state.keyCount) ? state.keyCount : DEFAULTS.keyCount;
@@ -419,32 +445,32 @@ const adjustKeyCount = (delta) => {
 };
 
 const bindKeyCountStepper = (down, up, downOct, upOct) => {
-    if (down) down.addEventListener("click", () => adjustKeyCount(-1));
-    if (up) up.addEventListener("click", () => adjustKeyCount(1));
-    if (downOct) downOct.addEventListener("click", () => adjustKeyCount(-12));
-    if (upOct) upOct.addEventListener("click", () => adjustKeyCount(12));
+    bindRuntimeEvent(down, "click", () => adjustKeyCount(-1), undefined, "settings/key-count-down");
+    bindRuntimeEvent(up, "click", () => adjustKeyCount(1), undefined, "settings/key-count-up");
+    bindRuntimeEvent(downOct, "click", () => adjustKeyCount(-12), undefined, "settings/key-count-down-oct");
+    bindRuntimeEvent(upOct, "click", () => adjustKeyCount(12), undefined, "settings/key-count-up-oct");
 };
 
 bindKeyCountStepper(keyCountDown, keyCountUp, keyCountDownOct, keyCountUpOct);
 bindKeyCountStepper(gameKeyCountDown, gameKeyCountUp, gameKeyCountDownOct, gameKeyCountUpOct);
 
-hintButton.addEventListener("click", () => {
+bindRuntimeEvent(hintButton, "click", () => {
     playTarget();
-});
+}, undefined, "settings/hint");
 
 if (chordAnswerInput) {
-    chordAnswerInput.addEventListener("input", () => {
+    bindRuntimeEvent(chordAnswerInput, "input", () => {
         if (typeof App.game?.updateTypedPreviewFromInput === "function") {
             App.game.updateTypedPreviewFromInput();
         }
         updateStatus();
         updateKeyStates();
-    });
-    chordAnswerInput.addEventListener("keydown", (event) => {
+    }, undefined, "settings/chord-answer-input");
+    bindRuntimeEvent(chordAnswerInput, "keydown", (event) => {
         if (event.code === "Enter" || event.code === "Space") {
             event.preventDefault();
         }
-    });
+    }, undefined, "settings/chord-answer-keydown");
 }
 
 const TUTORIAL_ROOTS = [

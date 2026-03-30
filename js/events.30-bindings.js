@@ -1,3 +1,21 @@
+const BINDING_SAFETY = App.safety || {};
+const bindRuntimeEvent = typeof BINDING_SAFETY.bindRuntimeEvent === "function"
+    ? BINDING_SAFETY.bindRuntimeEvent
+    : ((target, eventName, handler, options) => {
+        if (!target || typeof target.addEventListener !== "function") return false;
+        target.addEventListener(eventName, handler, options);
+        return true;
+    });
+const runProtectedAsync = typeof BINDING_SAFETY.runProtectedAsync === "function"
+    ? BINDING_SAFETY.runProtectedAsync
+    : async (_context, task) => Promise.resolve(typeof task === "function" ? task() : undefined);
+const reportMissingDomRefs = typeof BINDING_SAFETY.reportMissingDomRefs === "function"
+    ? BINDING_SAFETY.reportMissingDomRefs
+    : (() => []);
+const reportRuntimeIssue = typeof BINDING_SAFETY.reportRuntimeIssue === "function"
+    ? BINDING_SAFETY.reportRuntimeIssue
+    : (() => null);
+
 const handlePointerUpdate = (event) => {
     if (!customCursorEnabled) {
         if (event.type === "pointerrawupdate") return;
@@ -20,56 +38,66 @@ const handlePointerUpdate = (event) => {
 };
 
 if ("onpointerrawupdate" in window) {
-    document.addEventListener("pointerrawupdate", handlePointerUpdate, { passive: true, capture: true });
+    bindRuntimeEvent(document, "pointerrawupdate", handlePointerUpdate, { passive: true, capture: true }, "bindings/pointerrawupdate");
 }
-document.addEventListener("pointermove", handlePointerUpdate, { passive: true, capture: true });
+bindRuntimeEvent(document, "pointermove", handlePointerUpdate, { passive: true, capture: true }, "bindings/pointermove");
 
-document.addEventListener("pointerup", (event) => {
+bindRuntimeEvent(document, "pointerup", (event) => {
     customCursorPressed = false;
     updateCustomCursorPosition(event);
     requestAnimationFrame(blurPointerActivatedControl);
-}, true);
+}, true, "bindings/pointerup");
 
-document.addEventListener("pointercancel", () => {
+bindRuntimeEvent(document, "pointercancel", () => {
     customCursorPressed = false;
     scheduleCustomCursorRender();
-}, true);
+}, true, "bindings/pointercancel");
 
-document.addEventListener("pointerover", (event) => {
+bindRuntimeEvent(document, "pointerover", (event) => {
     if (!customCursorEnabled) return;
     customCursorMode = getCustomCursorMode(getCursorTarget(event));
     scheduleCustomCursorRender();
-}, true);
+}, true, "bindings/pointerover");
 
-document.addEventListener("pointerout", (event) => {
+bindRuntimeEvent(document, "pointerout", (event) => {
     if (!customCursorEnabled) return;
     if (!event.relatedTarget) {
         customCursorVisible = false;
         customCursorPressed = false;
         scheduleCustomCursorRender();
     }
-}, true);
+}, true, "bindings/pointerout");
 
-document.addEventListener("pointerover", handleHelperPointerEnter, true);
-document.addEventListener("pointerout", handleHelperPointerLeave, true);
+bindRuntimeEvent(document, "pointerover", handleHelperPointerEnter, true, "bindings/helper-pointerover");
+bindRuntimeEvent(document, "pointerout", handleHelperPointerLeave, true, "bindings/helper-pointerout");
 
-window.addEventListener("blur", () => {
+bindRuntimeEvent(window, "blur", () => {
     customCursorVisible = false;
     customCursorPressed = false;
     scheduleCustomCursorRender();
-});
+}, undefined, "bindings/window-blur");
 
-document.addEventListener("visibilitychange", () => {
+bindRuntimeEvent(document, "visibilitychange", () => {
     if (document.hidden) {
         customCursorVisible = false;
         customCursorPressed = false;
         scheduleCustomCursorRender();
     }
-});
+}, undefined, "bindings/visibilitychange");
 
-keyboardEl.addEventListener("click", (event) => {
+reportMissingDomRefs([
+    "keyboardEl",
+    "pedalIcon",
+    "gameSettingsModal",
+    "chordTutorialModal",
+    "advancedPanel",
+    "pianoPanel",
+    "instrumentBrowserPanel"
+], "Bindings startup");
+
+bindRuntimeEvent(keyboardEl, "click", (event) => {
     event.preventDefault();
-});
+}, undefined, "bindings/keyboard-click");
 
 let gameSettingsReturnFocusEl = null;
 let gameSettingsSkipReturnFocus = false;
@@ -195,7 +223,7 @@ const moveFocusInPanel = (panelEl, direction) => {
     return true;
 };
 
-document.addEventListener("keydown", (event) => {
+bindRuntimeEvent(document, "keydown", (event) => {
     const tag = event.target.tagName;
     const chordInputFocused = event.target === chordAnswerInput;
     if ((event.code === "Enter" || event.code === "Space") && event.repeat) {
@@ -329,9 +357,9 @@ document.addEventListener("keydown", (event) => {
         event.preventDefault();
         triggerPrimaryAction();
     }
-});
+}, undefined, "bindings/document-keydown");
 
-document.addEventListener("keyup", (event) => {
+bindRuntimeEvent(document, "keyup", (event) => {
     if (event.code === "Space") {
         releaseHeldPlayback();
     }
@@ -346,11 +374,11 @@ document.addEventListener("keyup", (event) => {
             releasePedalNotes();
         }
     }
-});
+}, undefined, "bindings/document-keyup");
 
 const pedalBox = document.querySelector(".pedal-box");
 if (pedalBox) {
-    pedalBox.addEventListener("pointerdown", (event) => {
+    bindRuntimeEvent(pedalBox, "pointerdown", (event) => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         event.preventDefault();
@@ -358,8 +386,8 @@ if (pedalBox) {
             pedalBox.setPointerCapture(event.pointerId);
         }
         startPedalHold();
-    });
-    pedalBox.addEventListener("pointerup", (event) => {
+    }, undefined, "bindings/pedal-pointerdown");
+    bindRuntimeEvent(pedalBox, "pointerup", (event) => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         event.preventDefault();
@@ -367,20 +395,20 @@ if (pedalBox) {
         if (typeof pedalBox.releasePointerCapture === "function") {
             pedalBox.releasePointerCapture(event.pointerId);
         }
-    });
-    pedalBox.addEventListener("pointercancel", (event) => {
+    }, undefined, "bindings/pedal-pointerup");
+    bindRuntimeEvent(pedalBox, "pointercancel", (event) => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         stopPedalHold();
         if (typeof pedalBox.releasePointerCapture === "function") {
             pedalBox.releasePointerCapture(event.pointerId);
         }
-    });
-    pedalBox.addEventListener("pointerleave", () => {
+    }, undefined, "bindings/pedal-pointercancel");
+    bindRuntimeEvent(pedalBox, "pointerleave", () => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         stopPedalHold();
-    });
+    }, undefined, "bindings/pedal-pointerleave");
 }
 
 const setRandomBackgroundAngle = () => {
@@ -388,36 +416,70 @@ const setRandomBackgroundAngle = () => {
     document.documentElement.style.setProperty("--bg-angle", `${angle}deg`);
 };
 
-const init = async () => {
-    loadSettings();
-    bindPianoOptionEvents();
-    setRandomBackgroundAngle();
-    renderKeyboard();
-    setKeyboardEnabled(true);
-    updateNoteCountMax();
-    renderPianoOptions();
-    applyUiFromState();
-    App.events?.applyCustomCursorMediaState?.();
-    if (typeof App.game?.updateTypedPreviewFromInput === "function") {
-        App.game.updateTypedPreviewFromInput();
+const runStartupSmokeCheck = () => {
+    const requiredApis = [
+        ["App.audio.ensureAudio", typeof App.audio?.ensureAudio === "function"],
+        ["App.audio.ensureSoundfontReady", typeof App.audio?.ensureSoundfontReady === "function"],
+        ["App.audio.refreshSoundfontCatalog", typeof App.audio?.refreshSoundfontCatalog === "function"],
+        ["App.game.updateTypedPreviewFromInput", typeof App.game?.updateTypedPreviewFromInput === "function"],
+        ["App.settings.applyUiFromState", typeof App.settings?.applyUiFromState === "function"]
+    ];
+    const missingApis = requiredApis
+        .filter(([, available]) => !available)
+        .map(([label]) => label);
+    if (missingApis.length) {
+        reportRuntimeIssue("Startup smoke check: missing APIs", new Error(missingApis.join(", ")), {
+            level: "warn",
+            fatal: true
+        });
     }
-    refreshResponseProfileBrowser();
-    setVolume(state.volume);
-    setNoteLength(state.noteDuration);
-    setKeyCount(state.keyCount, { delayOverrideMs: 0 });
-    updateStatus();
-    updateKeyStates();
-    updateKeyboardScale();
+    return missingApis;
+};
+
+const init = async () => {
+    reportMissingDomRefs([
+        "keyboardEl",
+        "whiteKeysContainer",
+        "blackKeysContainer",
+        "primaryActionButton",
+        "playSelectedButton",
+        "statusPanel",
+        "resultEl",
+        "selectedListEl",
+        "goalCountEl",
+        "modeLabelEl"
+    ], "Init");
+    runStartupSmokeCheck();
+
+    const startupTasks = [
+        ["init/load-settings", () => loadSettings()],
+        ["init/bind-piano-options", () => bindPianoOptionEvents()],
+        ["init/background-angle", () => setRandomBackgroundAngle()],
+        ["init/render-keyboard", () => renderKeyboard()],
+        ["init/keyboard-enabled", () => setKeyboardEnabled(true)],
+        ["init/note-count-max", () => updateNoteCountMax()],
+        ["init/render-piano-options", () => renderPianoOptions()],
+        ["init/apply-ui-from-state", () => applyUiFromState()],
+        ["init/custom-cursor-media", () => App.events?.applyCustomCursorMediaState?.()],
+        ["init/typed-preview", () => App.game?.updateTypedPreviewFromInput?.()],
+        ["init/profile-browser", () => refreshResponseProfileBrowser()],
+        ["init/volume", () => setVolume(state.volume)],
+        ["init/note-length", () => setNoteLength(state.noteDuration)],
+        ["init/key-count", () => setKeyCount(state.keyCount, { delayOverrideMs: 0 })],
+        ["init/status", () => updateStatus()],
+        ["init/key-states", () => updateKeyStates()],
+        ["init/keyboard-scale", () => updateKeyboardScale()]
+    ];
+
+    for (const [label, task] of startupTasks) {
+        await runProtectedAsync(label, task);
+    }
 
     const runDeferredCatalogLoad = () => {
-        void (async () => {
-            try {
-                await refreshSoundfontCatalog({ loadAllPacks: false });
-                void ensureSoundfontReady(state.pianoTone);
-            } catch (error) {
-                console.warn("Deferred soundfont load failed:", error);
-            }
-        })();
+        void runProtectedAsync("init/deferred-soundfont-load", async () => {
+            await refreshSoundfontCatalog({ loadAllPacks: false });
+            void ensureSoundfontReady(state.pianoTone);
+        }, { level: "warn" });
     };
 
     if (typeof window.requestIdleCallback === "function") {
@@ -427,8 +489,6 @@ const init = async () => {
     }
 };
 
-init().catch((error) => {
-    console.error("App initialization failed:", error);
-});
+void runProtectedAsync("init/bootstrap", init, { fatal: true });
 
 Object.assign(App.events, { bindPianoOptionEvents, init, setRandomBackgroundAngle });

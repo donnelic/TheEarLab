@@ -64,6 +64,11 @@ Browser-based piano ear-training app for note and chord recognition.
 - `tools/smoke-checklist.md`: fast regression pass for critical app flows (target <=10 minutes).
 - `tools/start-local-server.ps1` and `start-server.bat`: quick local static server launcher.
 
+## Runtime Safety
+- Startup now runs in guarded stages so one failed setup task does not automatically abort the whole app.
+- Recoverable startup/runtime failures surface in an in-app `safe mode` banner instead of only appearing in devtools.
+- Critical startup checks now verify key DOM targets and runtime APIs; recorded issues are also available in the console via `App.safety.getIssues()`.
+
 ## Run Locally
 1. Open `index.html` in a modern browser.
 2. Recommended for external soundfont auto-discovery: use a local static server.
@@ -153,3 +158,5 @@ Browser-based piano ear-training app for note and chord recognition.
 ## Verification
 - JavaScript syntax check:
   - `Get-ChildItem .\js -Filter *.js | ForEach-Object { node --check $_.FullName }`
+- Runtime guard check:
+  - reload the app and confirm no safe-mode banner appears during a healthy startup

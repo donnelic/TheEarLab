@@ -7,6 +7,7 @@ Purpose: quick confidence pass after runtime changes.
 - Serve project from local HTTP (recommended): `.\start-server.bat` or `python -m http.server 5500`
 - Open app in a clean tab.
 - Open devtools console and confirm no startup errors.
+- Confirm no safe-mode banner appears on a healthy load.
 
 ## Core Flow (3 minutes)
 
