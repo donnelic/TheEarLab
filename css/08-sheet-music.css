@@ -31,11 +31,41 @@
     color: var(--ink);
 }
 
+.sheet-notation {
+    position: relative;
+    width: fit-content;
+    min-height: 100%;
+}
+
 .sheet-notation-grid {
     position: absolute;
     inset: 0;
     padding: 18px 18px 16px 84px;
     pointer-events: none;
+}
+
+.sheet-key-signature {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: -6px;
+}
+
+.sheet-key-signature-item {
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--ink);
+}
+
+.sheet-measures {
+    position: absolute;
+    inset: 18px auto 18px 84px;
+    pointer-events: none;
+}
+
+.sheet-note-layer {
+    position: absolute;
+    inset: 0;
 }
 
 /* Lines are now stark ink and slightly thicker */
