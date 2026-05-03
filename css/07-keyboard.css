@@ -1,11 +1,13 @@
 .keyboard-zone {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     flex: 1 1 auto;
     min-height: 0;
     overflow: visible;
     width: 100%;
+    gap: 14px;
     padding-block: 0;
     grid-row: 4;
 }
@@ -398,6 +400,20 @@ body.landing .pedal-box {
 
     .quick-start {
         grid-template-columns: 1fr;
+    }
+
+    .quick-mode-btn {
+        grid-template-columns: 1fr;
+        min-height: 104px;
+        width: 100%;
+        padding-inline: 12px;
+    }
+
+    .quick-mode-preview {
+        min-height: 72px;
+        justify-self: stretch;
+        width: 100%;
+        margin-right: 0;
     }
 
     .btn {

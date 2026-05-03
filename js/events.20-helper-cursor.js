@@ -20,14 +20,14 @@ const applySettingEffects = typeof EVENTS_API.applySettingMutationEffects === "f
     : (() => {});
 const ROOT_HELPER_LABEL = App.game?.helperLabels?.rootNote || (App.uiCopy?.helpers?.rootNote || "Root note");
 const HELPER_SAFETY = App.safety || {};
-const bindRuntimeEvent = typeof HELPER_SAFETY.bindRuntimeEvent === "function"
+const bindHelperRuntimeEvent = typeof HELPER_SAFETY.bindRuntimeEvent === "function"
     ? HELPER_SAFETY.bindRuntimeEvent
     : ((target, eventName, handler, options) => {
         if (!target || typeof target.addEventListener !== "function") return false;
         target.addEventListener(eventName, handler, options);
         return true;
     });
-const reportMissingDomRefs = typeof HELPER_SAFETY.reportMissingDomRefs === "function"
+const reportHelperMissingDomRefs = typeof HELPER_SAFETY.reportMissingDomRefs === "function"
     ? HELPER_SAFETY.reportMissingDomRefs
     : (() => []);
 
@@ -114,20 +114,20 @@ const handleHelperPinEvent = (event, { persistent = false } = {}) => {
     }
 };
 
-reportMissingDomRefs([
+reportHelperMissingDomRefs([
     "advancedTrigger",
     "advancedPanel",
     "keyboardEl"
 ], "Helper cursor binding");
 
-bindRuntimeEvent(document, "click", (event) => handleHelperPinEvent(event), undefined, "helper/pin-click");
+bindHelperRuntimeEvent(document, "click", (event) => handleHelperPinEvent(event), undefined, "helper/pin-click");
 
-bindRuntimeEvent(document, "keydown", (event) => {
+bindHelperRuntimeEvent(document, "keydown", (event) => {
     if (!["Enter", " "].includes(event.key)) return;
     handleHelperPinEvent(event);
 }, undefined, "helper/pin-keydown");
 
-bindRuntimeEvent(document, "contextmenu", (event) => handleHelperPinEvent(event, { persistent: true }), undefined, "helper/pin-contextmenu");
+bindHelperRuntimeEvent(document, "contextmenu", (event) => handleHelperPinEvent(event, { persistent: true }), undefined, "helper/pin-contextmenu");
 
 if (chordTutorialRootList) {
     chordTutorialRootList.addEventListener("mouseover", (event) => {
@@ -532,7 +532,7 @@ const applyCustomCursorMediaState = () => {
     setCustomCursorEnabled(allowCustomCursor);
 };
 if (typeof CUSTOM_CURSOR_QUERY.addEventListener === "function") {
-    bindRuntimeEvent(CUSTOM_CURSOR_QUERY, "change", applyCustomCursorMediaState, undefined, "helper/custom-cursor-media");
+    bindHelperRuntimeEvent(CUSTOM_CURSOR_QUERY, "change", applyCustomCursorMediaState, undefined, "helper/custom-cursor-media");
 } else if (typeof CUSTOM_CURSOR_QUERY.addListener === "function") {
     CUSTOM_CURSOR_QUERY.addListener(applyCustomCursorMediaState);
 }
@@ -586,7 +586,7 @@ const triggerReplayAction = (event) => {
 };
 
 const bindDoubleClickReset = (target, handler) => {
-    bindRuntimeEvent(target, "dblclick", handler, undefined, "helper/double-click-reset");
+    bindHelperRuntimeEvent(target, "dblclick", handler, undefined, "helper/double-click-reset");
 };
 
 [
@@ -610,19 +610,19 @@ const bindDoubleClickReset = (target, handler) => {
 ].forEach(([target, handler]) => bindDoubleClickReset(target, handler));
 
 if (startNoteDownButton && startNoteUpButton && startNoteValue) {
-    bindRuntimeEvent(startNoteDownButton, "click", () => {
+    bindHelperRuntimeEvent(startNoteDownButton, "click", () => {
         setStartMidi(state.startMidi - 1);
     }, undefined, "helper/start-note-down");
-    bindRuntimeEvent(startNoteUpButton, "click", () => {
+    bindHelperRuntimeEvent(startNoteUpButton, "click", () => {
         setStartMidi(state.startMidi + 1);
     }, undefined, "helper/start-note-up");
 }
 
 if (startNoteDownOctButton && startNoteUpOctButton) {
-    bindRuntimeEvent(startNoteDownOctButton, "click", () => {
+    bindHelperRuntimeEvent(startNoteDownOctButton, "click", () => {
         setStartMidi(state.startMidi - 12);
     }, undefined, "helper/start-note-down-oct");
-    bindRuntimeEvent(startNoteUpOctButton, "click", () => {
+    bindHelperRuntimeEvent(startNoteUpOctButton, "click", () => {
         setStartMidi(state.startMidi + 12);
     }, undefined, "helper/start-note-up-oct");
 }
@@ -695,12 +695,12 @@ if (instrumentPresetApply) {
     });
 }
 
-bindRuntimeEvent(advancedTrigger, "click", (event) => {
+bindHelperRuntimeEvent(advancedTrigger, "click", (event) => {
     event.stopPropagation();
     toggleFloatingPanel("advanced");
 }, undefined, "helper/advanced-trigger");
 
-bindRuntimeEvent(advancedPanel, "click", (event) => {
+bindHelperRuntimeEvent(advancedPanel, "click", (event) => {
     event.stopPropagation();
 }, undefined, "helper/advanced-panel");
 
@@ -770,7 +770,7 @@ if (testEnvelopeButton) {
     });
 }
 
-bindRuntimeEvent(keyboardEl, "pointerdown", (event) => {
+bindHelperRuntimeEvent(keyboardEl, "pointerdown", (event) => {
     if (isChordTutorialOpen()) {
         event.preventDefault();
         return;
@@ -806,21 +806,21 @@ bindRuntimeEvent(keyboardEl, "pointerdown", (event) => {
     }
 }, undefined, "helper/keyboard-pointerdown");
 
-bindRuntimeEvent(document, "pointerup", (event) => {
+bindHelperRuntimeEvent(document, "pointerup", (event) => {
     const noteId = pointerActiveNotes.get(event.pointerId);
     if (!noteId) return;
     releaseManualNote(noteId);
     pointerActiveNotes.delete(event.pointerId);
 }, undefined, "helper/pointerup");
 
-bindRuntimeEvent(document, "pointercancel", (event) => {
+bindHelperRuntimeEvent(document, "pointercancel", (event) => {
     const noteId = pointerActiveNotes.get(event.pointerId);
     if (!noteId) return;
     releaseManualNote(noteId);
     pointerActiveNotes.delete(event.pointerId);
 }, undefined, "helper/pointercancel");
 
-bindRuntimeEvent(document, "pointerdown", (event) => {
+bindHelperRuntimeEvent(document, "pointerdown", (event) => {
     pointerActivatedControl = getButtonLikeTarget(event.target);
     lastPointerDownTarget = pointerActivatedControl;
     lastPointerDownAt = Date.now();
@@ -828,7 +828,7 @@ bindRuntimeEvent(document, "pointerdown", (event) => {
     updateCustomCursorPosition(event);
 }, true, "helper/pointerdown");
 
-bindRuntimeEvent(document, "click", () => {
+bindHelperRuntimeEvent(document, "click", () => {
     requestAnimationFrame(blurPointerActivatedControl);
 }, true, "helper/document-click");
 

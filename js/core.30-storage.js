@@ -23,6 +23,9 @@ const saveSettings = () => {
         chordDifficulty: state.chordDifficulty,
         chordExtraHelpers: state.chordExtraHelpers,
         chordRootHint: state.chordRootHint,
+        sheetClefMode: state.sheetClefMode,
+        sheetAccidentalStyle: state.sheetAccidentalStyle,
+        sheetNoteLayout: state.sheetNoteLayout,
         customCursorEnabled: state.customCursorEnabled,
         typingShowPiano: state.typingShowPiano,
         typingShowTyped: state.typingShowTyped,
@@ -57,12 +60,13 @@ const loadSettings = () => {
             ? data.responseProfileId.trim()
             : DEFAULTS.responseProfileId;
         const savedPracticeMode = String(data.practiceMode ?? "").trim();
-        state.practiceMode = ["random", "nice", "chord"].includes(savedPracticeMode)
+        state.practiceMode = ["random", "nice", "chord", "sheet"].includes(savedPracticeMode)
             ? savedPracticeMode
             : (Boolean(data.chordMode) ? "chord" : (Boolean(data.niceMode) ? "nice" : DEFAULTS.practiceMode));
-        state.chordMode = Boolean(data.chordMode);
         const trainingMode = String(data.trainingMode ?? "").trim();
-        state.trainingMode = ["keyboard", "type", "both"].includes(trainingMode)
+        state.niceMode = state.practiceMode === "nice";
+        state.chordMode = state.practiceMode === "chord";
+        state.trainingMode = state.practiceMode === "chord" && ["keyboard", "type", "both"].includes(trainingMode)
             ? trainingMode
             : DEFAULTS.trainingMode;
         const difficulty = String(data.chordDifficulty ?? "").trim().toLowerCase();
@@ -71,6 +75,18 @@ const loadSettings = () => {
             : (["easy", "medium", "voiced", "hard"].includes(difficulty) ? difficulty : DEFAULTS.chordDifficulty);
         state.chordExtraHelpers = Boolean(data.chordExtraHelpers);
         state.chordRootHint = Boolean(data.chordRootHint);
+        const sheetClefMode = String(data.sheetClefMode ?? "").trim().toLowerCase();
+        state.sheetClefMode = ["treble", "bass", "both"].includes(sheetClefMode)
+            ? sheetClefMode
+            : DEFAULTS.sheetClefMode;
+        const sheetAccidentalStyle = String(data.sheetAccidentalStyle ?? "").trim().toLowerCase();
+        state.sheetAccidentalStyle = ["sharp", "flat"].includes(sheetAccidentalStyle)
+            ? sheetAccidentalStyle
+            : DEFAULTS.sheetAccidentalStyle;
+        const sheetNoteLayout = String(data.sheetNoteLayout ?? "").trim().toLowerCase();
+        state.sheetNoteLayout = ["spread", "stacked"].includes(sheetNoteLayout)
+            ? sheetNoteLayout
+            : DEFAULTS.sheetNoteLayout;
         state.customCursorEnabled = data.customCursorEnabled !== false;
         state.typingShowPiano = data.typingShowPiano !== false;
         state.typingShowTyped = data.typingShowTyped !== false;
@@ -117,12 +133,16 @@ const resetAllSettings = () => {
     state.chordDifficulty = DEFAULTS.chordDifficulty;
     state.chordExtraHelpers = DEFAULTS.chordExtraHelpers;
     state.chordRootHint = DEFAULTS.chordRootHint;
+    state.sheetClefMode = DEFAULTS.sheetClefMode;
+    state.sheetAccidentalStyle = DEFAULTS.sheetAccidentalStyle;
+    state.sheetNoteLayout = DEFAULTS.sheetNoteLayout;
     state.customCursorEnabled = DEFAULTS.customCursorEnabled;
     state.typingShowPiano = DEFAULTS.typingShowPiano;
     state.typingShowTyped = DEFAULTS.typingShowTyped;
     state.hideLivePreview = DEFAULTS.hideLivePreview;
     state.practiceProfiles = createDefaultPracticeProfiles();
     state.targetChord = null;
+    state.sheetClef = null;
     state.selectedChordLabel = "";
     state.typedAnswer = "";
     state.typedPreviewNotes = [];

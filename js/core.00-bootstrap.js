@@ -1,6 +1,6 @@
 var App = window.App || (window.App = {});
 App.core = App.core || {};
-const BUILD_ID = "20260324154447";
+const BUILD_ID = "20260503151058";
 App.buildId = BUILD_ID;
 
 const dom = {
@@ -26,6 +26,9 @@ const dom = {
     blindToggle: document.getElementById("blind-mode"),
     hideLivePreviewToggle: document.getElementById("hide-live-preview"),
     resetSettingsButton: document.getElementById("reset-settings"),
+    sheetClefModeSelect: document.getElementById("sheet-clef-mode"),
+    sheetAccidentalStyleSelect: document.getElementById("sheet-accidental-style"),
+    sheetNoteLayoutSelect: document.getElementById("sheet-note-layout"),
     keyCountSlider: document.getElementById("key-count"),
     keyCountValue: document.getElementById("key-count-value"),
     keyCountDown: document.getElementById("key-count-down"),
@@ -103,6 +106,7 @@ const dom = {
     chordTutorialPiano: document.getElementById("chord-tutorial-piano"),
     chordReadout: document.getElementById("chord-readout"),
     statusPanel: document.getElementById("status-panel"),
+    sheetDisplay: document.getElementById("sheet-display"),
     instrumentPresetSearch: document.getElementById("instrument-preset-search"),
     instrumentPresetList: document.getElementById("instrument-preset-list"),
     instrumentPresetApply: document.getElementById("instrument-preset-apply"),
@@ -155,6 +159,9 @@ const {
     blindToggle,
     hideLivePreviewToggle,
     resetSettingsButton,
+    sheetClefModeSelect,
+    sheetAccidentalStyleSelect,
+    sheetNoteLayoutSelect,
     keyCountSlider,
     keyCountValue,
     keyCountDown,
@@ -232,6 +239,7 @@ const {
     chordTutorialPiano,
     chordReadout,
     statusPanel,
+    sheetDisplay,
     instrumentPresetSearch,
     instrumentPresetList,
     instrumentPresetApply,

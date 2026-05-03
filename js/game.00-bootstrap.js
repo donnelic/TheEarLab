@@ -171,6 +171,11 @@ const helperPinState = {
     globalLabels: new Set()
 };
 
+const SHEET_CLEF_LABELS = Object.freeze({
+    treble: "G clef",
+    bass: "F clef"
+});
+
 const getHelperPinRound = () => (Number.isFinite(state.round) ? state.round : 0);
 
 const syncHelperPinRound = () => {
@@ -368,12 +373,20 @@ Object.assign(App.chords, {
 const isTypingEnabled = () => GAME_MODE_POLICY.isTypingEnabledFromState(state);
 const isTypingOnlyMode = () => GAME_MODE_POLICY.isTypingOnlyModeFromState(state);
 const getIsChordRound = () => GAME_MODE_POLICY.getIsChordRoundFromState(state);
+const getIsSheetRound = () => GAME_MODE_POLICY.getIsSheetRoundFromState(state);
 const getEffectiveBlindMode = () => GAME_MODE_POLICY.getEffectiveBlindModeFromState(state);
 const getKeyboardZoneEl = () => document.querySelector(".keyboard-zone");
 const normalizePitchClass = (value) => ((Math.round(value) % 12) + 12) % 12;
 const getRootName = (pitchClass) => CHORD_ROOT_NAMES[normalizePitchClass(pitchClass)];
 const getMidiFromNoteId = (noteId) => noteMap.get(noteId)?.midi;
 const buildChordLabel = (rootPc, quality) => `${getRootName(rootPc)}${quality?.suffix ?? ""}`;
+const getSheetClefLabel = (clef) => SHEET_CLEF_LABELS[clef] ?? SHEET_CLEF_LABELS.treble;
+
+Object.assign(App.game, {
+    sheetClefLabels: SHEET_CLEF_LABELS,
+    getSheetClefLabel,
+    getIsSheetRound
+});
 
 const getPitchClassSetFromNoteIds = (noteIds) => {
     const set = new Set();

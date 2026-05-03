@@ -47,6 +47,8 @@ const goHome = () => {
         submittedComparisonNotes: [],
         targetNotes: [],
         targetChord: null,
+        sheetClef: null,
+        sheetNotation: null,
         typedAnswer: "",
         typedPreviewNotes: [],
         rootHintSuppressed: false
@@ -72,7 +74,9 @@ const refreshTarget = () => {
         selectedChordLabel: "",
         submissionSource: null,
         submittedComparisonNotes: [],
-        rootHintSuppressed: false
+        rootHintSuppressed: false,
+        sheetClef: null,
+        sheetNotation: null
     }, "round/refresh-target");
     setSubmitted(false);
     createTarget();
@@ -101,7 +105,9 @@ const startRound = async (shouldPlay = false) => {
         abortPlayback();
         clearTypingAutoNext();
 
-        if (shouldPlay) {
+        const playOnStart = shouldPlay && !getIsSheetRound();
+
+        if (playOnStart) {
             await waitForMs(ROUND_TRANSITION_PAUSE_MS);
             if (token !== roundStartToken) {
                 return;
@@ -125,6 +131,8 @@ const startRound = async (shouldPlay = false) => {
             selectedChordLabel: "",
             submissionSource: null,
             submittedComparisonNotes: [],
+            sheetClef: null,
+            sheetNotation: null,
             rootHintSuppressed: false
         }, "round/start");
         setSubmitted(false);
@@ -145,7 +153,7 @@ const startRound = async (shouldPlay = false) => {
         updateStatus();
         updateKeyStates();
         pendingCriticalRestart = false;
-        if (shouldPlay) {
+        if (playOnStart) {
             if (token !== roundStartToken || !state.active) {
                 return;
             }

@@ -43,3 +43,9 @@ Original prompt: i need some fresh eyes on my project. i have these chord helper
 - 2026-03-12: Tutorial modal now skips return focus when opened by pointer; adds pointer-down tracking to avoid refocusing question mark button.
 
 - 2026-03-12: Game settings modal now skips return focus for pointer-opened triggers and blurs active modal focus on close.
+
+- 2026-05-01: Sheet mode target generation rebuilt: clef-aware pools now come from a bounded playable range window (max display span) and notes are sorted by pitch for cleaner sheet reading.
+- 2026-05-01: Sheet mode rendering stabilized: note placement now maps to the full playable sheet range (not just the selected note min/max), plus range metadata is shown in the card header.
+- 2026-05-01: Cleaned stale sheet DOM refs in bootstrap and regenerated PROJECT_MAP.md after the feature fixes.
+- 2026-05-01: Fixed sheet target data type regression (targetNotes accidentally held note objects); sheet mode now stores note IDs again, restoring reveal/check/playback behavior.
+- 2026-05-01: Updated sheet staff presentation to a compact five-line staff with clef glyphs and accidental symbols, plus an accidental style setting (sharps/flats) in Game Settings.

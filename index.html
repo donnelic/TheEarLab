@@ -8,14 +8,15 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Note Recognition Piano Trainer</title>
-  <link rel="stylesheet" href="css/00-theme.css?v=20260324154447" />
-  <link rel="stylesheet" href="css/01-base.css?v=20260324154447" />
-  <link rel="stylesheet" href="css/02-chord-typing.css?v=20260324154447" />
-  <link rel="stylesheet" href="css/03-modals.css?v=20260324154447" />
-  <link rel="stylesheet" href="css/04-tutorial.css?v=20260324154447" />
-  <link rel="stylesheet" href="css/05-helper-cursor.css?v=20260324154447" />
-  <link rel="stylesheet" href="css/06-panels-status.css?v=20260324154447" />
-  <link rel="stylesheet" href="css/07-keyboard.css?v=20260324154447" />
+  <link rel="stylesheet" href="css/00-theme.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/01-base.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/02-chord-typing.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/03-modals.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/04-tutorial.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/05-helper-cursor.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/06-panels-status.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/07-keyboard.css?v=20260503151058" />
+  <link rel="stylesheet" href="css/08-sheet-music.css?v=20260503151058" />
 </head>
 
 <body>
@@ -249,6 +250,7 @@
                 <select id="practice-mode">
                   <option value="random">Random Notes</option>
                   <option value="nice">Harmonic Notes</option>
+                  <option value="sheet">Sheet Music</option>
                   <option value="chord">Chord Practice</option>
                 </select>
               </div>
@@ -269,6 +271,43 @@
               </div>
               <div class="control-row">
                 <span class="unit">Adjust by note or octave.</span>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="sheet">
+              <label for="sheet-clef-mode">Sheet clef</label>
+              <div class="control-row">
+                <select id="sheet-clef-mode">
+                  <option value="treble">G clef</option>
+                  <option value="bass">F clef</option>
+                  <option value="both">G or F randomly</option>
+                </select>
+              </div>
+              <div class="control-row">
+                <span class="unit">More sheet controls can be added later.</span>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="sheet">
+              <label for="sheet-accidental-style">Accidental style</label>
+              <div class="control-row">
+                <select id="sheet-accidental-style">
+                  <option value="sharp">Sharps (#)</option>
+                  <option value="flat">Flats (b)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="control compact" data-option-group="sheet">
+              <label for="sheet-note-layout">Sheet layout</label>
+              <div class="control-row">
+                <select id="sheet-note-layout">
+                  <option value="spread">Spread</option>
+                  <option value="stacked">Stacked</option>
+                </select>
+              </div>
+              <div class="control-row">
+                <span class="unit">Choose note layout on the staff.</span>
               </div>
             </div>
 
@@ -419,7 +458,7 @@
     <header class="hero">
       <div class="badge">Piano Ear Lab</div>
       <h1>Note Recognition Trainer</h1>
-      <p>Listen to the notes, then pick them on the keyboard. Selected keys are blue until you submit.</p>
+      <p>Listen to the notes or read the sheet, then pick them on the keyboard. Selected keys are blue until you submit.</p>
     </header>
 
     <section class="actions">
@@ -428,21 +467,59 @@
     </section>
 
     <section class="quick-start" id="quick-start">
-      <button class="quick-mode-btn" type="button" data-quick-mode="random">
-        <span class="quick-mode-title">Random Notes</span>
-        <span class="quick-mode-sub">Classic note recognition</span>
+      <button class="quick-mode-btn quick-mode-random" type="button" data-quick-mode="random">
+        <span class="quick-mode-copy">
+          <span class="quick-mode-title">Random Notes</span>
+          <span class="quick-mode-sub">Classic note recognition</span>
+        </span>
+        <span class="quick-mode-preview quick-mode-preview-random" aria-hidden="true">
+          <span class="preview-floor"></span>
+          <span class="preview-chip preview-chip-a"></span>
+          <span class="preview-chip preview-chip-b"></span>
+          <span class="preview-chip preview-chip-c"></span>
+        </span>
       </button>
-      <button class="quick-mode-btn" type="button" data-quick-mode="nice">
-        <span class="quick-mode-title">Harmonic Notes</span>
-        <span class="quick-mode-sub">Consonant-friendly rounds</span>
+      <button class="quick-mode-btn quick-mode-harmonic" type="button" data-quick-mode="nice">
+        <span class="quick-mode-copy">
+          <span class="quick-mode-title">Harmonic Notes</span>
+          <span class="quick-mode-sub">Consonant-friendly rounds</span>
+        </span>
+        <span class="quick-mode-preview quick-mode-preview-harmonic" aria-hidden="true">
+          <span class="preview-floor"></span>
+          <span class="preview-chip preview-chip-a"></span>
+          <span class="preview-chip preview-chip-b"></span>
+          <span class="preview-chip preview-chip-c"></span>
+        </span>
       </button>
-      <button class="quick-mode-btn" type="button" data-quick-mode="chord">
-        <span class="quick-mode-title">Chord Practice</span>
-        <span class="quick-mode-sub">Train chord naming and voicing</span>
+      <button class="quick-mode-btn quick-mode-sheet" type="button" data-quick-mode="sheet">
+        <span class="quick-mode-copy">
+          <span class="quick-mode-title">Sheet Music</span>
+          <span class="quick-mode-sub">Read a staff and play what you see</span>
+        </span>
+        <span class="quick-mode-preview quick-mode-preview-sheet" aria-hidden="true">
+          <span class="preview-floor"></span>
+          <span class="preview-staff"></span>
+          <span class="preview-note preview-note-a"></span>
+          <span class="preview-note preview-note-b"></span>
+          <span class="preview-note preview-note-c"></span>
+        </span>
+      </button>
+      <button class="quick-mode-btn quick-mode-chord" type="button" data-quick-mode="chord">
+        <span class="quick-mode-copy">
+          <span class="quick-mode-title">Chord Practice</span>
+          <span class="quick-mode-sub">Train chord naming and voicing</span>
+        </span>
+        <span class="quick-mode-preview quick-mode-preview-chord" aria-hidden="true">
+          <span class="preview-floor"></span>
+          <span class="preview-chip preview-chip-a"></span>
+          <span class="preview-chip preview-chip-b"></span>
+          <span class="preview-chip preview-chip-c"></span>
+        </span>
       </button>
     </section>
 
     <section class="keyboard-zone">
+      <section class="sheet-display" id="sheet-display" hidden aria-live="polite"></section>
       <div class="keyboard-stack">
         <div class="keyboard-wrapper">
           <div class="keyboard disabled" id="keyboard">
@@ -551,44 +628,44 @@
     </div>
   </section>
 
-  <script src="vendor/libfluidsynth-2.4.6.js?v=20260324154447" defer></script>
-  <script src="vendor/js-synthesizer.min.js?v=20260324154447" defer></script>
-  <script src="js/core.00-bootstrap.js?v=20260324154447" defer></script>
-  <script src="js/core.10-constants.js?v=20260324154447" defer></script>
-  <script src="js/core.20-envelope.js?v=20260324154447" defer></script>
-  <script src="js/core.30-storage.js?v=20260324154447" defer></script>
-  <script src="js/core.40-runtime.js?v=20260324154447" defer></script>
-  <script src="js/core.50-soundfonts.js?v=20260324154447" defer></script>
-  <script src="js/core.60-keyboard.js?v=20260324154447" defer></script>
-  <script src="js/store/reducers.js?v=20260324154447" defer></script>
-  <script src="js/store/actions.js?v=20260324154447" defer></script>
-  <script src="js/store/selectors.js?v=20260324154447" defer></script>
-  <script src="js/store/store.js?v=20260324154447" defer></script>
-  <script src="js/features/round/state-mutations.js?v=20260324154447" defer></script>
-  <script src="js/features/settings/state-mutations.js?v=20260324154447" defer></script>
-  <script src="js/features/chords/index.js?v=20260324154447" defer></script>
-  <script src="js/features/typing/index.js?v=20260324154447" defer></script>
-  <script src="js/features/tutorial/index.js?v=20260324154447" defer></script>
-  <script src="js/features/audio-preview/index.js?v=20260324154447" defer></script>
-  <script src="js/features/input/index.js?v=20260324154447" defer></script>
-  <script src="js/audio.00-bootstrap.js?v=20260324154447" defer></script>
-  <script src="js/audio.10-soundfont-catalog.js?v=20260324154447" defer></script>
-  <script src="js/audio.20-engine.js?v=20260324154447" defer></script>
-  <script src="js/audio.30-playback.js?v=20260324154447" defer></script>
-  <script src="js/audio.40-preview.js?v=20260324154447" defer></script>
-  <script src="js/game.00-bootstrap.js?v=20260324154447" defer></script>
-  <script src="js/game.10-chord-targets.js?v=20260324154447" defer></script>
-  <script src="js/game.20-round-ui.js?v=20260324154447" defer></script>
-  <script src="js/game.30-round-flow.js?v=20260324154447" defer></script>
-  <script src="js/game.40-reveal-submit.js?v=20260324154447" defer></script>
-  <script src="js/settings.00-profiles.js?v=20260324154447" defer></script>
-  <script src="js/settings.10-dialogs.js?v=20260324154447" defer></script>
-  <script src="js/settings.20-game.js?v=20260324154447" defer></script>
-  <script src="js/settings.30-panels.js?v=20260324154447" defer></script>
-  <script src="js/events.00-settings.js?v=20260324154447" defer></script>
-  <script src="js/events.10-tutorial.js?v=20260324154447" defer></script>
-  <script src="js/events.20-helper-cursor.js?v=20260324154447" defer></script>
-  <script src="js/events.30-bindings.js?v=20260324154447" defer></script>
+  <script src="vendor/libfluidsynth-2.4.6.js?v=20260503151058" defer></script>
+  <script src="vendor/js-synthesizer.min.js?v=20260503151058" defer></script>
+  <script src="js/core.00-bootstrap.js?v=20260503151058" defer></script>
+  <script src="js/core.10-constants.js?v=20260503151058" defer></script>
+  <script src="js/core.20-envelope.js?v=20260503151058" defer></script>
+  <script src="js/core.30-storage.js?v=20260503151058" defer></script>
+  <script src="js/core.40-runtime.js?v=20260503151058" defer></script>
+  <script src="js/core.50-soundfonts.js?v=20260503151058" defer></script>
+  <script src="js/core.60-keyboard.js?v=20260503151058" defer></script>
+  <script src="js/store/reducers.js?v=20260503151058" defer></script>
+  <script src="js/store/actions.js?v=20260503151058" defer></script>
+  <script src="js/store/selectors.js?v=20260503151058" defer></script>
+  <script src="js/store/store.js?v=20260503151058" defer></script>
+  <script src="js/features/round/state-mutations.js?v=20260503151058" defer></script>
+  <script src="js/features/settings/state-mutations.js?v=20260503151058" defer></script>
+  <script src="js/features/chords/index.js?v=20260503151058" defer></script>
+  <script src="js/features/typing/index.js?v=20260503151058" defer></script>
+  <script src="js/features/tutorial/index.js?v=20260503151058" defer></script>
+  <script src="js/features/audio-preview/index.js?v=20260503151058" defer></script>
+  <script src="js/features/input/index.js?v=20260503151058" defer></script>
+  <script src="js/audio.00-bootstrap.js?v=20260503151058" defer></script>
+  <script src="js/audio.10-soundfont-catalog.js?v=20260503151058" defer></script>
+  <script src="js/audio.20-engine.js?v=20260503151058" defer></script>
+  <script src="js/audio.30-playback.js?v=20260503151058" defer></script>
+  <script src="js/audio.40-preview.js?v=20260503151058" defer></script>
+  <script src="js/game.00-bootstrap.js?v=20260503151058" defer></script>
+  <script src="js/game.10-chord-targets.js?v=20260503151058" defer></script>
+  <script src="js/game.20-round-ui.js?v=20260503151058" defer></script>
+  <script src="js/game.30-round-flow.js?v=20260503151058" defer></script>
+  <script src="js/game.40-reveal-submit.js?v=20260503151058" defer></script>
+  <script src="js/settings.00-profiles.js?v=20260503151058" defer></script>
+  <script src="js/settings.10-dialogs.js?v=20260503151058" defer></script>
+  <script src="js/settings.20-game.js?v=20260503151058" defer></script>
+  <script src="js/settings.30-panels.js?v=20260503151058" defer></script>
+  <script src="js/events.00-settings.js?v=20260503151058" defer></script>
+  <script src="js/events.10-tutorial.js?v=20260503151058" defer></script>
+  <script src="js/events.20-helper-cursor.js?v=20260503151058" defer></script>
+  <script src="js/events.30-bindings.js?v=20260503151058" defer></script>
 </body>
 
 </html>

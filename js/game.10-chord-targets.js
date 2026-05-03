@@ -133,6 +133,174 @@ const randomSample = (array, count) => {
     return shuffled.slice(0, count);
 };
 
+const recentSheetTargets = [];
+const MAX_SHEET_HISTORY = 6;
+const SHEET_MAX_DISPLAY_SPAN_SEMITONES = 29; // Keep the displayed staff range readable even on large keyboards.
+const SHEET_CENTER_MIDI = 60; // C4
+const SHEET_CLEF_SPLIT_MIDI = 60; // Around middle C
+const SHEET_CLEF_OVERLAP = 3;
+
+const getSheetClefMode = () => {
+    const value = String(state.sheetClefMode ?? "").trim().toLowerCase();
+    return ["treble", "bass", "both"].includes(value) ? value : DEFAULTS.sheetClefMode;
+};
+
+const chooseSheetClef = () => {
+    const mode = getSheetClefMode();
+    if (mode === "both") {
+        return Math.random() < 0.5 ? "treble" : "bass";
+    }
+    return mode;
+};
+
+const getSheetPlayableRange = () => {
+    if (!notes.length) return null;
+    const minMidi = notes[0].midi;
+    const maxMidi = notes[notes.length - 1].midi;
+    const span = Math.max(0, maxMidi - minMidi);
+    if (span <= SHEET_MAX_DISPLAY_SPAN_SEMITONES) {
+        return { minMidi, maxMidi };
+    }
+
+    const half = Math.floor(SHEET_MAX_DISPLAY_SPAN_SEMITONES / 2);
+    let rangeMin = SHEET_CENTER_MIDI - half;
+    let rangeMax = rangeMin + SHEET_MAX_DISPLAY_SPAN_SEMITONES;
+    if (rangeMin < minMidi) {
+        rangeMin = minMidi;
+        rangeMax = rangeMin + SHEET_MAX_DISPLAY_SPAN_SEMITONES;
+    }
+    if (rangeMax > maxMidi) {
+        rangeMax = maxMidi;
+        rangeMin = rangeMax - SHEET_MAX_DISPLAY_SPAN_SEMITONES;
+    }
+    rangeMin = Math.max(minMidi, rangeMin);
+    rangeMax = Math.min(maxMidi, rangeMax);
+    return { minMidi: rangeMin, maxMidi: rangeMax };
+};
+
+const getNotesInSheetPlayableRange = () => {
+    const range = getSheetPlayableRange();
+    if (!range) return [];
+    return notes.filter((note) => note.midi >= range.minMidi && note.midi <= range.maxMidi);
+};
+
+const getClefPools = (pool) => {
+    const bassCutoff = SHEET_CLEF_SPLIT_MIDI + SHEET_CLEF_OVERLAP;
+    const trebleCutoff = SHEET_CLEF_SPLIT_MIDI - SHEET_CLEF_OVERLAP;
+    const bass = pool.filter((note) => note.midi <= bassCutoff);
+    const treble = pool.filter((note) => note.midi >= trebleCutoff);
+    return { bass, treble };
+};
+
+const resolveSheetTargetForClef = (requestedClef, count) => {
+    const playablePool = getNotesInSheetPlayableRange();
+    if (!playablePool.length) {
+        return {
+            clef: requestedClef,
+            pool: []
+        };
+    }
+    const { bass, treble } = getClefPools(playablePool);
+    const pools = { bass, treble };
+    const requestedPool = pools[requestedClef] ?? [];
+    if (requestedPool.length >= count) {
+        return {
+            clef: requestedClef,
+            pool: requestedPool
+        };
+    }
+
+    const fallbackClef = requestedClef === "bass" ? "treble" : "bass";
+    const fallbackPool = pools[fallbackClef] ?? [];
+    if (fallbackPool.length >= count) {
+        return {
+            clef: fallbackClef,
+            pool: fallbackPool
+        };
+    }
+
+    return {
+        clef: requestedClef,
+        pool: playablePool
+    };
+};
+
+const createSheetTarget = () => {
+    if (!notes.length) {
+        applyRoundStatePatch({
+            targetChord: null,
+            targetNotes: [],
+            sheetClef: null
+        }, "round/create-sheet-target-empty");
+        return;
+    }
+
+    const requestedClef = chooseSheetClef();
+    const count = Math.max(1, Math.min(state.noteCount, 6));
+    const resolved = resolveSheetTargetForClef(requestedClef, count);
+    const clef = resolved.clef;
+    const pool = resolved.pool;
+    if (!pool.length) {
+        applyRoundStatePatch({
+            targetChord: null,
+            targetNotes: [],
+            sheetClef: clef
+        }, "round/create-sheet-target-no-pool");
+        return;
+    }
+
+    const safeCount = Math.min(count, pool.length);
+    let picked = null;
+    let signature = "";
+    for (let attempt = 0; attempt < 120; attempt += 1) {
+        const candidate = randomSample(pool, safeCount);
+        const candidateIds = candidate
+            .map((note) => note?.id)
+            .filter((noteId) => typeof noteId === "string");
+        if (candidateIds.length !== safeCount) continue;
+        const sortedIds = candidateIds.slice().sort((leftId, rightId) => {
+            const leftMidi = getMidiFromNoteId(leftId);
+            const rightMidi = getMidiFromNoteId(rightId);
+            return leftMidi - rightMidi;
+        });
+        signature = `${clef}-${sortedIds.join("-")}`;
+        if (recentSheetTargets.includes(signature)) {
+            continue;
+        }
+        picked = sortedIds;
+        break;
+    }
+
+    if (!picked) {
+        const fallbackIds = randomSample(pool, safeCount)
+            .map((note) => note?.id)
+            .filter((noteId) => typeof noteId === "string");
+        picked = fallbackIds.slice().sort((leftId, rightId) => {
+            const leftMidi = getMidiFromNoteId(leftId);
+            const rightMidi = getMidiFromNoteId(rightId);
+            return leftMidi - rightMidi;
+        });
+        signature = `${clef}-${picked.join("-")}`;
+    }
+
+    const sheetNotation = buildSheetNotationFromState({ noteIds: picked, clef, layout: state.sheetNoteLayout });
+    recentSheetTargets.unshift(signature);
+    if (recentSheetTargets.length > MAX_SHEET_HISTORY) {
+        recentSheetTargets.pop();
+    }
+
+    applyRoundStatePatch({
+        targetChord: null,
+        targetNotes: picked,
+        sheetClef: clef,
+        sheetNotation
+    }, "round/create-sheet-target");
+};
+
+Object.assign(App.game, {
+    getSheetPlayableRange
+});
+
 const getNiceTarget = (count) => {
     const pool = getNicePool();
     if (pool.length <= count) {
@@ -413,7 +581,8 @@ const createChordTarget = () => {
     if (!qualities.length || !notes.length) {
         applyRoundStatePatch({
             targetChord: null,
-            targetNotes: []
+            targetNotes: [],
+            sheetClef: null
         }, "round/create-chord-target-empty");
         return;
     }
@@ -443,7 +612,8 @@ const createChordTarget = () => {
     if (!picked) {
         applyRoundStatePatch({
             targetChord: null,
-            targetNotes: []
+            targetNotes: [],
+            sheetClef: null
         }, "round/create-chord-target-fallback-empty");
         return;
     }
@@ -455,7 +625,8 @@ const createChordTarget = () => {
 
     applyRoundStatePatch({
         targetChord: picked,
-        targetNotes: [...picked.noteIds]
+        targetNotes: [...picked.noteIds],
+        sheetClef: null
     }, "round/create-chord-target");
 };
 
@@ -492,12 +663,17 @@ const createNoteTarget = () => {
 
     applyRoundStatePatch({
         targetNotes: next,
-        targetChord: null
+        targetChord: null,
+        sheetClef: null
     }, "round/create-note-target");
 };
 
 const createTarget = () => {
     applyRoundStatePatch({ rootHintSuppressed: false }, "round/reset-root-hint-suppressed");
+    if (getIsSheetRound()) {
+        createSheetTarget();
+        return;
+    }
     if (getIsChordRound()) {
         createChordTarget();
         return;

@@ -17,7 +17,8 @@ body {
 }
 
 body.landing {
-    --layout-extra: var(--pedal-width);
+    --layout-extra: clamp(220px, 20vw, 360px);
+    --section-width: min(1080px, calc(100vw - 36px));
 }
 
 body.runtime-degraded {
@@ -269,37 +270,71 @@ input[type="number"] {
 
 .quick-start {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3, max-content);
+    gap: 12px;
     align-items: start;
+    justify-content: start;
     grid-row: 3;
 }
 
 .quick-mode-btn {
+    position: relative;
+    overflow: hidden;
     border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--control-border));
-    background: linear-gradient(165deg,
-            color-mix(in oklab, var(--panel) 88%, transparent),
-            color-mix(in oklab, var(--status-bg) 74%, transparent));
+    background:
+        linear-gradient(160deg,
+            color-mix(in oklab, var(--panel) 90%, transparent),
+            color-mix(in oklab, var(--status-bg) 70%, transparent)),
+    radial-gradient(circle at top right, color-mix(in oklab, var(--accent) 18%, transparent), transparent 55%);
     border-radius: var(--surface-radius);
-    padding: 7px 10px;
+    padding: 0;
     text-align: left;
     display: grid;
-    gap: 2px;
+    grid-template-columns: max-content minmax(110px, 0.48fr);
+    gap: 0;
+    align-items: center;
     cursor: pointer;
-    transition: transform var(--dur-fast) var(--ease-quick), border-color var(--dur-med) var(--ease-soft), box-shadow var(--dur-med) var(--ease-soft);
+    transition:
+        transform var(--dur-fast) var(--ease-quick),
+        border-color var(--dur-med) var(--ease-soft),
+        box-shadow var(--dur-med) var(--ease-soft),
+        background var(--dur-med) var(--ease-soft);
     align-self: start;
+    min-height: 116px;
+    width: max-content;
+    min-width: 0;
+}
+
+.quick-mode-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.06) 42%, transparent 78%);
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.quick-mode-copy {
+    display: inline-grid;
+    gap: 4px;
+    width: fit-content;
+    justify-self: start;
+    align-self: center;
+    z-index: 1;
+    padding: 12px 0 11px 12px;
 }
 
 .quick-mode-btn:hover,
 .quick-mode-btn:focus-visible {
     border-color: var(--accent);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 18px color-mix(in oklab, var(--accent) 18%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 26px color-mix(in oklab, var(--accent) 18%, transparent);
     outline: none;
 }
 
 .quick-mode-title {
-    font-size: 0.78rem;
+    font-size: 0.92rem;
     font-weight: 800;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -307,9 +342,185 @@ input[type="number"] {
 }
 
 .quick-mode-sub {
-    font-size: 0.69rem;
+    font-size: 0.78rem;
     color: var(--muted);
-    line-height: 1.2;
+    line-height: 1.35;
+    max-width: 24ch;
+}
+
+.quick-mode-preview {
+    position: relative;
+    display: block;
+    align-self: stretch;
+    min-height: 108px;
+    border-radius: 0;
+    overflow: visible;
+    isolation: isolate;
+    justify-self: stretch;
+    width: 100%;
+    background: transparent;
+    box-shadow: none;
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.10) 6%, #000 22%, #000 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.10) 6%, #000 22%, #000 100%);
+}
+
+.quick-mode-preview::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: none;
+    opacity: 0;
+}
+
+.preview-floor {
+    position: absolute;
+    left: 0;
+    right: 5px;
+    bottom: 9px;
+    height: 10px;
+    border-radius: 100px;
+    background:
+        linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--ink) 8%, var(--panel)) 18%, color-mix(in oklab, var(--ink) 15%, var(--panel)) 74%, color-mix(in oklab, var(--ink) 20%, var(--panel)) 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        0 5px 12px rgba(15, 23, 42, 0.08);
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.preview-chip {
+    position: absolute;
+    bottom: 18px;
+    width: 26px;
+    height: 58px;
+    border-radius: 12px 12px 8px 8px;
+    background:
+        linear-gradient(180deg, color-mix(in oklab, var(--accent) 78%, white), color-mix(in oklab, var(--accent) 88%, var(--ink))),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent);
+    box-shadow:
+        inset 0 -2px 0 rgba(255, 255, 255, 0.24),
+        0 10px 20px rgba(15, 23, 42, 0.16);
+}
+
+.quick-mode-preview-random .preview-chip-a {
+    left: 15%;
+    bottom: 16px;
+    transform: rotate(-12deg);
+}
+
+.quick-mode-preview-random .preview-chip-b {
+    left: 43%;
+    bottom: 37px;
+    height: 31px;
+    transform: rotate(9deg);
+}
+
+.quick-mode-preview-random .preview-chip-c {
+    left: 70%;
+    bottom: 20px;
+    transform: rotate(5deg);
+    background: linear-gradient(180deg, color-mix(in oklab, var(--yellow) 72%, white), color-mix(in oklab, var(--yellow) 90%, var(--ink)));
+}
+
+.quick-mode-preview-harmonic .preview-chip {
+    height: 58px;
+}
+
+.quick-mode-preview-harmonic .preview-chip-a {
+    left: 15%;
+    bottom: 21px;
+    transform: rotate(-2deg);
+}
+
+.quick-mode-preview-harmonic .preview-chip-b {
+    left: 36%;
+    bottom: 22px;
+    transform: rotate(0deg);
+    background: linear-gradient(180deg, color-mix(in oklab, var(--yellow) 72%, white), color-mix(in oklab, var(--yellow) 90%, var(--ink)));
+}
+
+.quick-mode-preview-harmonic .preview-chip-c {
+    left: 56%;
+    bottom: 20px;
+    transform: rotate(2deg);
+}
+
+.quick-mode-preview-chord .preview-chip {
+    width: 26px;
+    border-radius: 12px 12px 8px 8px;
+}
+
+.quick-mode-preview-chord .preview-chip-a {
+    left: 45%;
+    bottom: 18px;
+    transform: translateX(-50%) rotate(-2deg);
+}
+
+.quick-mode-preview-chord .preview-chip-b {
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%) rotate(0deg);
+}
+
+.quick-mode-preview-chord .preview-chip-c {
+    left: 55%;
+    bottom: 60px;
+    transform: translateX(-50%) rotate(2deg);
+    background: linear-gradient(180deg, color-mix(in oklab, var(--yellow) 72%, white), color-mix(in oklab, var(--yellow) 90%, var(--ink)));
+}
+
+.quick-mode-preview-sheet .preview-staff {
+    position: absolute;
+    inset: 18px 8px 20px 8px;
+    border-radius: 14px;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 15px,
+            color-mix(in oklab, var(--ink) 20%, var(--panel)) 15px,
+            color-mix(in oklab, var(--ink) 20%, var(--panel)) 16px,
+            transparent 16px 31px
+        );
+    opacity: 0.82;
+}
+
+.quick-mode-preview-sheet .preview-note {
+    position: absolute;
+    width: 18px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--ink) 92%, white), color-mix(in oklab, var(--ink) 84%, var(--blue)));
+    box-shadow: 0 5px 10px rgba(15, 23, 42, 0.16);
+}
+
+.quick-mode-preview-sheet .preview-note::before {
+    content: "";
+    position: absolute;
+    right: 3px;
+    bottom: 10px;
+    width: 2px;
+    height: 28px;
+    border-radius: 999px;
+    background: currentColor;
+    transform: rotate(-4deg);
+    transform-origin: bottom center;
+}
+
+.quick-mode-preview-sheet .preview-note-a {
+    left: 26%;
+    top: 56px;
+}
+
+.quick-mode-preview-sheet .preview-note-b {
+    left: 49%;
+    top: 36px;
+}
+
+.quick-mode-preview-sheet .preview-note-c {
+    left: 71%;
+    top: 48px;
 }
 
 body:not(.landing) .quick-start {
@@ -440,4 +651,3 @@ body[data-reduced-motion="true"] {
 body[data-reduced-motion="true"] .pulse-once {
     animation: none;
 }
-

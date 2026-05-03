@@ -89,11 +89,15 @@ const isSettingsTypingEnabled = () => SETTINGS_MODE_POLICY_LOCAL.isTypingEnabled
 const refreshOptionsModeVisibility = () => {
     const mode = getEffectivePracticeMode();
     const showChord = mode === "chord";
+    const showSheet = mode === "sheet";
     const showTyping = showChord && isSettingsTypingEnabled();
     const showNoteCount = mode !== "chord";
 
     document.querySelectorAll('[data-option-group="notes"]').forEach((el) => {
         el.hidden = !showNoteCount;
+    });
+    document.querySelectorAll('[data-option-group="sheet"]').forEach((el) => {
+        el.hidden = !showSheet;
     });
     document.querySelectorAll('[data-option-group="chord"]').forEach((el) => {
         el.hidden = !showChord;
@@ -104,6 +108,15 @@ const refreshOptionsModeVisibility = () => {
 
     if (practiceModeSelect) {
         practiceModeSelect.value = mode;
+    }
+    if (sheetClefModeSelect) {
+        sheetClefModeSelect.value = state.sheetClefMode;
+    }
+    if (sheetAccidentalStyleSelect) {
+        sheetAccidentalStyleSelect.value = state.sheetAccidentalStyle;
+    }
+    if (sheetNoteLayoutSelect) {
+        sheetNoteLayoutSelect.value = state.sheetNoteLayout;
     }
 };
 
@@ -119,7 +132,7 @@ const setPracticeMode = (mode, options = {}) => {
         capturePracticeProfileFromState(previousMode, workingState);
     }
 
-    const normalized = ["random", "nice", "chord"].includes(mode) ? mode : "random";
+    const normalized = ["random", "nice", "chord", "sheet"].includes(mode) ? mode : "random";
     const profiles = typeof normalizePracticeProfiles === "function"
         ? normalizePracticeProfiles(workingState.practiceProfiles)
         : (workingState.practiceProfiles || {});
@@ -130,6 +143,15 @@ const setPracticeMode = (mode, options = {}) => {
     const nextDifficulty = ["easy", "medium", "voiced", "hard"].includes(restored.chordDifficulty)
         ? restored.chordDifficulty
         : DEFAULTS.chordDifficulty;
+    const nextSheetClefMode = ["treble", "bass", "both"].includes(restored.sheetClefMode)
+        ? restored.sheetClefMode
+        : DEFAULTS.sheetClefMode;
+    const nextSheetAccidentalStyle = ["sharp", "flat"].includes(restored.sheetAccidentalStyle)
+        ? restored.sheetAccidentalStyle
+        : DEFAULTS.sheetAccidentalStyle;
+    const nextSheetNoteLayout = ["spread", "stacked"].includes(restored.sheetNoteLayout)
+        ? restored.sheetNoteLayout
+        : DEFAULTS.sheetNoteLayout;
     applySettingsStatePatch({
         practiceMode: normalized,
         niceMode: normalized === "nice",
@@ -141,6 +163,9 @@ const setPracticeMode = (mode, options = {}) => {
         chordDifficulty: nextDifficulty,
         chordExtraHelpers: Boolean(restored.chordExtraHelpers),
         chordRootHint: Boolean(restored.chordRootHint),
+        sheetClefMode: nextSheetClefMode,
+        sheetAccidentalStyle: nextSheetAccidentalStyle,
+        sheetNoteLayout: nextSheetNoteLayout,
         typingShowPiano: restored.typingShowPiano !== false,
         typingShowTyped: restored.typingShowTyped !== false,
         hideLivePreview: Boolean(restored.hideLivePreview),
@@ -164,6 +189,12 @@ const setPracticeMode = (mode, options = {}) => {
     }
     if (chordRootHintToggle) {
         chordRootHintToggle.checked = state.chordRootHint;
+    }
+    if (sheetClefModeSelect) {
+        sheetClefModeSelect.value = state.sheetClefMode;
+    }
+    if (sheetAccidentalStyleSelect) {
+        sheetAccidentalStyleSelect.value = state.sheetAccidentalStyle;
     }
     if (customCursorToggle) {
         customCursorToggle.checked = state.customCursorEnabled !== false;
@@ -232,6 +263,12 @@ const applyUiFromState = () => {
     }
     if (chordRootHintToggle) {
         chordRootHintToggle.checked = state.chordRootHint;
+    }
+    if (sheetClefModeSelect) {
+        sheetClefModeSelect.value = state.sheetClefMode;
+    }
+    if (sheetAccidentalStyleSelect) {
+        sheetAccidentalStyleSelect.value = state.sheetAccidentalStyle;
     }
     if (customCursorToggle) {
         customCursorToggle.checked = state.customCursorEnabled !== false;

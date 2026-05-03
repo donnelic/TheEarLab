@@ -1,18 +1,18 @@
 const BINDING_SAFETY = App.safety || {};
-const bindRuntimeEvent = typeof BINDING_SAFETY.bindRuntimeEvent === "function"
+const bindBindingsRuntimeEvent = typeof BINDING_SAFETY.bindRuntimeEvent === "function"
     ? BINDING_SAFETY.bindRuntimeEvent
     : ((target, eventName, handler, options) => {
         if (!target || typeof target.addEventListener !== "function") return false;
         target.addEventListener(eventName, handler, options);
         return true;
     });
-const runProtectedAsync = typeof BINDING_SAFETY.runProtectedAsync === "function"
+const runBindingsProtectedAsync = typeof BINDING_SAFETY.runProtectedAsync === "function"
     ? BINDING_SAFETY.runProtectedAsync
     : async (_context, task) => Promise.resolve(typeof task === "function" ? task() : undefined);
-const reportMissingDomRefs = typeof BINDING_SAFETY.reportMissingDomRefs === "function"
+const reportBindingsMissingDomRefs = typeof BINDING_SAFETY.reportMissingDomRefs === "function"
     ? BINDING_SAFETY.reportMissingDomRefs
     : (() => []);
-const reportRuntimeIssue = typeof BINDING_SAFETY.reportRuntimeIssue === "function"
+const reportBindingsRuntimeIssue = typeof BINDING_SAFETY.reportRuntimeIssue === "function"
     ? BINDING_SAFETY.reportRuntimeIssue
     : (() => null);
 
@@ -38,28 +38,28 @@ const handlePointerUpdate = (event) => {
 };
 
 if ("onpointerrawupdate" in window) {
-    bindRuntimeEvent(document, "pointerrawupdate", handlePointerUpdate, { passive: true, capture: true }, "bindings/pointerrawupdate");
+    bindBindingsRuntimeEvent(document, "pointerrawupdate", handlePointerUpdate, { passive: true, capture: true }, "bindings/pointerrawupdate");
 }
-bindRuntimeEvent(document, "pointermove", handlePointerUpdate, { passive: true, capture: true }, "bindings/pointermove");
+bindBindingsRuntimeEvent(document, "pointermove", handlePointerUpdate, { passive: true, capture: true }, "bindings/pointermove");
 
-bindRuntimeEvent(document, "pointerup", (event) => {
+bindBindingsRuntimeEvent(document, "pointerup", (event) => {
     customCursorPressed = false;
     updateCustomCursorPosition(event);
     requestAnimationFrame(blurPointerActivatedControl);
 }, true, "bindings/pointerup");
 
-bindRuntimeEvent(document, "pointercancel", () => {
+bindBindingsRuntimeEvent(document, "pointercancel", () => {
     customCursorPressed = false;
     scheduleCustomCursorRender();
 }, true, "bindings/pointercancel");
 
-bindRuntimeEvent(document, "pointerover", (event) => {
+bindBindingsRuntimeEvent(document, "pointerover", (event) => {
     if (!customCursorEnabled) return;
     customCursorMode = getCustomCursorMode(getCursorTarget(event));
     scheduleCustomCursorRender();
 }, true, "bindings/pointerover");
 
-bindRuntimeEvent(document, "pointerout", (event) => {
+bindBindingsRuntimeEvent(document, "pointerout", (event) => {
     if (!customCursorEnabled) return;
     if (!event.relatedTarget) {
         customCursorVisible = false;
@@ -68,16 +68,16 @@ bindRuntimeEvent(document, "pointerout", (event) => {
     }
 }, true, "bindings/pointerout");
 
-bindRuntimeEvent(document, "pointerover", handleHelperPointerEnter, true, "bindings/helper-pointerover");
-bindRuntimeEvent(document, "pointerout", handleHelperPointerLeave, true, "bindings/helper-pointerout");
+bindBindingsRuntimeEvent(document, "pointerover", handleHelperPointerEnter, true, "bindings/helper-pointerover");
+bindBindingsRuntimeEvent(document, "pointerout", handleHelperPointerLeave, true, "bindings/helper-pointerout");
 
-bindRuntimeEvent(window, "blur", () => {
+bindBindingsRuntimeEvent(window, "blur", () => {
     customCursorVisible = false;
     customCursorPressed = false;
     scheduleCustomCursorRender();
 }, undefined, "bindings/window-blur");
 
-bindRuntimeEvent(document, "visibilitychange", () => {
+bindBindingsRuntimeEvent(document, "visibilitychange", () => {
     if (document.hidden) {
         customCursorVisible = false;
         customCursorPressed = false;
@@ -85,7 +85,7 @@ bindRuntimeEvent(document, "visibilitychange", () => {
     }
 }, undefined, "bindings/visibilitychange");
 
-reportMissingDomRefs([
+reportBindingsMissingDomRefs([
     "keyboardEl",
     "pedalIcon",
     "gameSettingsModal",
@@ -95,7 +95,7 @@ reportMissingDomRefs([
     "instrumentBrowserPanel"
 ], "Bindings startup");
 
-bindRuntimeEvent(keyboardEl, "click", (event) => {
+bindBindingsRuntimeEvent(keyboardEl, "click", (event) => {
     event.preventDefault();
 }, undefined, "bindings/keyboard-click");
 
@@ -223,7 +223,7 @@ const moveFocusInPanel = (panelEl, direction) => {
     return true;
 };
 
-bindRuntimeEvent(document, "keydown", (event) => {
+bindBindingsRuntimeEvent(document, "keydown", (event) => {
     const tag = event.target.tagName;
     const chordInputFocused = event.target === chordAnswerInput;
     if ((event.code === "Enter" || event.code === "Space") && event.repeat) {
@@ -359,7 +359,7 @@ bindRuntimeEvent(document, "keydown", (event) => {
     }
 }, undefined, "bindings/document-keydown");
 
-bindRuntimeEvent(document, "keyup", (event) => {
+bindBindingsRuntimeEvent(document, "keyup", (event) => {
     if (event.code === "Space") {
         releaseHeldPlayback();
     }
@@ -378,7 +378,7 @@ bindRuntimeEvent(document, "keyup", (event) => {
 
 const pedalBox = document.querySelector(".pedal-box");
 if (pedalBox) {
-    bindRuntimeEvent(pedalBox, "pointerdown", (event) => {
+    bindBindingsRuntimeEvent(pedalBox, "pointerdown", (event) => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         event.preventDefault();
@@ -387,7 +387,7 @@ if (pedalBox) {
         }
         startPedalHold();
     }, undefined, "bindings/pedal-pointerdown");
-    bindRuntimeEvent(pedalBox, "pointerup", (event) => {
+    bindBindingsRuntimeEvent(pedalBox, "pointerup", (event) => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         event.preventDefault();
@@ -396,7 +396,7 @@ if (pedalBox) {
             pedalBox.releasePointerCapture(event.pointerId);
         }
     }, undefined, "bindings/pedal-pointerup");
-    bindRuntimeEvent(pedalBox, "pointercancel", (event) => {
+    bindBindingsRuntimeEvent(pedalBox, "pointercancel", (event) => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         stopPedalHold();
@@ -404,7 +404,7 @@ if (pedalBox) {
             pedalBox.releasePointerCapture(event.pointerId);
         }
     }, undefined, "bindings/pedal-pointercancel");
-    bindRuntimeEvent(pedalBox, "pointerleave", () => {
+    bindBindingsRuntimeEvent(pedalBox, "pointerleave", () => {
         if (isChordTutorialOpen()) return;
         if (state.active || previewState.playing) return;
         stopPedalHold();
@@ -428,7 +428,7 @@ const runStartupSmokeCheck = () => {
         .filter(([, available]) => !available)
         .map(([label]) => label);
     if (missingApis.length) {
-        reportRuntimeIssue("Startup smoke check: missing APIs", new Error(missingApis.join(", ")), {
+        reportBindingsRuntimeIssue("Startup smoke check: missing APIs", new Error(missingApis.join(", ")), {
             level: "warn",
             fatal: true
         });
@@ -437,7 +437,7 @@ const runStartupSmokeCheck = () => {
 };
 
 const init = async () => {
-    reportMissingDomRefs([
+    reportBindingsMissingDomRefs([
         "keyboardEl",
         "whiteKeysContainer",
         "blackKeysContainer",
@@ -472,11 +472,11 @@ const init = async () => {
     ];
 
     for (const [label, task] of startupTasks) {
-        await runProtectedAsync(label, task);
+        await runBindingsProtectedAsync(label, task);
     }
 
     const runDeferredCatalogLoad = () => {
-        void runProtectedAsync("init/deferred-soundfont-load", async () => {
+            void runBindingsProtectedAsync("init/deferred-soundfont-load", async () => {
             await refreshSoundfontCatalog({ loadAllPacks: false });
             void ensureSoundfontReady(state.pianoTone);
         }, { level: "warn" });
@@ -489,6 +489,6 @@ const init = async () => {
     }
 };
 
-void runProtectedAsync("init/bootstrap", init, { fatal: true });
+void runBindingsProtectedAsync("init/bootstrap", init, { fatal: true });
 
 Object.assign(App.events, { bindPianoOptionEvents, init, setRandomBackgroundAngle });

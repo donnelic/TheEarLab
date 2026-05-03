@@ -44,6 +44,8 @@ const UI_COPY = {
     prompts: {
         landingTyping: "Press New Round to hear a chord, then type your answer.",
         landingBoth: "Press New Round to hear a chord, then play it, type it, or both.",
+        landingSheet: "Press New Round to read the sheet, then select the notes on the keyboard.",
+        sheetRound: "Read the sheet and select the notes on the keyboard. Hint plays the notes.",
         landingDefault: "Press New Round to begin."
     },
     modes: {
@@ -51,6 +53,7 @@ const UI_COPY = {
         chordBoth: "Chord + Both",
         chordBlind: "Chord + Blind",
         chord: "Chord",
+        sheet: "Sheet Music",
         blind: "Blind",
         normal: "Normal"
     },
@@ -124,10 +127,13 @@ const DEFAULT_RULE_TRAINING_MODE = "keyboard";
 const DEFAULT_RULE_CHORD_DIFFICULTY = "easy";
 const DEFAULT_RULE_CHORD_EXTRA_HELPERS = false;
 const DEFAULT_RULE_CHORD_ROOT_HINT = false;
+const DEFAULT_RULE_SHEET_CLEF = "both";
+const DEFAULT_RULE_SHEET_ACCIDENTAL_STYLE = "sharp";
+const DEFAULT_RULE_SHEET_NOTE_LAYOUT = "spread";
 const DEFAULT_RULE_TYPING_SHOW_PIANO = true;
 const DEFAULT_RULE_TYPING_SHOW_TYPED = true;
 const DEFAULT_RULE_HIDE_LIVE_PREVIEW = false;
-const PRACTICE_MODE_IDS = ["random", "nice", "chord"];
+const PRACTICE_MODE_IDS = ["random", "nice", "chord", "sheet"];
 const createDefaultPracticeProfile = (modeId) => ({
     mode: DEFAULT_RULE_MODE,
     blindMode: DEFAULT_RULE_BLIND,
@@ -135,6 +141,9 @@ const createDefaultPracticeProfile = (modeId) => ({
     chordDifficulty: DEFAULT_RULE_CHORD_DIFFICULTY,
     chordExtraHelpers: DEFAULT_RULE_CHORD_EXTRA_HELPERS,
     chordRootHint: DEFAULT_RULE_CHORD_ROOT_HINT,
+    sheetClefMode: DEFAULT_RULE_SHEET_CLEF,
+    sheetAccidentalStyle: DEFAULT_RULE_SHEET_ACCIDENTAL_STYLE,
+    sheetNoteLayout: DEFAULT_RULE_SHEET_NOTE_LAYOUT,
     typingShowPiano: DEFAULT_RULE_TYPING_SHOW_PIANO,
     typingShowTyped: DEFAULT_RULE_TYPING_SHOW_TYPED,
     hideLivePreview: DEFAULT_RULE_HIDE_LIVE_PREVIEW
@@ -142,24 +151,42 @@ const createDefaultPracticeProfile = (modeId) => ({
 const createDefaultPracticeProfiles = () => ({
     random: createDefaultPracticeProfile("random"),
     nice: createDefaultPracticeProfile("nice"),
-    chord: createDefaultPracticeProfile("chord")
+    chord: createDefaultPracticeProfile("chord"),
+    sheet: createDefaultPracticeProfile("sheet")
 });
 const normalizePracticeProfile = (value, modeId) => {
     const fallback = createDefaultPracticeProfile(modeId);
     const profile = value && typeof value === "object" ? value : {};
     const rawDifficulty = String(profile.chordDifficulty ?? "").trim().toLowerCase();
+    const rawSheetClefMode = String(profile.sheetClefMode ?? "").trim().toLowerCase();
+    const rawSheetAccidentalStyle = String(profile.sheetAccidentalStyle ?? "").trim().toLowerCase();
+    const rawSheetNoteLayout = String(profile.sheetNoteLayout ?? "").trim().toLowerCase();
     const chordDifficulty = rawDifficulty === "playful"
         ? "voiced"
         : (["easy", "medium", "voiced", "hard"].includes(rawDifficulty) ? rawDifficulty : fallback.chordDifficulty);
+    const sheetClefMode = ["treble", "bass", "both"].includes(rawSheetClefMode)
+        ? rawSheetClefMode
+        : fallback.sheetClefMode;
+    const sheetAccidentalStyle = ["sharp", "flat"].includes(rawSheetAccidentalStyle)
+        ? rawSheetAccidentalStyle
+        : fallback.sheetAccidentalStyle;
+    const sheetNoteLayout = ["spread", "stacked"].includes(rawSheetNoteLayout)
+        ? rawSheetNoteLayout
+        : fallback.sheetNoteLayout;
     return {
         mode: profile.mode === "ascending" ? "ascending" : fallback.mode,
         blindMode: Boolean(profile.blindMode),
-        trainingMode: ["keyboard", "type", "both"].includes(profile.trainingMode)
+        trainingMode: modeId === "sheet"
+            ? "keyboard"
+            : (["keyboard", "type", "both"].includes(profile.trainingMode)
             ? profile.trainingMode
-            : fallback.trainingMode,
+            : fallback.trainingMode),
         chordDifficulty,
         chordExtraHelpers: Boolean(profile.chordExtraHelpers),
         chordRootHint: Boolean(profile.chordRootHint),
+        sheetClefMode,
+        sheetAccidentalStyle,
+        sheetNoteLayout,
         typingShowPiano: profile.typingShowPiano !== false,
         typingShowTyped: profile.typingShowTyped !== false,
         hideLivePreview: Boolean(profile.hideLivePreview)
@@ -170,7 +197,8 @@ const normalizePracticeProfiles = (value) => {
     return {
         random: normalizePracticeProfile(source.random, "random"),
         nice: normalizePracticeProfile(source.nice, "nice"),
-        chord: normalizePracticeProfile(source.chord, "chord")
+        chord: normalizePracticeProfile(source.chord, "chord"),
+        sheet: normalizePracticeProfile(source.sheet, "sheet")
     };
 };
 const isTypingEnabledFromState = (sourceState = state) => (
@@ -180,8 +208,12 @@ const isTypingOnlyModeFromState = (sourceState = state) => sourceState.trainingM
 const getIsChordRoundFromState = (sourceState = state) => (
     isTypingEnabledFromState(sourceState) || Boolean(sourceState.chordMode)
 );
+const getIsSheetRoundFromState = (sourceState = state) => sourceState.practiceMode === "sheet";
 const getEffectiveBlindModeFromState = (sourceState = state) => Boolean(sourceState.blindMode);
 const getEffectivePracticeModeFromState = (sourceState = state) => {
+    if (sourceState.practiceMode === "sheet" || getIsSheetRoundFromState(sourceState)) {
+        return "sheet";
+    }
     if (sourceState.practiceMode === "chord" || getIsChordRoundFromState(sourceState)) {
         return "chord";
     }
@@ -198,14 +230,25 @@ const capturePracticeProfileFromState = (modeId, sourceState = state) => {
     sourceState.practiceProfiles[safeMode] = {
         mode: sourceState.mode === "ascending" ? "ascending" : "simultaneous",
         blindMode: Boolean(sourceState.blindMode),
-        trainingMode: ["keyboard", "type", "both"].includes(sourceState.trainingMode)
+        trainingMode: safeMode === "sheet"
+            ? "keyboard"
+            : (["keyboard", "type", "both"].includes(sourceState.trainingMode)
             ? sourceState.trainingMode
-            : "keyboard",
+            : "keyboard"),
         chordDifficulty: ["easy", "medium", "voiced", "hard", "playful"].includes(sourceState.chordDifficulty)
             ? (sourceState.chordDifficulty === "playful" ? "voiced" : sourceState.chordDifficulty)
             : DEFAULT_RULE_CHORD_DIFFICULTY,
         chordExtraHelpers: Boolean(sourceState.chordExtraHelpers),
         chordRootHint: Boolean(sourceState.chordRootHint),
+        sheetClefMode: ["treble", "bass", "both"].includes(sourceState.sheetClefMode)
+            ? sourceState.sheetClefMode
+            : DEFAULT_RULE_SHEET_CLEF,
+        sheetAccidentalStyle: ["sharp", "flat"].includes(sourceState.sheetAccidentalStyle)
+            ? sourceState.sheetAccidentalStyle
+            : DEFAULT_RULE_SHEET_ACCIDENTAL_STYLE,
+        sheetNoteLayout: ["spread", "stacked"].includes(sourceState.sheetNoteLayout)
+            ? sourceState.sheetNoteLayout
+            : DEFAULT_RULE_SHEET_NOTE_LAYOUT,
         typingShowPiano: sourceState.typingShowPiano !== false,
         typingShowTyped: sourceState.typingShowTyped !== false,
         hideLivePreview: Boolean(sourceState.hideLivePreview)
@@ -234,6 +277,9 @@ const DEFAULTS = {
     chordDifficulty: "easy",
     chordExtraHelpers: false,
     chordRootHint: false,
+    sheetClefMode: DEFAULT_RULE_SHEET_CLEF,
+    sheetAccidentalStyle: DEFAULT_RULE_SHEET_ACCIDENTAL_STYLE,
+    sheetNoteLayout: DEFAULT_RULE_SHEET_NOTE_LAYOUT,
     customCursorEnabled: true,
     typingShowPiano: true,
     typingShowTyped: true,
@@ -270,12 +316,16 @@ const state = {
     chordDifficulty: DEFAULTS.chordDifficulty,
     chordExtraHelpers: DEFAULTS.chordExtraHelpers,
     chordRootHint: DEFAULTS.chordRootHint,
+    sheetClefMode: DEFAULTS.sheetClefMode,
+    sheetAccidentalStyle: DEFAULTS.sheetAccidentalStyle,
+    sheetNoteLayout: DEFAULTS.sheetNoteLayout,
     customCursorEnabled: DEFAULTS.customCursorEnabled,
     typingShowPiano: DEFAULTS.typingShowPiano,
     typingShowTyped: DEFAULTS.typingShowTyped,
     hideLivePreview: DEFAULTS.hideLivePreview,
     practiceProfiles: createDefaultPracticeProfiles(),
     targetChord: null,
+    sheetClef: null,
     selectedChordLabel: "",
     typedAnswer: "",
     typedPreviewNotes: [],
@@ -289,6 +339,7 @@ App.modePolicy = {
     isTypingEnabledFromState,
     isTypingOnlyModeFromState,
     getIsChordRoundFromState,
+    getIsSheetRoundFromState,
     getEffectiveBlindModeFromState,
     getEffectivePracticeModeFromState
 };

@@ -93,7 +93,7 @@ Browser-based piano ear-training app for note and chord recognition.
 - Round-affecting settings now follow a shared refresh policy: active rounds auto-restart only for changes that require target regeneration/playback context refresh (for example play style, practice/input mode, chord set/root hint, note count, key range/start note).
 - Migrated round/settings/submission state flows now dispatch through `App.store` patch actions (with optional action logging + invariant checks for development diagnostics).
   - Runtime debug toggles (console): `App.debug.enableActionLog()`, `App.debug.disableActionLog()`, `App.debug.enableInvariantChecks()`, `App.debug.disableInvariantChecks()`.
-- `Notes per round` now lives inside `Game Settings` and is only shown in `Random Notes` / `Harmonic Notes` modes.
+- `Notes per round` now lives inside `Game Settings` and is shown in `Random Notes`, `Harmonic Notes`, and `Sheet Music` modes.
 - Advanced sliders show absolute values (seconds + hold multiplier), not percentages.
 - Slider ghost markers show the selected profile target while editing.
 - Profiles support built-in + custom saved presets (persisted in local storage).
@@ -108,6 +108,7 @@ Browser-based piano ear-training app for note and chord recognition.
 
 ## Chord Training Modes
 - Landing page now includes quick-start cards for `Random Notes`, `Harmonic Notes`, and `Chord Practice`; pressing `Enter` still starts a round with your last-used mode profile.
+- Landing quick-start cards are taller now and include embedded mode-preview art so the landing screen reads more like a practice dashboard than a utility strip.
 - Top-right `Home` button (under theme toggle) returns to landing/free-play from any round state.
 - Playback timing is centralized:
   - active rounds use `note length` as the minimum sounding time for manual key presses and replay presses, then sustain if held longer;
@@ -117,7 +118,11 @@ Browser-based piano ear-training app for note and chord recognition.
 - Settings now use one `Practice mode` selector:
   - `Random Notes`: classic random note rounds,
   - `Nice Notes (Harmonics)`: consonant/nice-note rounds,
+  - `Sheet Music`: shows a staff and asks you to play the displayed notes on the keyboard,
   - `Chord Training`: reveals chord-only controls.
+- `Sheet Music` adds a clef selector (`G clef`, `F clef`, or random) and keeps the target silent until you press `Hint`.
+- `Sheet Music` target generation now uses a bounded display/playable window (readability-first on large keyboards), and always picks notes that are currently playable on the visible keyboard range.
+- `Sheet Music` settings now also include accidental style (`Sharps`/`Flats`) so black-key notes can be displayed with your preferred notation.
 - `Practice mode = Chord Training` switches round targets from loose notes to chord targets.
 - Chord parsing/training now includes broader common types (for example `m6`, `m9`, `maj9`, `7sus4`, `add11`, plus prior advanced variants like `m7b5`, `dim7`, `mMaj7`, `maj7#11`, `7b9`).
 - Live selected chord detection is shown below the keyboard while in chord rounds.
